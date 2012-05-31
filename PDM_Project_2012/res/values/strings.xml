@@ -3,5 +3,16 @@
 
     <string name="hello">Hello World, PDM_Project_2012Activity!</string>
     <string name="app_name">PDM_Project_2012</string>
+    
+    <style name="AudioFileInfoOverlayText">
+	    <item name="android:paddingLeft">4px</item>
+	    <item name="android:paddingBottom">4px</item>
+	    <item name="android:textColor">#ffffffff</item>
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:shadowColor">#000000</item>
+	    <item name="android:shadowDx">1</item>
+	    <item name="android:shadowDy">1</item>
+	    <item name="android:shadowRadius">2</item>
+  	</style>
 
 </resources>
