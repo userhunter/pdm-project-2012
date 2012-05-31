@@ -4,19 +4,8 @@ import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuffXfermode;
+import android.content.*;
+import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Shader.TileMode;
@@ -25,27 +14,28 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MusicPlayerActivity extends Activity implements OnClickListener {
 	//Servizio per la gestione del mediaplayer
 	private MusicPlayerService m_mpService;
+	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
+	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist;
 	  
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.music_player_layout);
+	    initViewMemberVars();
 	    
 	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
-	    if (bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE)) {
+	    if (bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE))
 	    	//Abilito questa activity per ricevere notifiche dal servizio MusicPlayerService
 	    	registerReceiver(broadcastReceiver, new IntentFilter(MusicPlayerService.BROADCAST_ACTION));
-	    } else {
+	    else
 	    	Log.d("BINDSERVICE", "ERROR DURING BINDING");
-	    }
 
 	    /*
         btnPlay.setVisibility(View.GONE);
@@ -75,8 +65,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
         
         Bitmap skewedBitmap = Bitmap.createBitmap(reflectedImage, 0, 0, width, height, matrix, true);
         imgCover.setImageBitmap(skewedBitmap);
-        
-        
 	}
 	
 	@Override
@@ -104,6 +92,19 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    	Log.d("SERVICES", "UNBOUNDED");
 	    }
 	};
+	
+	@Override
+	public void onClick(View sourceClick) {
+		if (sourceClick.getId() == this.m_btnPlayButton.getId()) {
+			this.m_btnPauseButton.setVisibility(View.VISIBLE);
+			this.m_btnPlayButton.setVisibility(View.GONE);
+			this.m_mpService.playSong();
+		} else if (sourceClick.getId() == this.m_btnPauseButton.getId()) {
+			this.m_btnPauseButton.setVisibility(View.GONE);
+			this.m_btnPlayButton.setVisibility(View.VISIBLE);
+			this.m_mpService.pausePlaying();
+		}
+	}
 	  
 	//Oggetto responsabile della gestione delle notifiche inviate dal Service.
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -115,11 +116,25 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    }
 	};
 	
+	private void initViewMemberVars() {
+		this.m_tvSongAlbum = (TextView)findViewById(R.id.labelAlbumTitle);
+		this.m_tvSongArtist = (TextView)findViewById(R.id.labelArtists);
+		this.m_tvSongTitle = (TextView)findViewById(R.id.labelSongTitle);
+		this.m_tvSongYear = (TextView)findViewById(R.id.labelYear);
+		
+	    this.m_btnPlayButton = (ImageButton)findViewById(R.id.btnPlay);
+	    this.m_btnPauseButton = (ImageButton)findViewById(R.id.btnPause);
+	    this.m_btnBackwardButton = (ImageButton)findViewById(R.id.btnPrevious);
+	    this.m_btnForwardButton = (ImageButton)findViewById(R.id.btnNext);
+	    
+	    this.m_btnPlayButton.setOnClickListener(this);
+	    this.m_btnPauseButton.setOnClickListener(this);
+	    this.m_btnForwardButton.setOnClickListener(this);
+	    this.m_btnBackwardButton.setOnClickListener(this);
+	}
+	
 	/**
-	 * This code is courtesy of Neil Davies at http://www.inter-fuser.com
-	 * @param context the current context
-	 * @param originalImage The original Bitmap image used to create the reflection
-	 * @return the bitmap with a reflection
+	 * REFLECTED IMAGE METHOD
 	 */
 	public static Bitmap createReflectedImage(Context context, Bitmap originalImage) {
 		//The gap we want between the reflection and the original image
@@ -165,11 +180,5 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		canvas.drawRect(0, height, width, bitmapWithReflection.getHeight() + reflectionGap, paint);
 
 		return bitmapWithReflection;
-	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
 	}
 }
