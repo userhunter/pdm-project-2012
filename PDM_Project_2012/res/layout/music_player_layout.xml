@@ -1,32 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <Button
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play" />
-
-    <Button
-        android:id="@+id/pause_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pause" />
-
-    <Button
-        android:id="@+id/stop_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop" />
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/player_background">
+    
+    <!-- COVER -->
+    <ImageView 
+        android:id="@+id/cover"
+        android:layout_width="180dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"/>
+    
+    <!-- SONGINFO -->
     <TextView
-        android:id="@+id/mp3_title"
+        android:id="@+id/labelYear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MP3 Title"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_above="@+id/labelAlbumTitle"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:textSize="12sp"
+        android:text="2011"
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelAlbumTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/labelArtists"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:textSize="12sp"
+        android:text="Clementino Album"
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelArtists"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/labelSongTitle"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:textSize="12sp"
+        android:text="Clementino feat. Boh"
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelSongTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:layout_alignBottom="@+id/timerDisplay"
+        android:layout_marginBottom="30dp"
+        android:text="Toxico Bravo Guaglio"
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right"/>
+    
+    <!-- ############################################################ -->
+    
+    <!-- TIMER DISPLAY -->
+    <LinearLayout
+        android:id="@+id/timerDisplay"
+        android:layout_above="@+id/songProgressBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp">
+        <TextView 
+            android:id="@+id/songCurrentDurationLabel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left" 
+            android:textColor="#EEEEEE"
+            android:textStyle="bold"
+            android:text="00:10"/>
+        <TextView 
+            android:id="@+id/songTotalDurationLabel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right" 
+            android:textColor="#EEEEEE"
+            android:textStyle="bold"
+            android:text="-02:32"/>
+    </LinearLayout>
+    
+    <!-- SEEKBAR -->
+    <SeekBar 
+        android:id="@+id/songProgressBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/bottom_container"
+        android:thumb="@drawable/seek_handler"
+        android:progressDrawable="@drawable/seekbar_progress"/>
+    
+    <!-- ############################################################ -->
+    
+    <!-- BOTTOM CONTAINER -->
+    <LinearLayout
+        android:id="@+id/bottom_container"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center">
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <!-- PREVIOUS -->
+            <ImageButton
+                android:id="@+id/btnPrevious"
+                android:src="@drawable/previous_scheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:paddingLeft="10dp"
+            	android:paddingRight="10dp"/>
+            <!-- PLAY -->
+            <ImageButton
+                android:id="@+id/btnPlay"
+                android:src="@drawable/play_scheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:paddingLeft="10dp"
+            	android:paddingRight="10dp"/>
+            <!-- PAUSE -->
+            <ImageButton
+                android:id="@+id/btnPause"
+                android:src="@drawable/pause_scheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:paddingLeft="10dp"
+            	android:paddingRight="10dp"
+            	android:visibility="gone"/>
+            <!-- NEXT -->
+            <ImageButton
+                android:id="@+id/btnNext"
+                android:src="@drawable/next_scheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:paddingLeft="10dp"
+            	android:paddingRight="10dp"/>
+        </LinearLayout>
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
