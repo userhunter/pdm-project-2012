@@ -19,6 +19,13 @@ public class MP3Item {
 	private String m_strFileName;
 	private Hashtable<String, String> m_htID3Fields = new Hashtable<String, String>();
 	
+	public static String TITLE = "TITLE";
+	public static String ALBUM = "ALBUM";
+	public static String ARTIST = "ARTIST";
+	public static String YEAR = "YEAR";
+	public static String BITRATE = "BITRATE";
+	public static String LENGTH = "LENGTH";
+	
 	
 	public MP3Item(String strPath, String strFileName) {
 		this.setPath(strPath);
