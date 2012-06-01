@@ -11,13 +11,45 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int btn_next=0x7f020000;
+        public static final int btn_next_hover=0x7f020001;
+        public static final int btn_pause=0x7f020002;
+        public static final int btn_pause_hover=0x7f020003;
+        public static final int btn_play=0x7f020004;
+        public static final int btn_play_hover=0x7f020005;
+        public static final int btn_previous=0x7f020006;
+        public static final int btn_previous_hover=0x7f020007;
+        public static final int ic_action_search=0x7f020008;
+        public static final int ic_launcher=0x7f020009;
+        public static final int ic_settings=0x7f02000a;
+        public static final int ic_social=0x7f02000b;
+        public static final int img_seekbar_bg=0x7f02000c;
+        public static final int img_seekbar_progress_blue=0x7f02000d;
+        public static final int next_scheme=0x7f02000e;
+        public static final int pause_scheme=0x7f02000f;
+        public static final int play_scheme=0x7f020010;
+        public static final int player_background=0x7f020011;
+        public static final int previous_scheme=0x7f020012;
+        public static final int sample_cover=0x7f020013;
+        public static final int seek_handler=0x7f020014;
+        public static final int seekbar_progress=0x7f020015;
+        public static final int seekbar_progress_bg=0x7f020016;
     }
     public static final class id {
-        public static final int mp3_title=0x7f050003;
-        public static final int pause_button=0x7f050001;
-        public static final int play_button=0x7f050000;
-        public static final int stop_button=0x7f050002;
+        public static final int bottom_container=0x7f060009;
+        public static final int btnNext=0x7f06000d;
+        public static final int btnPause=0x7f06000c;
+        public static final int btnPlay=0x7f06000b;
+        public static final int btnPrevious=0x7f06000a;
+        public static final int cover=0x7f060000;
+        public static final int labelAlbumTitle=0x7f060002;
+        public static final int labelArtists=0x7f060004;
+        public static final int labelSongTitle=0x7f060005;
+        public static final int labelYear=0x7f060001;
+        public static final int songCurrentDurationLabel=0x7f060007;
+        public static final int songProgressBar=0x7f060006;
+        public static final int songTotalDurationLabel=0x7f060008;
+        public static final int timerDisplay=0x7f060003;
     }
     public static final class layout {
         public static final int music_player_layout=0x7f030000;
@@ -26,5 +58,8 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f040001;
         public static final int hello=0x7f040000;
+    }
+    public static final class style {
+        public static final int AudioFileInfoOverlayText=0x7f050000;
     }
 }
