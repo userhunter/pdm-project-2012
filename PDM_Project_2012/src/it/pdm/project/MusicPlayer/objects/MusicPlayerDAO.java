@@ -2,6 +2,7 @@ package it.pdm.project.MusicPlayer.objects;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import it.pdm.project.MusicPlayer.utils.MusicPlayerDBHelper;
 
@@ -23,7 +24,7 @@ public class MusicPlayerDAO {
 	}
 	
 	/**
-	 * operazioni sull'archivio musical
+	 * OPERAZIONI SULL'ARCHIVIO MUSICALE
 	 */
 	
 	public long insertTrack(MP3Item mp3){
@@ -57,8 +58,18 @@ public class MusicPlayerDAO {
 		m_sqliteDB.delete(MusicPlayerDBHelper.MUSIC_TABLE_NAME, null, null);
 	}
 	
+	public Cursor getAllTracks(){
+		return m_sqliteDB.query(MusicPlayerDBHelper.MUSIC_TABLE_NAME,	/* String table */
+								null,									/* String[] columns */
+								null,									/* String selection */
+								null,									/* String[] selectionArgs */
+								null,									/* String groupBy */
+								null,									/* String having */
+								null);									/* String orderBy */
+	}
+	
 	/**
-	 * operazioni sulla cronologia
+	 * OPERAZIONI SULLA CRONOLOGIA
 	 */
 	
 	public long insertHistoryItem(MP3Item mp3){
@@ -84,6 +95,16 @@ public class MusicPlayerDAO {
 	
 	public void flushHistory(){
 		m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, null, null);
+	}
+	
+	public Cursor getHistory(){
+		return m_sqliteDB.query(MusicPlayerDBHelper.HISTORY_TABLE_NAME,	/* String table */
+								null,									/* String[] columns */
+								null,									/* String selection */
+								null,									/* String[] selectionArgs */
+								null,									/* String groupBy */
+								null,									/* String having */
+								null);									/* String orderBy */
 	}
 
 }
