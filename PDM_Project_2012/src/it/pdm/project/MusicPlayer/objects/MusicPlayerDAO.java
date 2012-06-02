@@ -1,5 +1,7 @@
 package it.pdm.project.MusicPlayer.objects;
 
+import java.util.Hashtable;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -44,6 +46,15 @@ public class MusicPlayerDAO {
 		return m_sqliteDB.insert(MusicPlayerDBHelper.MUSIC_TABLE_NAME, null, values);
 	}
 	
+	public long insertTracksFromHT(Hashtable<String,MP3Item> ht){
+		/* ritorna 0 se tutti gli elementi dell'hashtable sono stati inseriti nel db, -1 in caso di errore */
+		for(MP3Item mp3 : ht.values()) {
+			if(insertTrack(mp3) == -1)
+				return -1;
+		}
+		return 0;
+	}
+	
 	public long deteleteTrackById(int id){
 		/* ritorna il numero di record eliminati */
 		return m_sqliteDB.delete(MusicPlayerDBHelper.MUSIC_TABLE_NAME, "_id = "+id, null);
@@ -67,6 +78,7 @@ public class MusicPlayerDAO {
 								null,									/* String having */
 								null);									/* String orderBy */
 	}
+
 	
 	/**
 	 * OPERAZIONI SULLA CRONOLOGIA
@@ -104,7 +116,26 @@ public class MusicPlayerDAO {
 								null,									/* String[] selectionArgs */
 								null,									/* String groupBy */
 								null,									/* String having */
-								null);									/* String orderBy */
+								"timestamp DESC");						/* String orderBy */
+	}
+	
+	public String[] getFirstHistoryItemPathAndFilename(){
+		/* ritorna un array di stringhe con path e filename del primo elemento della cronologia */
+		Cursor tempCursor;
+		tempCursor = m_sqliteDB.query(MusicPlayerDBHelper.HISTORY_TABLE_NAME,
+								null,
+								null,
+								null,
+								null,
+								null,
+								"timestamp DESC",
+								"LIMIT 1");
+		String[] res = {"",""};							/* se non c'è alcun elemento, ritorna array vuoto */
+		if(tempCursor.isFirst()){
+			res[0] = tempCursor.getString(1);			/* path */
+			res[1] = tempCursor.getString(2);			/* filename */
+		}
+		return res;
 	}
 
 }
