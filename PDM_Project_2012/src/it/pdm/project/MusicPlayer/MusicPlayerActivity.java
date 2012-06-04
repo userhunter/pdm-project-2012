@@ -107,7 +107,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			int lCurrentDuration = msg.getData().getInt("CURRENT_DURATION");
 			int lTotalDuration = msg.getData().getInt("TOTAL_DURATION");
 			
-			m_tvSongTotalDuration.setText(m_utUtils.milliSecondsToTimer(lTotalDuration));
+			m_tvSongTotalDuration.setText("-" + m_utUtils.milliSecondsToTimer(lTotalDuration-lCurrentDuration));
 			m_tvSongActualPosition.setText(m_utUtils.milliSecondsToTimer(lCurrentDuration));
 		}
 	};
@@ -180,8 +180,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		this.m_tvSongArtist = (TextView)findViewById(R.id.labelArtists);
 		this.m_tvSongTitle = (TextView)findViewById(R.id.labelSongTitle);
 		this.m_tvSongYear = (TextView)findViewById(R.id.labelYear);
-		this.m_tvSongTotalDuration = (TextView)findViewById(R.id.songCurrentDurationLabel);
-		this.m_tvSongActualPosition = (TextView)findViewById(R.id.songTotalDurationLabel);
+		this.m_tvSongActualPosition = (TextView)findViewById(R.id.songCurrentDurationLabel);
+		this.m_tvSongTotalDuration = (TextView)findViewById(R.id.songTotalDurationLabel);
 		
 	    this.m_btnPlayButton = (ImageButton)findViewById(R.id.btnPlay);
 	    this.m_btnPauseButton = (ImageButton)findViewById(R.id.btnPause);
