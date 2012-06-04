@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MusicPlayerActivity extends Activity implements OnClickListener {
@@ -28,6 +29,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	private MusicPlayerService m_mpService;
 	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
 	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
+	private ProgressBar m_pbPositionBar;
 	  
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,9 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			
 			m_tvSongTotalDuration.setText("-" + m_utUtils.milliSecondsToTimer(lTotalDuration-lCurrentDuration));
 			m_tvSongActualPosition.setText(m_utUtils.milliSecondsToTimer(lCurrentDuration));
+			
+			int lCurrentPercentage = m_utUtils.getProgressPercentage(lCurrentDuration, lTotalDuration);
+			m_pbPositionBar.setProgress(lCurrentPercentage);
 		}
 	};
 	
@@ -159,7 +164,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 								isFinished = true;
 							else {
 								try {
-									Thread.sleep(1000);
+									Thread.sleep(500);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
@@ -192,6 +197,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    this.m_btnPauseButton.setOnClickListener(this);
 	    this.m_btnForwardButton.setOnClickListener(this);
 	    this.m_btnBackwardButton.setOnClickListener(this);
+	    
+	    this.m_pbPositionBar = (ProgressBar)findViewById(R.id.songProgressBar);
 	}
 	
 	/**
