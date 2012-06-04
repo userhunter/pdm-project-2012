@@ -3,6 +3,7 @@ package it.pdm.project.MusicPlayer;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
+import it.pdm.project.MusicPlayer.utils.Utilities;
 
 import android.app.Activity;
 import android.content.*;
@@ -11,7 +12,9 @@ import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Shader.TileMode;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,14 +24,16 @@ import android.widget.TextView;
 
 public class MusicPlayerActivity extends Activity implements OnClickListener {
 	//Servizio per la gestione del mediaplayer
+	private Utilities m_utUtils;
 	private MusicPlayerService m_mpService;
 	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
-	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist;
+	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
 	  
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.music_player_layout);
+	 
 	    initViewMemberVars();
 	    
 	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
@@ -94,6 +99,19 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    }
 	};
 	
+	private Handler positionHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			
+			int lCurrentDuration = msg.getData().getInt("CURRENT_DURATION");
+			int lTotalDuration = msg.getData().getInt("TOTAL_DURATION");
+			
+			m_tvSongTotalDuration.setText(m_utUtils.milliSecondsToTimer(lTotalDuration));
+			m_tvSongActualPosition.setText(m_utUtils.milliSecondsToTimer(lCurrentDuration));
+		}
+	};
+	
 	@Override
 	public void onClick(View sourceClick) {
 		if (sourceClick.getId() == this.m_btnPlayButton.getId()) {
@@ -109,6 +127,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	  
 	//Oggetto responsabile della gestione delle notifiche inviate dal Service.
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			if (intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
@@ -120,15 +139,49 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 					m_tvSongTitle.setText(currentPlaying.getLocalID3Field(currentPlaying.TITLE));
 					m_tvSongYear.setText(currentPlaying.getLocalID3Field(currentPlaying.YEAR));
 				}
+				
+				Thread updateProgressBar = new Thread (new Runnable() {
+					boolean isFinished = false;
+					
+					@Override
+					public void run() {
+						while (!isFinished) {
+							Bundle data = new Bundle();
+							Message msg = new Message();
+							data.putInt("CURRENT_DURATION", m_mpService.getCurrentPlayingPosition());
+							data.putInt("TOTAL_DURATION", m_mpService.getCurrentPlayingTotalDuration());
+							
+							msg.setData(data);
+							
+							positionHandler.sendMessage(msg);
+							
+							if (m_mpService.getCurrentPlayingPosition() == m_mpService.getCurrentPlayingTotalDuration())
+								isFinished = true;
+							else {
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				});
+				
+				updateProgressBar.start();
 			}
 	    }
 	};
 	
 	private void initViewMemberVars() {
+		this.m_utUtils = new Utilities();
+		
 		this.m_tvSongAlbum = (TextView)findViewById(R.id.labelAlbumTitle);
 		this.m_tvSongArtist = (TextView)findViewById(R.id.labelArtists);
 		this.m_tvSongTitle = (TextView)findViewById(R.id.labelSongTitle);
 		this.m_tvSongYear = (TextView)findViewById(R.id.labelYear);
+		this.m_tvSongTotalDuration = (TextView)findViewById(R.id.songCurrentDurationLabel);
+		this.m_tvSongActualPosition = (TextView)findViewById(R.id.songTotalDurationLabel);
 		
 	    this.m_btnPlayButton = (ImageButton)findViewById(R.id.btnPlay);
 	    this.m_btnPauseButton = (ImageButton)findViewById(R.id.btnPause);

@@ -73,6 +73,7 @@ public class MP3Player extends MediaPlayer {
 	}
 	
 	/** GETTER AND SETTER **/
+	
 	public MP3Item getMp3ElementById(String strKey) {
 		return this.m_htMp3sSongs.get(strKey);
 	}
