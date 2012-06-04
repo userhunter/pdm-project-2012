@@ -66,6 +66,11 @@ public class MusicPlayerService extends Service {
 		return this.m_mpMP3Player.getDuration();
 	}
 	
+	public void setCurrentPlayingPosition(int pos){
+		//Sposta la riproduzione a pos msec
+		this.m_mpMP3Player.seekTo(pos);
+	}
+	
 	public void pausePlaying() {
 		//Se il riproduttore sta riproducendo, metto in pausa
 		if (this.m_mpMP3Player.isPlaying()) {

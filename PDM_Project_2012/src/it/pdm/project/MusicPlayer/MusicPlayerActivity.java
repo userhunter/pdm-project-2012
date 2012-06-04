@@ -20,7 +20,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class MusicPlayerActivity extends Activity implements OnClickListener {
@@ -29,7 +30,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	private MusicPlayerService m_mpService;
 	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
 	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
-	private ProgressBar m_pbPositionBar;
+	private SeekBar m_pbPositionBar;
+	public static boolean m_bProgressBarTouching = false;
 	  
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -101,6 +103,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    }
 	};
 	
+	//Questo handler aggiorna i timer d'esecuzione del brano
 	private Handler positionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -109,11 +112,34 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			int lCurrentDuration = msg.getData().getInt("CURRENT_DURATION");
 			int lTotalDuration = msg.getData().getInt("TOTAL_DURATION");
 			
-			m_tvSongTotalDuration.setText("-" + m_utUtils.milliSecondsToTimer(lTotalDuration-lCurrentDuration));
-			m_tvSongActualPosition.setText(m_utUtils.milliSecondsToTimer(lCurrentDuration));
+			String strRemainingTime = "-" + m_utUtils.milliSecondsToTimer(lTotalDuration-lCurrentDuration);
+			String strActualTime = m_utUtils.milliSecondsToTimer(lCurrentDuration);
+			
+			m_tvSongTotalDuration.setText(strRemainingTime);
+			m_tvSongActualPosition.setText(strActualTime);
 			
 			int lCurrentPercentage = m_utUtils.getProgressPercentage(lCurrentDuration, lTotalDuration);
-			m_pbPositionBar.setProgress(lCurrentPercentage);
+			if(!m_bProgressBarTouching)
+				m_pbPositionBar.setProgress(lCurrentPercentage);
+		}
+	};
+	
+	//Questo listener gestisce l'avanzamento "manuale" effettuato sulla barra di progresso
+	private OnSeekBarChangeListener positionListener = new OnSeekBarChangeListener() {
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			/* non fare niente, pu˜ causare loop e traumi vari */
+		}
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			m_bProgressBarTouching = true;
+		}
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			int progress = seekBar.getProgress();
+			int iNewPosition = Utilities.progressToTimer(progress, m_mpService.getCurrentPlayingTotalDuration());
+			m_mpService.setCurrentPlayingPosition(iNewPosition);
+			m_bProgressBarTouching = false;
 		}
 	};
 	
@@ -198,7 +224,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    this.m_btnForwardButton.setOnClickListener(this);
 	    this.m_btnBackwardButton.setOnClickListener(this);
 	    
-	    this.m_pbPositionBar = (ProgressBar)findViewById(R.id.songProgressBar);
+	    this.m_pbPositionBar = (SeekBar)findViewById(R.id.songProgressBar);
+	    this.m_pbPositionBar.setOnSeekBarChangeListener(positionListener);
 	}
 	
 	/**

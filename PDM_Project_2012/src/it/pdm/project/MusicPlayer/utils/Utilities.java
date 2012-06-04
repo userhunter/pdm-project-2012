@@ -39,7 +39,7 @@ public class Utilities {
         return percentage.intValue();
     }
 
-    public int progressToTimer(int progress, int totalDuration) {
+    public static int progressToTimer(int progress, int totalDuration) {
         int currentDuration = 0;
         totalDuration = (int) (totalDuration / 1000);
         currentDuration = (int) ((((double)progress) / 100) * totalDuration);
