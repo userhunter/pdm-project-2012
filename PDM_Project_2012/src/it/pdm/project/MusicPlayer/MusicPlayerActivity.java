@@ -1,5 +1,10 @@
 package it.pdm.project.MusicPlayer;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.jaudiotagger.tag.images.Artwork;
+
 import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
@@ -31,6 +36,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
 	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
 	private SeekBar m_pbPositionBar;
+	private ImageView m_ivCover;
 	public static boolean m_bProgressBarTouching = false;
 	  
 	@Override
@@ -47,34 +53,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    else
 	    	Log.d("BINDSERVICE", "ERROR DURING BINDING");
 
-	    /*
-        btnPlay.setVisibility(View.GONE);
-		btnPause.setVisibility(View.VISIBLE);
-		
-		private final String imageInSD = "/sdcard/er.PNG";
-		Bitmap bitmap = BitmapFactory.decodeFile(imageInSD);
-        */
-        
-        ImageView imgCover = (ImageView)findViewById(R.id.cover);
-        Bitmap originalImage = BitmapFactory.decodeResource(getResources(), R.drawable.sample_cover);
-        Bitmap reflectedImage = createReflectedImage(getBaseContext(), originalImage);
-        //imgCover.setImageBitmap(reflectedImage);
-        
-        /* ora modifichiamo la prospettiva del bitmap */
-        float curScale = 1F;
-        float curRotate = 0F;
-        float curSkewX = 0F;
-        float curSkewY = -0.063F;
-        
-        Matrix matrix = new Matrix();
-        //matrix.postScale(curScale, curScale);
-        //matrix.postRotate(curRotate);
-        matrix.postSkew(curSkewX, curSkewY);
-        int width = reflectedImage.getWidth();
-        int height = reflectedImage.getHeight();
-        
-        Bitmap skewedBitmap = Bitmap.createBitmap(reflectedImage, 0, 0, width, height, matrix, true);
-        imgCover.setImageBitmap(skewedBitmap);
+	    
 	}
 	
 	@Override
@@ -149,6 +128,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playSong();
+			updateCoverImage(m_mpService.getCurrentPlayingItem());
 		} else if (sourceClick.getId() == this.m_btnPauseButton.getId()) {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
@@ -219,6 +199,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    this.m_btnBackwardButton = (ImageButton)findViewById(R.id.btnPrevious);
 	    this.m_btnForwardButton = (ImageButton)findViewById(R.id.btnNext);
 	    
+	    this.m_ivCover = (ImageView)findViewById(R.id.cover);
+	    
 	    this.m_btnPlayButton.setOnClickListener(this);
 	    this.m_btnPauseButton.setOnClickListener(this);
 	    this.m_btnForwardButton.setOnClickListener(this);
@@ -226,6 +208,38 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    
 	    this.m_pbPositionBar = (SeekBar)findViewById(R.id.songProgressBar);
 	    this.m_pbPositionBar.setOnSeekBarChangeListener(positionListener);
+	}
+	
+	//Aggiorna la cover dell'album visualizzata
+	public void updateCoverImage(MP3Item mp3){
+		Artwork artCover = mp3.getCover();
+		Bitmap originalCover = null;
+		
+		if(artCover != null) {
+			originalCover = BitmapFactory.decodeByteArray(artCover.getBinaryData(), 0, artCover.getBinaryData().length);
+		}
+		else {
+			/* imposto la cover di default se non presente */
+			originalCover = BitmapFactory.decodeResource(getResources(), R.drawable.sample_cover);
+		}
+		
+		Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
+        
+        /* ora modifichiamo la prospettiva del bitmap */
+        float curScale = 1F;
+        float curRotate = 0F;
+        float curSkewX = 0F;
+        float curSkewY = -0.063F;
+        
+        Matrix matrix = new Matrix();
+        //matrix.postScale(curScale, curScale);
+        //matrix.postRotate(curRotate);
+        matrix.postSkew(curSkewX, curSkewY);
+        int width = reflectedCover.getWidth();
+        int height = reflectedCover.getHeight();
+        
+        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
+        m_ivCover.setImageBitmap(skewedCover);
 	}
 	
 	/**

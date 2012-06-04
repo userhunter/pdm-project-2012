@@ -71,6 +71,10 @@ public class MusicPlayerService extends Service {
 		this.m_mpMP3Player.seekTo(pos);
 	}
 	
+	public MP3Item getCurrentPlayingItem() {
+		return this.m_mpMP3Player.getCurrentPlaying();
+	}
+	
 	public void pausePlaying() {
 		//Se il riproduttore sta riproducendo, metto in pausa
 		if (this.m_mpMP3Player.isPlaying()) {
