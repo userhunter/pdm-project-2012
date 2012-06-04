@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer.services;
 
+import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.utils.MP3Player;
 import android.app.Service;
 import android.content.Intent;
@@ -52,7 +53,7 @@ public class MusicPlayerService extends Service {
 			//Preparo l'intent per la notifica da inviare all'activity
 			Intent intent = new Intent(MusicPlayerService.BROADCAST_ACTION);
 			intent.putExtra("ACTION", "PLAY_SONG");
-			intent.putExtra("CURRENT_FILE_PLAYING", this.m_mpMP3Player.getCurrentPlaying().getFileName());
+			intent.putExtra("CURRENT_FILE_PLAYING", this.m_mpMP3Player.getCurrentPlaying().getPath() + this.m_mpMP3Player.getCurrentPlaying().getFileName());
 			this.sendBroadcast(intent);
 		}
 	}
@@ -62,5 +63,9 @@ public class MusicPlayerService extends Service {
 		if (this.m_mpMP3Player.isPlaying()) {
 			this.m_mpMP3Player.pause();
 		}
+	}
+	
+	public MP3Item getItemFromFileName(String strKey) {
+		return this.m_mpMP3Player.getMp3ElementById(strKey);
 	}
 }

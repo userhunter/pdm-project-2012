@@ -21,7 +21,7 @@ public class MP3Manager {
 			for (File mp3File : mp3sFiles) {
 				String strFileName = mp3File.getName();
 				String strFilePath = mp3File.getPath().substring(0, mp3File.getPath().lastIndexOf("/")+1);
-				htMp3Table.put(strFileName, new MP3Item(strFilePath, strFileName));
+				htMp3Table.put(strFilePath + strFileName, new MP3Item(strFilePath, strFileName));
 			}
 		
 		return htMp3Table;

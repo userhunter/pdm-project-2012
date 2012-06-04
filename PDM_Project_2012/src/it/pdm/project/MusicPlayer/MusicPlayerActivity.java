@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer;
 
+import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
 
@@ -111,7 +112,14 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			if (intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
-				//Setting param  
+				MP3Item currentPlaying = m_mpService.getItemFromFileName(intent.getStringExtra("CURRENT_FILE_PLAYING"));
+				
+				if (currentPlaying != null) {
+					m_tvSongAlbum.setText(currentPlaying.getLocalID3Field(currentPlaying.ALBUM));
+					m_tvSongArtist.setText(currentPlaying.getLocalID3Field(currentPlaying.ARTIST));
+					m_tvSongTitle.setText(currentPlaying.getLocalID3Field(currentPlaying.TITLE));
+					m_tvSongYear.setText(currentPlaying.getLocalID3Field(currentPlaying.YEAR));
+				}
 			}
 	    }
 	};
