@@ -29,8 +29,14 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 			Intent newIntent = new Intent(this.BROADCAST_ACTION);
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
-			
+			this.switchTabInActivity(1);
 			this.sendBroadcast(newIntent);
 		}
+	}
+	
+	public void switchTabInActivity(int indexTabToSwitch) {
+		TabController thController = (TabController) this.getParent();
+		
+		thController.switchTab(indexTabToSwitch);
 	}
 }
