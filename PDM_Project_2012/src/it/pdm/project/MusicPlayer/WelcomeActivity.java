@@ -3,6 +3,7 @@ package it.pdm.project.MusicPlayer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,11 +27,12 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 		if (arg0.getId() == this.btntest.getId())
 		{
 			String[] playlistContent = {"Canzone1", "Canzone2", "Canzone3"};
-			Intent newIntent = new Intent(this.BROADCAST_ACTION);
+			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
-			this.switchTabInActivity(1);
 			this.sendBroadcast(newIntent);
+			Log.d("WELCOMEACTIVITY", "SENDING INTENT");
+			this.switchTabInActivity(1);
 		}
 	}
 	
