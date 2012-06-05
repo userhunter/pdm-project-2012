@@ -17,8 +17,9 @@ public class MP3Player extends MediaPlayer {
 	private MP3Manager m_mp3Manager; //Manager responsabile del reperimento degli mp3
 	
 	private MP3Item m_mp3CurrentPlaying; //Mp3 in riproduzione
-	private Stack m_nextQueue; //Coda dei brani successivi
-	private MP3Item m_mp3Previous; //Mp3 precedente
+	
+	private ArrayList<String> m_alCurrentPlaylist; //Playlist attuale
+	private int m_iCursor; //Cursore della playlist
 	
 	//Hashtable che conterrˆ le canzoni
 	private Hashtable<String, MP3Item> m_htMp3sSongs;
@@ -27,8 +28,8 @@ public class MP3Player extends MediaPlayer {
 		this.m_bIsReady = false;
 		this.m_mp3Manager = new MP3Manager("/sdcard/Music/");
 		this.m_mp3CurrentPlaying = null;
-		this.m_nextQueue = null;
-		this.m_mp3Previous = null;
+		this.setCurrentPlaylist(null);
+		this.m_iCursor = -1;
 		this.m_htMp3sSongs = this.m_mp3Manager.getMp3sTable();
 	}
 	
@@ -84,5 +85,28 @@ public class MP3Player extends MediaPlayer {
 
 	public void setCurrentPlaying(MP3Item mp3CurrentPlaying) {
 		this.m_mp3CurrentPlaying = mp3CurrentPlaying;
+	}
+
+	public ArrayList<String> getCurrentPlaylist() {
+		return m_alCurrentPlaylist;
+	}
+
+	public void setCurrentPlaylist(ArrayList<String> m_alCurrentPlaylist) {
+		this.m_alCurrentPlaylist = m_alCurrentPlaylist;
+	}
+	
+	public int incrementPlaylistCursor(){
+		m_iCursor++;
+		return m_iCursor;
+	}
+	
+	public int decrementPlaylistCursor(){
+		if(m_iCursor > 0)
+			m_iCursor--;
+		return m_iCursor;
+	}
+	
+	public int getPlaylistCursor(){
+		return m_iCursor;
 	}
 }
