@@ -1,6 +1,8 @@
 package it.pdm.project.MusicPlayer.utils;
 
 public class Utilities {
+	
+	//Conversione del tempo da millisecondi a Stringa formattata tipo hh:mm:ss o mm:ss
 	public String milliSecondsToTimer(int milliseconds){
         String finalTimerString = "";
         String secondsString = "";
@@ -26,7 +28,8 @@ public class Utilities {
         return finalTimerString;
     }
  
-    public int getProgressPercentage(int currentDuration, int totalDuration){
+	//Metodo ausiliario per calcolare la percentuale a partire da valore corrente e valore massimo
+	public int getProgressPercentage(int currentDuration, int totalDuration){
         Double percentage = (double) 0;
  
         int currentSeconds = (int) (currentDuration / 1000);
@@ -39,6 +42,7 @@ public class Utilities {
         return percentage.intValue();
     }
 
+	//Metodo ausiliario per calcolare la posizione corrente a partire dalla percentuale e dal valore massimo
     public static int progressToTimer(int progress, int totalDuration) {
         int currentDuration = 0;
         totalDuration = (int) (totalDuration / 1000);

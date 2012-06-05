@@ -30,6 +30,8 @@ public class MusicPlayerService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		//Registro il servizio abilitandolo alla ricezione di Broadcast da parte di SearchActivity
 		registerReceiver(broadcastReceiver, new IntentFilter(WelcomeActivity.BROADCAST_ACTION));
 		
 		//Se l'inizializzazione del player fallisce gestisco l'errore.
@@ -40,17 +42,17 @@ public class MusicPlayerService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
 		Log.d(SERVICE_TAG, "SERVICE DESTROYED");
 	}
 	
 	public class LocalBinder extends Binder {
 		public MusicPlayerService getService() {
-			//Return this instance of LocalService so clients can call public methods
+			//Ritorna il service in modo da poterne utilizzare i metodi pubblici
 			return MusicPlayerService.this;
 		}
 	}
 	
+	//Oggetto che gestisce la ricezione di messaggi di tipo Broadcast
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@SuppressWarnings("static-access")
 		@Override
@@ -99,6 +101,7 @@ public class MusicPlayerService extends Service {
 		}
 	}
 	
+	//Metodo per ottenere l'oggetto di tipo MP3Item a partire dall'id (path+filename)
 	public MP3Item getItemFromFileName(String strKey) {
 		return this.m_mpMP3Player.getMp3ElementById(strKey);
 	}

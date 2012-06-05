@@ -150,6 +150,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 				
 				updateCoverImage(m_mpService.getCurrentPlayingItem());
 				
+				//Thread che tramite l'handler aggiorna la progress bar del brano in esecuzione (ogni 500 msec)
 				Thread updateProgressBar = new Thread (new Runnable() {
 					boolean isFinished = false;
 					
