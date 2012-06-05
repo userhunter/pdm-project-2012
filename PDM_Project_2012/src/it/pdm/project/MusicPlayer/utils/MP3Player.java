@@ -71,6 +71,7 @@ public class MP3Player extends MediaPlayer {
 	public void playSong() {
 		if (this.m_bIsReady) 
 			this.start();
+		
 	}
 	
 	/** GETTER AND SETTER **/
