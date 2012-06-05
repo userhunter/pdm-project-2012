@@ -1,5 +1,7 @@
 package it.pdm.project.MusicPlayer.services;
 
+import java.io.IOException;
+
 import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.utils.MP3Player;
@@ -104,5 +106,32 @@ public class MusicPlayerService extends Service {
 	//Metodo per ottenere l'oggetto di tipo MP3Item a partire dall'id (path+filename)
 	public MP3Item getItemFromFileName(String strKey) {
 		return this.m_mpMP3Player.getMp3ElementById(strKey);
+	}
+	
+	public void playNextSong(){
+		//TODO: verificare se è l'ultimo elemento della playlist
+		int iCursor = this.m_mpMP3Player.incrementPlaylistCursor();
+		String strSrc = this.m_mpMP3Player.getCurrentPlaylist().get(iCursor);
+		MP3Item miToPlay = this.m_mpMP3Player.getMp3ElementById(strSrc);
+		
+		try
+		{
+			this.m_mpMP3Player.setDataSource(strSrc);
+		} 
+				catch (IllegalArgumentException e) {e.printStackTrace();}
+				catch (SecurityException e) {e.printStackTrace();}
+				catch (IllegalStateException e) {e.printStackTrace();}
+				catch (IOException e) {e.printStackTrace();}
+		
+		this.m_mpMP3Player.setCurrentPlaying(miToPlay);
+		
+		try 
+		{
+			this.m_mpMP3Player.prepare();
+		}
+				catch (IllegalStateException e) {e.printStackTrace();}
+				catch (IOException e) {e.printStackTrace();}
+		
+		this.m_mpMP3Player.playSong();
 	}
 }
