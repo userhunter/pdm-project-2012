@@ -55,8 +55,6 @@ public class TabController extends TabActivity {
 		switch (item.getItemId()) {
 			case R.id.search_ab_item:
 				return true;
-			case R.id.settings_ab_item:
-				return true;
 			default: 
 				return super.onOptionsItemSelected(item);
 		}

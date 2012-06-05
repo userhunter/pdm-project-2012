@@ -25,15 +25,16 @@ public final class R {
         public static final int ic_social=0x7f02000b;
         public static final int img_seekbar_bg=0x7f02000c;
         public static final int img_seekbar_progress_blue=0x7f02000d;
-        public static final int next_scheme=0x7f02000e;
-        public static final int pause_scheme=0x7f02000f;
-        public static final int play_scheme=0x7f020010;
-        public static final int player_background=0x7f020011;
-        public static final int previous_scheme=0x7f020012;
-        public static final int sample_cover=0x7f020013;
-        public static final int seek_handler=0x7f020014;
-        public static final int seekbar_progress=0x7f020015;
-        public static final int seekbar_progress_bg=0x7f020016;
+        public static final int logo=0x7f02000e;
+        public static final int next_scheme=0x7f02000f;
+        public static final int pause_scheme=0x7f020010;
+        public static final int play_scheme=0x7f020011;
+        public static final int player_background=0x7f020012;
+        public static final int previous_scheme=0x7f020013;
+        public static final int sample_cover=0x7f020014;
+        public static final int seek_handler=0x7f020015;
+        public static final int seekbar_progress=0x7f020016;
+        public static final int seekbar_progress_bg=0x7f020017;
     }
     public static final class id {
         public static final int bottom_container=0x7f07000c;
@@ -47,7 +48,6 @@ public final class R {
         public static final int labelSongTitle=0x7f070008;
         public static final int labelYear=0x7f070004;
         public static final int search_ab_item=0x7f070012;
-        public static final int settings_ab_item=0x7f070013;
         public static final int songCurrentDurationLabel=0x7f07000a;
         public static final int songProgressBar=0x7f070009;
         public static final int songTotalDurationLabel=0x7f07000b;
