@@ -1,8 +1,5 @@
 package it.pdm.project.MusicPlayer;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.jaudiotagger.tag.images.Artwork;
 
 import it.pdm.project.MusicPlayer.objects.MP3Item;
@@ -91,7 +88,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			int lCurrentDuration = msg.getData().getInt("CURRENT_DURATION");
 			int lTotalDuration = msg.getData().getInt("TOTAL_DURATION");
 			
-			String strRemainingTime = "-" + m_utUtils.milliSecondsToTimer(lTotalDuration-lCurrentDuration);
+			String strRemainingTime = m_utUtils.milliSecondsToTimer(lTotalDuration);
 			String strActualTime = m_utUtils.milliSecondsToTimer(lCurrentDuration);
 			
 			m_tvSongTotalDuration.setText(strRemainingTime);
@@ -128,7 +125,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playSong();
-			updateCoverImage(m_mpService.getCurrentPlayingItem());
 		} else if (sourceClick.getId() == this.m_btnPauseButton.getId()) {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
@@ -150,6 +146,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 					m_tvSongTitle.setText(currentPlaying.getLocalID3Field(currentPlaying.TITLE));
 					m_tvSongYear.setText(currentPlaying.getLocalID3Field(currentPlaying.YEAR));
 				}
+				
+				updateCoverImage(m_mpService.getCurrentPlayingItem());
 				
 				Thread updateProgressBar = new Thread (new Runnable() {
 					boolean isFinished = false;
