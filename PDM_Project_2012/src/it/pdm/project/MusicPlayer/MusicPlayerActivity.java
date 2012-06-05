@@ -137,6 +137,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
+			Log.d("ACTIVITY", "CIAO");
 			if (intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
 				MP3Item currentPlaying = m_mpService.getItemFromFileName(intent.getStringExtra("CURRENT_FILE_PLAYING"));
 				

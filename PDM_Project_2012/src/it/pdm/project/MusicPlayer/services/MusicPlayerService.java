@@ -1,11 +1,13 @@
 package it.pdm.project.MusicPlayer.services;
 
+import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.utils.MP3Player;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -28,6 +30,8 @@ public class MusicPlayerService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		registerReceiver(broadcastReceiver, new IntentFilter(WelcomeActivity.BROADCAST_ACTION));
+		
 		//Se l'inizializzazione del player fallisce gestisco l'errore.
 		if (!this.m_mpMP3Player.initPlayer())
 			Log.d(SERVICE_TAG, "ERROR DURING INITIALIZATION OF PLAYER.");
@@ -51,13 +55,9 @@ public class MusicPlayerService extends Service {
 		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
-			Log.d("SERVICE", "BROADCAST RECEIVED");
 			
 			if (intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST"))
-			{
-				Log.d("BROADCAST FOR SERVICE", "RECEIVED");
 				Toast.makeText(MusicPlayerService.this, "PLAY A PLAYLIST", Toast.LENGTH_LONG).show();
-			}
 		}
 	};
 
