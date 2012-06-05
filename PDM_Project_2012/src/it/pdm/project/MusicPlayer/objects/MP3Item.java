@@ -26,7 +26,10 @@ public class MP3Item {
 	public static String BITRATE = "BITRATE";
 	public static String LENGTH = "LENGTH";
 	
-	
+	/*
+	 * Costruttore dell'oggetto MP3Item
+	 * tramite libreria jaudiotagger, parsa i campi ID3 del relativo mp3
+	 */
 	public MP3Item(String strPath, String strFileName) {
 		this.setPath(strPath);
 		this.setFileName(strFileName);
@@ -43,6 +46,7 @@ public class MP3Item {
 		
 		Tag tag = f.getTag();
 		
+		//Aggiungo le informazioni prelevate dal tag ID3 all'hashtable m_htID3Fields
 		setLocalID3Field("TITLE", tag.getFirst(FieldKey.TITLE));
 		setLocalID3Field("ALBUM", tag.getFirst(FieldKey.ALBUM));
 		setLocalID3Field("ARTIST", tag.getFirst(FieldKey.ARTIST));
@@ -78,6 +82,7 @@ public class MP3Item {
 	}
 	
 	public Artwork getCover(){
+		/* restituisce null se nessuna cover è presente */
 		File tempFile = new File(getPath()+getFileName());
 		AudioFile f = null;
 		try {

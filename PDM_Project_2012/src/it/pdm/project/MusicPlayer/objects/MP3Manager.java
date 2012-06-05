@@ -1,6 +1,5 @@
 package it.pdm.project.MusicPlayer.objects;
 
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Hashtable;
