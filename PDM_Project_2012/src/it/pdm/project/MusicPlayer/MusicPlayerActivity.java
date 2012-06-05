@@ -44,7 +44,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    initViewMemberVars();
 	    
 	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
-	    if (bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE))
+	    if (this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE))
 	    	//Abilito questa activity per ricevere notifiche dal servizio MusicPlayerService
 	    	registerReceiver(broadcastReceiver, new IntentFilter(MusicPlayerService.BROADCAST_ACTION));
 	    else

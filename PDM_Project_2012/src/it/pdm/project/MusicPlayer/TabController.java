@@ -6,7 +6,12 @@ import android.os.Bundle;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
+@SuppressWarnings("deprecation")
 public class TabController extends TabActivity {
+	private TabHost m_thController;
+	private TabSpec m_tsMusicPlayer;
+	private TabSpec m_tsSocialNetwork;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,14 +23,18 @@ public class TabController extends TabActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         */
         
-        TabHost tabHost = (TabHost)findViewById(android.R.id.tabhost);
-        TabSpec musicPlayerTab = tabHost.newTabSpec("music_player");
-        TabSpec socialNetworkTab = tabHost.newTabSpec("social_networking");
+        m_thController = (TabHost)findViewById(android.R.id.tabhost);
+        m_tsMusicPlayer = m_thController.newTabSpec("music_player");
+        m_tsSocialNetwork = m_thController.newTabSpec("social_networking");
         
-        musicPlayerTab.setIndicator("Player Musicale").setContent(new Intent(this, MusicPlayerActivity.class));
-        socialNetworkTab.setIndicator("Dai tuoi amici").setContent(new Intent(this, WelcomeActivity.class));
+        m_tsMusicPlayer.setIndicator("Player Musicale").setContent(new Intent(this, MusicPlayerActivity.class));
+        m_tsSocialNetwork.setIndicator("Dai tuoi amici").setContent(new Intent(this, WelcomeActivity.class));
         
-        tabHost.addTab(socialNetworkTab);
-        tabHost.addTab(musicPlayerTab);
+        m_thController.addTab(m_tsSocialNetwork);
+        m_thController.addTab(m_tsMusicPlayer);   
+    }
+    
+    public void switchTab(int tab) {
+    	this.m_thController.setCurrentTab(tab);
     }
 }

@@ -51,7 +51,9 @@ public class MusicPlayerService extends Service {
 		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
-			if (intent.getStringExtra("ACTION") != null && intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST"))
+			Log.d("SERVICE", "BROADCAST RECEIVED");
+			
+			if (intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST"))
 			{
 				Log.d("BROADCAST FOR SERVICE", "RECEIVED");
 				Toast.makeText(MusicPlayerService.this, "PLAY A PLAYLIST", Toast.LENGTH_LONG).show();
