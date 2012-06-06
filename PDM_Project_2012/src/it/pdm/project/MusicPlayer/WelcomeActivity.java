@@ -26,7 +26,7 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 	public void onClick(View arg0) {
 		if (arg0.getId() == this.btntest.getId())
 		{
-			String[] playlistContent = {"/sdcard/Music/Oceana_-_Endless_Summer.mp3", "/sdcard/Music/guetta.mp3", "/sdcard/Music/Oceana_-_Endless_Summer.mp3"};
+			String[] playlistContent = {"/sdcard/Music/01 Rovine (ft. Mama Marjas).mp3", "/sdcard/Music/05 What's My Age Again_.mp3" };
 			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
