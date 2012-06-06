@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -11,6 +12,7 @@ import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.objects.MP3Manager;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 
 public class MP3Player extends MediaPlayer {
 	private boolean m_bIsReady;
@@ -36,14 +38,23 @@ public class MP3Player extends MediaPlayer {
 	public boolean initPlayer() {
     	try {
     		//Se non c'è nessun mp3 in riproduzione, ne scelgo uno a caso. Se è di nuovo null ritorno false
-    		if (this.m_mp3CurrentPlaying == null)
-    			this.m_mp3CurrentPlaying = this.getRandomMp3();
+    		if (this.m_mp3CurrentPlaying == null){
+    			
+    			/*ArrayList<String> alTemp = new ArrayList<String>();
+    			alTemp.add(this.getRandomMp3().getId());
+    			alTemp.add(this.getRandomMp3().getId());
+    			alTemp.add(this.getRandomMp3().getId());
+    			alTemp.add(this.getRandomMp3().getId());
+    			alTemp.add(this.getRandomMp3().getId());
+    			this.setCurrentPlaylist(alTemp);*/
+    			
+    		}
     		
     		//Inizializzo il player dicendo di riprodurre come primo mp3 m_mp3CurrentPlaying. 
-			this.reset();
+			/*this.reset();
 			this.setDataSource(this.m_mp3CurrentPlaying.getPath() + this.m_mp3CurrentPlaying.getFileName());
 			this.prepare();
-			this.m_bIsReady = true;
+			this.m_bIsReady = true;*/
 			
 			return true;
 		} catch (Exception e) {
@@ -96,18 +107,69 @@ public class MP3Player extends MediaPlayer {
 		this.m_alCurrentPlaylist = m_alCurrentPlaylist;
 	}
 	
-	public int incrementPlaylistCursor(){
+	public boolean incrementPlaylistCursor(){
+		if(m_iCursor >= m_alCurrentPlaylist.size()-1){
+			return false;
+		}
 		m_iCursor++;
-		return m_iCursor;
+		return true;
 	}
 	
-	public int decrementPlaylistCursor(){
-		if(m_iCursor > 0)
-			m_iCursor--;
-		return m_iCursor;
+	public boolean decrementPlaylistCursor(){
+		if(m_iCursor <= 0){
+			return false;
+		}
+		m_iCursor--;
+		return true;
 	}
 	
 	public int getPlaylistCursor(){
 		return m_iCursor;
+	}
+	
+	public void resetPlaylistCursor(){
+		m_iCursor = -1;
+	}
+	
+	public void playNextSong(){
+		if(this.incrementPlaylistCursor()){
+			int iCursor = this.getPlaylistCursor();
+			String strSrc = this.getCurrentPlaylist().get(iCursor);
+			MP3Item miToPlay = this.getMp3ElementById(strSrc);
+			
+			try
+			{
+				this.reset();
+				this.setDataSource(strSrc);
+				this.setCurrentPlaying(miToPlay);
+				this.prepare();
+				this.m_bIsReady = true;
+			}
+			catch (IllegalArgumentException e) {e.printStackTrace();}
+			catch (SecurityException e) {e.printStackTrace();}
+			catch (IllegalStateException e) {e.printStackTrace();}
+			catch (IOException e) {e.printStackTrace();}
+		}
+	}
+	
+	public void playPreviousSong(){
+		if(this.decrementPlaylistCursor()){
+			int iCursor = this.getPlaylistCursor();
+			String strSrc = this.getCurrentPlaylist().get(iCursor);
+			MP3Item miToPlay = this.getMp3ElementById(strSrc);
+			
+			try
+			{
+				this.reset();
+				this.setDataSource(strSrc);
+				this.setCurrentPlaying(miToPlay);
+				this.prepare();
+				this.m_bIsReady = true;
+			}
+			catch (IllegalArgumentException e) {e.printStackTrace();}
+			catch (SecurityException e) {e.printStackTrace();}
+			catch (IllegalStateException e) {e.printStackTrace();}
+			catch (IOException e) {e.printStackTrace();}
+		}
 	}
 }

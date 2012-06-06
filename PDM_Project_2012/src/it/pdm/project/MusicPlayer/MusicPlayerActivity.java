@@ -44,9 +44,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    initViewMemberVars();
 	    
 	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
-	    if (this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE))
+	    if (this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE)){
 	    	//Abilito questa activity per ricevere notifiche dal servizio MusicPlayerService
 	    	registerReceiver(broadcastReceiver, new IntentFilter(MusicPlayerService.BROADCAST_ACTION));
+		}
 	    else
 	    	Log.d("BINDSERVICE", "ERROR DURING BINDING");
 
@@ -70,6 +71,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	        LocalBinder binder = (LocalBinder) service;
 	        //Valorizzo m_mpService con il servizio a cui l'activity di è appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
+	        Log.d("SERVICE", "CONNECTED");
 		}
 
 	    @Override
@@ -129,6 +131,14 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
 			this.m_mpService.pausePlaying();
+		} else if (sourceClick.getId() == this.m_btnForwardButton.getId()) {
+			this.m_btnPauseButton.setVisibility(View.VISIBLE);
+			this.m_btnPlayButton.setVisibility(View.GONE);
+			this.m_mpService.playNextSong();
+		} else if (sourceClick.getId() == this.m_btnBackwardButton.getId()) {
+			this.m_btnPauseButton.setVisibility(View.VISIBLE);
+			this.m_btnPlayButton.setVisibility(View.GONE);
+			this.m_mpService.playPreviousSong();
 		}
 	}
 	  
@@ -137,9 +147,12 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
-			Log.d("ACTIVITY", "CIAO");
-			if (intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
-				MP3Item currentPlaying = m_mpService.getItemFromFileName(intent.getStringExtra("CURRENT_FILE_PLAYING"));
+			
+			if (intent.getStringExtra("ACTION")!=null && intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
+				Log.d("DUNABUG", "BROADCAST ARRIVATO");
+				if(m_mpService == null)
+					System.out.println("SERVICE NULL");
+				MP3Item currentPlaying = m_mpService.getCurrentPlayingItem();
 				
 				if (currentPlaying != null) {
 					m_tvSongAlbum.setText(currentPlaying.getLocalID3Field(currentPlaying.ALBUM));
@@ -147,6 +160,9 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 					m_tvSongTitle.setText(currentPlaying.getLocalID3Field(currentPlaying.TITLE));
 					m_tvSongYear.setText(currentPlaying.getLocalID3Field(currentPlaying.YEAR));
 				}
+				
+				m_btnPauseButton.setVisibility(View.VISIBLE);
+				m_btnPlayButton.setVisibility(View.GONE);
 				
 				updateCoverImage(m_mpService.getCurrentPlayingItem());
 				

@@ -56,6 +56,10 @@ public class MP3Item {
 		
 
 	}
+	
+	public String getId(){
+		return m_strPath + m_strFileName;
+	}
 
 	public String getPath() {
 		return m_strPath;

@@ -26,13 +26,13 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 	public void onClick(View arg0) {
 		if (arg0.getId() == this.btntest.getId())
 		{
-			String[] playlistContent = {"Canzone1", "Canzone2", "Canzone3"};
+			String[] playlistContent = {"/sdcard/Music/Oceana_-_Endless_Summer.mp3", "/sdcard/Music/guetta.mp3", "/sdcard/Music/Oceana_-_Endless_Summer.mp3"};
 			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
 			this.sendBroadcast(newIntent);
 			Log.d("WELCOMEACTIVITY", "SENDING INTENT");
-			this.switchTabInActivity(1);
+			this.switchTabInActivity(0);
 		}
 	}
 	

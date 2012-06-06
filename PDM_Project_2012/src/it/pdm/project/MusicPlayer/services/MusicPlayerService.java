@@ -1,6 +1,8 @@
 package it.pdm.project.MusicPlayer.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
@@ -10,6 +12,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -60,8 +64,15 @@ public class MusicPlayerService extends Service {
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			
-			if (intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST"))
-				Toast.makeText(MusicPlayerService.this, "PLAY A PLAYLIST", Toast.LENGTH_LONG).show();
+			if (intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST")){
+				//Imposto la playlist che ricevo come playlist del mediaplayer e avvio la riproduzione del primo elemento
+				String[] playlistContent = intent.getStringArrayExtra("PLAYLIST");
+				ArrayList<String> alNewPlaylist  = new ArrayList(Arrays.asList(playlistContent));
+				m_mpMP3Player.setCurrentPlaylist(alNewPlaylist);
+				//Resetto il cursore
+				m_mpMP3Player.resetPlaylistCursor();
+				playNextSong();
+			}
 		}
 	};
 
@@ -71,12 +82,29 @@ public class MusicPlayerService extends Service {
 		if (!this.m_mpMP3Player.isPlaying()) {
 			this.m_mpMP3Player.playSong();
 			
+			m_mpMP3Player.setOnCompletionListener(new OnCompletionListener() {
+						@Override
+						public void onCompletion(MediaPlayer arg0) {
+							// TODO Auto-generated method stub
+							playNextSong();
+						}});
+			
 			//Preparo l'intent per la notifica da inviare all'activity
 			Intent intent = new Intent(MusicPlayerService.BROADCAST_ACTION);
 			intent.putExtra("ACTION", "PLAY_SONG");
-			intent.putExtra("CURRENT_FILE_PLAYING", this.m_mpMP3Player.getCurrentPlaying().getPath() + this.m_mpMP3Player.getCurrentPlaying().getFileName());
-			this.sendBroadcast(intent);
+			//intent.putExtra("CURRENT_FILE_PLAYING", this.m_mpMP3Player.getCurrentPlaying().getPath() + this.m_mpMP3Player.getCurrentPlaying().getFileName());
+			this.getApplicationContext().sendBroadcast(intent);
 		}
+	}
+	
+	public void playNextSong(){
+		this.m_mpMP3Player.playNextSong();
+		this.playSong();
+	}
+	
+	public void playPreviousSong(){
+		this.m_mpMP3Player.playPreviousSong();
+		this.playSong();
 	}
 	
 	public int getCurrentPlayingPosition() {
@@ -84,7 +112,7 @@ public class MusicPlayerService extends Service {
 	}
 	
 	public int getCurrentPlayingTotalDuration() {
-		return this.m_mpMP3Player.getDuration();
+		return Integer.parseInt(this.m_mpMP3Player.getCurrentPlaying().getLocalID3Field(MP3Item.LENGTH))*1000;
 	}
 	
 	public void setCurrentPlayingPosition(int pos){
@@ -108,30 +136,4 @@ public class MusicPlayerService extends Service {
 		return this.m_mpMP3Player.getMp3ElementById(strKey);
 	}
 	
-	public void playNextSong(){
-		//TODO: verificare se è l'ultimo elemento della playlist
-		int iCursor = this.m_mpMP3Player.incrementPlaylistCursor();
-		String strSrc = this.m_mpMP3Player.getCurrentPlaylist().get(iCursor);
-		MP3Item miToPlay = this.m_mpMP3Player.getMp3ElementById(strSrc);
-		
-		try
-		{
-			this.m_mpMP3Player.setDataSource(strSrc);
-		} 
-				catch (IllegalArgumentException e) {e.printStackTrace();}
-				catch (SecurityException e) {e.printStackTrace();}
-				catch (IllegalStateException e) {e.printStackTrace();}
-				catch (IOException e) {e.printStackTrace();}
-		
-		this.m_mpMP3Player.setCurrentPlaying(miToPlay);
-		
-		try 
-		{
-			this.m_mpMP3Player.prepare();
-		}
-				catch (IllegalStateException e) {e.printStackTrace();}
-				catch (IOException e) {e.printStackTrace();}
-		
-		this.m_mpMP3Player.playSong();
-	}
 }
