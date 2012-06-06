@@ -41,8 +41,10 @@ public class TabController extends TabActivity {
         m_tsMusicPlayer.setIndicator("Player Musicale").setContent(new Intent(this, MusicPlayerActivity.class));
         m_tsSocialNetwork.setIndicator("Dai tuoi amici").setContent(new Intent(this, WelcomeActivity.class));
         
+        m_thController.addTab(m_tsMusicPlayer);
         m_thController.addTab(m_tsSocialNetwork);
-        m_thController.addTab(m_tsMusicPlayer);   
+        
+        m_thController.setCurrentTab(1);
         
         //m_thController.getTabWidget().getLayoutParams().height = 35;
         //m_thController.getTabWidget().getChildAt(1).getLayoutParams().height = 35;
