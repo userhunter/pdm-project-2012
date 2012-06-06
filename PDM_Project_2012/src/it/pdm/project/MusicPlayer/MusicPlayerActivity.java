@@ -3,6 +3,8 @@ package it.pdm.project.MusicPlayer;
 import org.jaudiotagger.tag.images.Artwork;
 
 import it.pdm.project.MusicPlayer.objects.MP3Item;
+import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
+import it.pdm.project.MusicPlayer.objects.MusicPlayerUpdater;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
 import it.pdm.project.MusicPlayer.utils.Utilities;
@@ -34,6 +36,9 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
 	private SeekBar m_pbPositionBar;
 	private ImageView m_ivCover;
+	
+	public MusicPlayerDAO m_daoDatabase;
+	
 	public static boolean m_bProgressBarTouching = false;
 	  
 	@Override
@@ -43,6 +48,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	 
 	    initViewMemberVars();
 	    
+	    m_daoDatabase.open();
+	    m_daoDatabase.insertUtilityValue("DbIsUpdating", "false");
+	    m_daoDatabase.close();
+	    
 	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
 	    if (this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE)){
 	    	//Abilito questa activity per ricevere notifiche dal servizio MusicPlayerService
@@ -50,8 +59,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		}
 	    else
 	    	Log.d("BINDSERVICE", "ERROR DURING BINDING");
-
-	    
 	}
 	
 	@Override
@@ -61,6 +68,11 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		//con UnregisterReceiver, richiedo di non voler più ricevere notifiche da parte del Service
 		unregisterReceiver(broadcastReceiver);
 	}
+	
+	public void test() {
+		this.m_daoDatabase.open();
+		this.m_daoDatabase.close();
+	}
 	  
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
@@ -69,7 +81,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	        LocalBinder binder = (LocalBinder) service;
 	        //Valorizzo m_mpService con il servizio a cui l'activity di è appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
-	        Log.d("SERVICE", "CONNECTED");
+	        
+	        //Faccio partire il thread responsabile dell'aggiornamento.
+	    	Thread thUpdater = new Thread(new MusicPlayerUpdater(MusicPlayerActivity.this.getApplicationContext(), m_mpService.getMp3sPath(), m_mpService.getAllMp3s()));
+	    	thUpdater.start();
 		}
 
 	    @Override
@@ -222,6 +237,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    
 	    this.m_pbPositionBar = (SeekBar)findViewById(R.id.songProgressBar);
 	    this.m_pbPositionBar.setOnSeekBarChangeListener(positionListener);
+	    
+	    this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
 	}
 	
 	//Aggiorna la cover dell'album visualizzata

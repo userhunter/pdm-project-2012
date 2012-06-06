@@ -38,10 +38,6 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	        "label text not null, " +
 	        "value text not null ) ";
 	
-	private static String INITIALIZE_VAR_DB_LASTMODIFIED_syntax = 
-	        "INSERT INTO " + UTILITIES_TABLE_NAME + "(label,value) " +
-	        "values('dblastmodified','')";
-
 	public MusicPlayerDBHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
 
@@ -52,7 +48,6 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_MUSIC_TABLE_syntax);
 		db.execSQL(CREATE_HISTORY_TABLE_syntax);
 		db.execSQL(CREATE_UTILITIES_TABLE_syntax);
-		db.execSQL(INITIALIZE_VAR_DB_LASTMODIFIED_syntax);
 	}
 
 	@Override
