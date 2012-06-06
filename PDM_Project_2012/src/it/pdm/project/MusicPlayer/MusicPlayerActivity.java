@@ -137,9 +137,11 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View sourceClick) {
 		if (sourceClick.getId() == this.m_btnPlayButton.getId()) {
-			this.m_btnPauseButton.setVisibility(View.VISIBLE);
-			this.m_btnPlayButton.setVisibility(View.GONE);
-			this.m_mpService.playSong();
+			if(m_mpService.getCurrentPlayingItem()!=null){
+				this.m_btnPauseButton.setVisibility(View.VISIBLE);
+				this.m_btnPlayButton.setVisibility(View.GONE);
+				this.m_mpService.playSong();
+			}
 		} else if (sourceClick.getId() == this.m_btnPauseButton.getId()) {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
