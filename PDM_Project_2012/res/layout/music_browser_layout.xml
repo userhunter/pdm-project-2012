@@ -1,80 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-    
- 	<ExpandableListView android:id="@android:id/list"
-               android:layout_width="fill_parent"
-               android:layout_height="fill_parent"
-               android:layout_above="@+id/search_selectors_box" />
- 
-     <TextView android:id="@+id/android:empty"
-               android:layout_width="fill_parent"
-               android:layout_height="fill_parent"
-               android:text="No items"/>
-     
-     <LinearLayout
-         android:id="@+id/search_selectors_box"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_alignParentBottom="true"
-         android:layout_gravity="bottom"
-         android:gravity="center" >
+    android:orientation="vertical" >
 
-         <Button
-             android:id="@+id/testbtn"
-             android:clickable="true"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical|center_horizontal|center"
-             android:layout_marginLeft="2dp"
-             android:layout_marginRight="2dp"
-             android:background="@null"
-             android:drawableLeft="@drawable/all_icon"
-             android:gravity="center_vertical|center_horizontal"
-             android:paddingRight="7dp"
-             android:text=" Tutto"
-             android:textSize="15sp" />
+    <ExpandableListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/search_selectors_box" />
 
-         <Button
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical|center_horizontal|center"
-             android:layout_marginLeft="2dp"
-             android:layout_marginRight="2dp"
-             android:background="@null"
-             android:drawableLeft="@drawable/song_icon"
-             android:gravity="center_vertical|center_horizontal"
-             android:paddingRight="7dp"
-             android:text=" Album"
-             android:textSize="15sp" />
-         
-         <Button
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical|center_horizontal|center"
-             android:layout_marginLeft="2dp"
-             android:layout_marginRight="2dp"
-             android:background="@null"
-             android:drawableLeft="@drawable/artists_icon"
-             android:gravity="center_vertical|center_horizontal"
-             android:paddingRight="7dp"
-             android:text=" Artisti"
-             android:textSize="15sp" />
-         
-         <Button
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical|center_horizontal|center"
-             android:layout_marginLeft="2dp"
-             android:layout_marginRight="2dp"
-             android:background="@null"
-             android:drawableLeft="@drawable/webradio_icon"
-             android:gravity="center_vertical|center_horizontal"
-             android:paddingRight="7dp"
-             android:text=" Radio"
-             android:textSize="15sp" />
-     </LinearLayout>
+    <TextView
+        android:id="@+id/android:empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/search_selectors_box"
+        android:text="No items" />
+
+    <LinearLayout
+        android:id="@+id/search_selectors_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/btnAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal|center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:clickable="true"
+            android:drawableLeft="@drawable/all_icon"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingRight="7dp"
+            android:text=" Tutto"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAlbum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal|center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@null"
+            android:drawableLeft="@drawable/song_icon"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingRight="7dp"
+            android:text=" Album"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal|center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@null"
+            android:drawableLeft="@drawable/artists_icon"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingRight="7dp"
+            android:text=" Artisti"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnWebRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal|center"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@null"
+            android:drawableLeft="@drawable/webradio_icon"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingRight="7dp"
+            android:text=" Radio"
+            android:textSize="15sp" />
+    </LinearLayout>
+
 </RelativeLayout>
