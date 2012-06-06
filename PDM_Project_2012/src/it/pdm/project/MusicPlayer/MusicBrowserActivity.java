@@ -11,12 +11,14 @@ import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
-public class MusicBrowserActivity extends ExpandableListActivity {
+public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener {
+	private Button m_btnFilterAll, m_btnFilterAlbum, m_btnFilterArtists, m_btnFilterRadio;
 	private ExpandableListView m_expListView;
 	private SimpleExpandableListAdapter m_expListAdapter;
 	private MusicPlayerDAO m_daoDatabase;
@@ -27,12 +29,7 @@ public class MusicBrowserActivity extends ExpandableListActivity {
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.music_browser_layout);
-    	
-    	this.m_expListView = this.getExpandableListView();
-    	
-    	this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
-    	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
-    	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
+    	initMemberVars();
    
     	this.m_expListAdapter = new SimpleExpandableListAdapter(
     		this,
@@ -47,13 +44,50 @@ public class MusicBrowserActivity extends ExpandableListActivity {
     	);
     	
     	this.setListAdapter(this.m_expListAdapter);
-
+    }
+    
+    private void initMemberVars() {
+    	this.m_expListView = this.getExpandableListView();
+    	
+    	this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
+    	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
+    	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
+    	
+    	this.m_btnFilterAll = (Button)findViewById(R.id.btnAll);
+    	this.m_btnFilterAlbum = (Button)findViewById(R.id.btnAlbum);
+    	this.m_btnFilterArtists = (Button)findViewById(R.id.btnArtist);
+    	this.m_btnFilterRadio = (Button)findViewById(R.id.btnWebRadio);
+    	
+    	this.m_btnFilterAll.setOnClickListener(this);
+    	this.m_btnFilterAlbum.setOnClickListener(this);
+    	this.m_btnFilterArtists.setOnClickListener(this);
+    	//this.m_btnFilterRadio.setOnClickListener(this);
+    }
+    
+    @Override
+    public void onClick(View arg0) {
+    	
+    	if (arg0.getId() == this.m_btnFilterAll.getId())
+    		this.applyFilter("all_tracks");
+    	else if (arg0.getId() == this.m_btnFilterAlbum.getId())
+    		this.applyFilter("albums");
+    	else if (arg0.getId() == this.m_btnFilterArtists.getId())
+    		this.applyFilter("artists");
+    	else if (arg0.getId() == this.m_btnFilterRadio.getId())
+    		this.createListFromFilter("all_tracks");
+    	
+    }
+    
+    private void applyFilter(String strFilter) {
     	this.m_daoDatabase.open();
-    	this.createListFromFilter("all_tracks");
-    	//this.createListFromFilter("artists");
-    	//this.createListFromFilter("albums");
-    	this.m_daoDatabase.close();
+    	
+    	this.m_alRootElements.clear();
+    	this.m_alChildElements.clear();
+    	
+    	this.createListFromFilter(strFilter);
     	this.m_expListAdapter.notifyDataSetChanged();
+    	
+    	this.m_daoDatabase.close();
     }
     
     private void createListFromFilter(String strFilter) {
@@ -112,12 +146,6 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 		Cursor cursor = this.m_daoDatabase.getAllTracks();
 		ArrayList<HashMap<String, String>> alAllTracksChilds = new ArrayList<HashMap<String, String>>();
 		
-		HashMap<String, String> hmPlayAll = new HashMap<String, String>();
-		hmPlayAll.put("item_title", "Riproduci tutti");
-		hmPlayAll.put("item_album", "");
-		
-		alAllTracksChilds.add(hmPlayAll);
-		
 		while (cursor.moveToNext()) {
 			HashMap<String, String> hmNewTrack = new HashMap<String, String>();
 			hmNewTrack.put("item_id", cursor.getString(cursor.getColumnIndex("path")) + cursor.getString(cursor.getColumnIndex("filename")));
@@ -136,11 +164,14 @@ public class MusicBrowserActivity extends ExpandableListActivity {
     /* This function is called on each child click */
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 		String[] playlistContent = this.getPlaylistFromClick(groupPosition, childPosition);
-		Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
-		newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
-		newIntent.putExtra("PLAYLIST", playlistContent);
-		this.sendBroadcast(newIntent);
-		this.switchTabInActivity(0);
+		
+		if (playlistContent.length > 0) {
+			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
+			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
+			newIntent.putExtra("PLAYLIST", playlistContent);
+			this.sendBroadcast(newIntent);
+			this.switchTabInActivity(0);
+		}
 		
         return true;
     }
@@ -149,8 +180,15 @@ public class MusicBrowserActivity extends ExpandableListActivity {
     	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
     	ArrayList<String> alResultList = new ArrayList<String>();
     	
-    	for (int i = 1; i < clickedGroupChilds.size(); i++)
+    	for (int i = clickedChild; i < clickedGroupChilds.size(); i++) {
     		alResultList.add(clickedGroupChilds.get(i).get("item_id"));
+    		System.out.println("Adding: " + i + " -> " + clickedGroupChilds.get(i).get("item_id"));
+    	}
+    	
+    	for (int i = 0; i < clickedGroupChilds.size()-alResultList.size()-1; i++) {
+    		alResultList.add(clickedGroupChilds.get(i).get("item_id"));
+    		System.out.println("Adding: " + i + " -> " + clickedGroupChilds.get(i).get("item_id"));
+    	}
     	
     	String[] strResult = (String[])alResultList.toArray(new String[alResultList.size()]);
     	return strResult;
@@ -161,4 +199,5 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 		
 		thController.switchTab(indexTabToSwitch);
 	}
+
 }

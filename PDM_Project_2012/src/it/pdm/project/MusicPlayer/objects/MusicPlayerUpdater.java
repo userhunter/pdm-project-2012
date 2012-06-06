@@ -31,10 +31,10 @@ public class MusicPlayerUpdater implements Runnable {
 			this.m_daoDatabase.deleteAllTracks();
 			this.m_daoDatabase.insertTracksFromHT(m_htMp3Items);
 			this.m_daoDatabase.insertUtilityValue("DbIsUpdating", "false");
+			this.m_daoDatabase.insertUtilityValue("DbUpdatedAt", Long.toString(lLastModified));
 		}
 		
 		//Dopo aver aggiornato il database, inserisco la data di modifica in quest'ultimo.
-		this.m_daoDatabase.insertUtilityValue("DbUpdatedAt", Long.toString(lLastModified));
 		this.m_daoDatabase.close();
 	}
 }
