@@ -3,12 +3,12 @@ package it.pdm.project.MusicPlayer;
 import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
 import android.app.ExpandableListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -90,6 +90,7 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 			
 			while (tracksCursor.moveToNext()) {
 				HashMap<String, String> hmNewTrack = new HashMap<String, String>();
+				hmNewTrack.put("item_id", tracksCursor.getString(tracksCursor.getColumnIndex("path")) + tracksCursor.getString(tracksCursor.getColumnIndex("filename")));
 				hmNewTrack.put("item_title", tracksCursor.getString(tracksCursor.getColumnIndex("title")));
 				hmNewTrack.put("item_album", tracksCursor.getString(tracksCursor.getColumnIndex("album")));
 				
@@ -110,8 +111,16 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 		//Creazione dei childs
 		Cursor cursor = this.m_daoDatabase.getAllTracks();
 		ArrayList<HashMap<String, String>> alAllTracksChilds = new ArrayList<HashMap<String, String>>();
+		
+		HashMap<String, String> hmPlayAll = new HashMap<String, String>();
+		hmPlayAll.put("item_title", "Riproduci tutti");
+		hmPlayAll.put("item_album", "");
+		
+		alAllTracksChilds.add(hmPlayAll);
+		
 		while (cursor.moveToNext()) {
 			HashMap<String, String> hmNewTrack = new HashMap<String, String>();
+			hmNewTrack.put("item_id", cursor.getString(cursor.getColumnIndex("path")) + cursor.getString(cursor.getColumnIndex("filename")));
 			hmNewTrack.put("item_title", cursor.getString(cursor.getColumnIndex("title")));
 			hmNewTrack.put("item_album", cursor.getString(cursor.getColumnIndex("album")));
 			
@@ -126,17 +135,30 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 	
     /* This function is called on each child click */
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        System.out.println("Inside onChildClick at groupPosition = " + groupPosition +" Child clicked at position " + childPosition);
+		String[] playlistContent = this.getPlaylistFromClick(groupPosition, childPosition);
+		Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
+		newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
+		newIntent.putExtra("PLAYLIST", playlistContent);
+		this.sendBroadcast(newIntent);
+		this.switchTabInActivity(0);
+		
         return true;
     }
-         
-    /* This function is called on expansion of the group */
-    public void onGroupExpand(int groupPosition) {
-        try {
-             System.out.println("Group exapanding Listener => groupPosition = " + groupPosition);
-        } catch(Exception e) {
-            Log.d("BROWSER ACTIVITY", "ERROR");
-            e.printStackTrace();
-        }
+    
+    private String[] getPlaylistFromClick(int group, int clickedChild) {
+    	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
+    	ArrayList<String> alResultList = new ArrayList<String>();
+    	
+    	for (int i = 1; i < clickedGroupChilds.size(); i++)
+    		alResultList.add(clickedGroupChilds.get(i).get("item_id"));
+    	
+    	String[] strResult = (String[])alResultList.toArray(new String[alResultList.size()]);
+    	return strResult;
     }
+    
+	public void switchTabInActivity(int indexTabToSwitch) {
+		TabController thController = (TabController) this.getParent();
+		
+		thController.switchTab(indexTabToSwitch);
+	}
 }
