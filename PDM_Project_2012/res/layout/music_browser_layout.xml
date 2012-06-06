@@ -32,6 +32,7 @@
             android:layout_gravity="center_vertical|center_horizontal|center"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
+            android:background="@null"
             android:clickable="true"
             android:drawableLeft="@drawable/all_icon"
             android:gravity="center_vertical|center_horizontal"
