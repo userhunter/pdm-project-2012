@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 import android.app.ExpandableListActivity;
@@ -18,6 +17,8 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
 public class MusicBrowserActivity extends ExpandableListActivity {
+	private ExpandableListView m_expListView;
+	private SimpleExpandableListAdapter m_expListAdapter;
 	private MusicPlayerDAO m_daoDatabase;
 	private ArrayList<HashMap<String, String>> m_alRootElements;
 	private ArrayList<ArrayList<HashMap<String, String>>> m_alChildElements;
@@ -27,37 +28,38 @@ public class MusicBrowserActivity extends ExpandableListActivity {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.music_browser_layout);
     	
+    	this.m_expListView = this.getExpandableListView();
+    	
     	this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
     	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
     	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
-    	
-
-		this.m_daoDatabase.open();
-		this.createListFromFilter("all_tracks");
-		//this.createListFromFilter("artists");
-		//this.createListFromFilter("albums");
-    	this.m_daoDatabase.close();
-    	
-    	SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
+   
+    	this.m_expListAdapter = new SimpleExpandableListAdapter(
     		this,
-    		this.m_alRootElements,			 //ArrayList contenente le root
-            R.layout.music_browser_root,     //XML relativo al layout delle root
-            new String[] { "key" },  		 //Chiave delle hashtable relative alle root
-            new int[] { R.id.row_name },     //Nome della text view a cui associare il valore della root
-            this.m_alChildElements,			 //ArrayList contenente i child per le root
-            R.layout.music_browser_child,    //XML relativo al layout dei child
-            new String[] { "subkey" },       //Chiave delle hashtable relative ai childs
-            new int[] { R.id.grp_child }     //Nome della text view a cui associare il valore della root
+    		this.m_alRootElements,			 					//ArrayList contenente le root
+            R.layout.music_browser_root,     					//XML relativo al layout delle root
+            new String[] { "key" },  		 					//Chiave delle hashtable relative alle root
+            new int[] { R.id.element_title },     				//Nome della text view a cui associare il valore della root
+            this.m_alChildElements,			 					//ArrayList contenente i child per le root
+            R.layout.music_browser_child,    					//XML relativo al layout dei child
+            new String[] { "item_title", "item_album" },       	//Chiave delle hashtable relative ai childs
+            new int[] { R.id.item_title, R.id.item_album }     	//Nome della text view a cui associare il valore della root
     	);
     	
-    	this.setListAdapter(expListAdapter);
-    	expListAdapter.notifyDataSetChanged();
+    	this.setListAdapter(this.m_expListAdapter);
+
+    	this.m_daoDatabase.open();
+    	this.createListFromFilter("all_tracks");
+    	//this.createListFromFilter("artists");
+    	//this.createListFromFilter("albums");
+    	this.m_daoDatabase.close();
+    	this.m_expListAdapter.notifyDataSetChanged();
     }
     
     private void createListFromFilter(String strFilter) {
-    	if (strFilter.equals("all_tracks"))
+    	if (strFilter.equals("all_tracks")) {
     		this.allTracksCase();
-    	else if (strFilter.equals("artists"))
+    	} else if (strFilter.equals("artists"))
     		this.artistsOrAlbumCase("artist");
     	else if (strFilter.equals("albums"))
     		this.artistsOrAlbumCase("album");
@@ -88,7 +90,8 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 			
 			while (tracksCursor.moveToNext()) {
 				HashMap<String, String> hmNewTrack = new HashMap<String, String>();
-				hmNewTrack.put("subkey", tracksCursor.getString(tracksCursor.getColumnIndex("title")));
+				hmNewTrack.put("item_title", tracksCursor.getString(tracksCursor.getColumnIndex("title")));
+				hmNewTrack.put("item_album", tracksCursor.getString(tracksCursor.getColumnIndex("album")));
 				
 				childs.add(hmNewTrack);
 			}
@@ -109,7 +112,8 @@ public class MusicBrowserActivity extends ExpandableListActivity {
 		ArrayList<HashMap<String, String>> alAllTracksChilds = new ArrayList<HashMap<String, String>>();
 		while (cursor.moveToNext()) {
 			HashMap<String, String> hmNewTrack = new HashMap<String, String>();
-			hmNewTrack.put("subkey", cursor.getString(cursor.getColumnIndex("title")));
+			hmNewTrack.put("item_title", cursor.getString(cursor.getColumnIndex("title")));
+			hmNewTrack.put("item_album", cursor.getString(cursor.getColumnIndex("album")));
 			
 			alAllTracksChilds.add(hmNewTrack);
 		}

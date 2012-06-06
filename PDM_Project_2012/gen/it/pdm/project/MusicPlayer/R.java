@@ -37,27 +37,28 @@ public final class R {
         public static final int seekbar_progress_bg=0x7f020017;
     }
     public static final class id {
-        public static final int bottom_container=0x7f07000e;
-        public static final int btnNext=0x7f070012;
-        public static final int btnPause=0x7f070011;
-        public static final int btnPlay=0x7f070010;
-        public static final int btnPrevious=0x7f07000f;
-        public static final int cover=0x7f070005;
-        public static final int grp_child=0x7f070003;
-        public static final int labelAlbumTitle=0x7f070007;
-        public static final int labelArtists=0x7f070009;
-        public static final int labelSongTitle=0x7f07000a;
-        public static final int labelYear=0x7f070006;
-        public static final int row_name=0x7f070004;
-        public static final int search_ab_item=0x7f070014;
-        public static final int songCurrentDurationLabel=0x7f07000c;
-        public static final int songProgressBar=0x7f07000b;
-        public static final int songTotalDurationLabel=0x7f07000d;
+        public static final int bottom_container=0x7f07000f;
+        public static final int btnNext=0x7f070013;
+        public static final int btnPause=0x7f070012;
+        public static final int btnPlay=0x7f070011;
+        public static final int btnPrevious=0x7f070010;
+        public static final int cover=0x7f070006;
+        public static final int element_title=0x7f070005;
+        public static final int item_album=0x7f070004;
+        public static final int item_title=0x7f070003;
+        public static final int labelAlbumTitle=0x7f070008;
+        public static final int labelArtists=0x7f07000a;
+        public static final int labelSongTitle=0x7f07000b;
+        public static final int labelYear=0x7f070007;
+        public static final int search_ab_item=0x7f070015;
+        public static final int songCurrentDurationLabel=0x7f07000d;
+        public static final int songProgressBar=0x7f07000c;
+        public static final int songTotalDurationLabel=0x7f07000e;
         public static final int tab1=0x7f070000;
         public static final int tab2=0x7f070001;
         public static final int tab3=0x7f070002;
-        public static final int test_button=0x7f070013;
-        public static final int timerDisplay=0x7f070008;
+        public static final int test_button=0x7f070014;
+        public static final int timerDisplay=0x7f070009;
     }
     public static final class layout {
         public static final int main=0x7f030000;
