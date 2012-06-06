@@ -1,4 +1,4 @@
-package it.pdm.project.MusicPlayer.utils;
+package it.pdm.project.MusicPlayer.objects;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,8 +8,6 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Stack;
 
-import it.pdm.project.MusicPlayer.objects.MP3Item;
-import it.pdm.project.MusicPlayer.objects.MP3Manager;
 
 import android.media.MediaPlayer;
 import android.util.Log;

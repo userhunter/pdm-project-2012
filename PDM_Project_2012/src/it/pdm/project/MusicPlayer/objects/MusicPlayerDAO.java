@@ -29,6 +29,26 @@ public class MusicPlayerDAO {
 	 * OPERAZIONI SULL'ARCHIVIO MUSICALE
 	 */
 	
+	public void insertUtilityValue(String label, String value){
+		ContentValues cv = new ContentValues();
+	    cv.put(label, value);
+	    
+	    if(getUtilitiesValues(label) == null)
+	    	m_sqliteDB.insert(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, null, cv);
+	    else
+	    	m_sqliteDB.update(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, cv, "label LIKE \""+label+"\"", null);
+	}
+	
+	public String getUtilitiesValues(String label) {
+		Cursor cursor = m_sqliteDB.query(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, new String[] {"label", "value"}, 
+                "label LIKE \"" + label + "\"", null, null, null, null);
+		
+		while (cursor.moveToNext())
+			return cursor.getString(cursor.getColumnIndex("value"));
+		
+		return null;
+	}
+	
 	public long insertTrack(MP3Item mp3){
 		/* ritorna l'id del record inserito oppure -1 in caso di errore */
 		

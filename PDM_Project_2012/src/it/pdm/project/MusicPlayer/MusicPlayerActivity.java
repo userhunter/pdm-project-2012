@@ -59,9 +59,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		super.onDestroy();
 		
 		//con UnregisterReceiver, richiedo di non voler più ricevere notifiche da parte del Service
-		//con UnbindService, elimino il link tra questa activity e il servizio.
 		unregisterReceiver(broadcastReceiver);
-		unbindService(mConnection);
 	}
 	  
 	private ServiceConnection mConnection = new ServiceConnection() {
