@@ -35,7 +35,7 @@ public class MP3Manager {
 			
 			FileFilter dumpsFilter = new FileFilter() {
 			    public boolean accept(File file) {
-			    	return (file.getName().endsWith(".mp3"));
+			    	return (file.getName().endsWith(".mp3") || file.getName().endsWith(".m4a"));
 				}
 			};
 			

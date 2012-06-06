@@ -18,16 +18,6 @@ public class WelcomeActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.welcome_layout);
         
-        MusicPlayerDAO daoDb = new MusicPlayerDAO(this.getApplicationContext());
-        daoDb.open();
-       
-        if (daoDb.getUtilitiesValues("dbciao") == null)
-        	System.out.println("Nce sta ncazzo");
-        else
-        	System.out.println("Ci sta il risultato");
-        
-        daoDb.close();
-        
         btntest = (Button)this.findViewById(R.id.test_button);
         
         btntest.setOnClickListener(this);
