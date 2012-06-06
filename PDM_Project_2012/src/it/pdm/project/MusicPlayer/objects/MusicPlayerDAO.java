@@ -61,7 +61,7 @@ public class MusicPlayerDAO {
 		values.put("artist", mp3.getLocalID3Field(MP3Item.ARTIST));
 		values.put("album", mp3.getLocalID3Field(MP3Item.ALBUM));
 		values.put("year", mp3.getLocalID3Field(MP3Item.YEAR));
-		values.put("bitrate", Float.valueOf(mp3.getLocalID3Field(MP3Item.BITRATE)));
+		values.put("bitrate", Long.valueOf(mp3.getLocalID3Field(MP3Item.BITRATE).replace("~", "")));
 		values.put("length", Long.valueOf(mp3.getLocalID3Field(MP3Item.LENGTH)));
 		
 		return m_sqliteDB.insert(MusicPlayerDBHelper.MUSIC_TABLE_NAME, null, values);
