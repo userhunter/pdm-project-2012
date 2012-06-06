@@ -21,6 +21,11 @@ public class WelcomeActivity extends Activity implements OnClickListener {
         MusicPlayerDAO daoDb = new MusicPlayerDAO(this.getApplicationContext());
         daoDb.open();
        
+        if (daoDb.getUtilitiesValues("dbciao") == null)
+        	System.out.println("Nce sta ncazzo");
+        else
+        	System.out.println("Ci sta il risultato");
+        
         daoDb.close();
         
         btntest = (Button)this.findViewById(R.id.test_button);

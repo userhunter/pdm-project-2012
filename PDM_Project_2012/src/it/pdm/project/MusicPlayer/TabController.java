@@ -16,10 +16,10 @@ import android.widget.TabHost.TabSpec;
 
 @SuppressWarnings("deprecation")
 public class TabController extends TabActivity {
-	private boolean m_bIsUpdatingDb;
 	private TabHost m_thController;
 	private TabSpec m_tsMusicPlayer;
 	private TabSpec m_tsSocialNetwork;
+	private TabSpec m_tsMusicLibrary;
 	private ActionBar m_abActionBar;
 	
     @Override
@@ -29,7 +29,6 @@ public class TabController extends TabActivity {
         
         //Avvio del servizio in background
         this.startService(new Intent(this, MusicPlayerService.class));
-        this.m_bIsUpdatingDb = false;
         
         m_abActionBar = this.getActionBar();
         m_abActionBar.setHomeButtonEnabled(false);
@@ -39,12 +38,15 @@ public class TabController extends TabActivity {
         
         m_tsMusicPlayer = m_thController.newTabSpec("music_player");
         m_tsSocialNetwork = m_thController.newTabSpec("social_networking");
+        m_tsMusicLibrary = m_thController.newTabSpec("music_library");
         
-        m_tsMusicPlayer.setIndicator("Player Musicale").setContent(new Intent(this, MusicPlayerActivity.class));
-        m_tsSocialNetwork.setIndicator("Dai tuoi amici").setContent(new Intent(this, WelcomeActivity.class));
+        m_tsMusicPlayer.setIndicator("Player").setContent(new Intent(this, MusicPlayerActivity.class));
+        m_tsSocialNetwork.setIndicator("Amici").setContent(new Intent(this, WelcomeActivity.class));
+        m_tsMusicLibrary.setIndicator("Libreria").setContent(new Intent(this, MusicBrowserActivity.class));
         
         m_thController.addTab(m_tsMusicPlayer);
         m_thController.addTab(m_tsSocialNetwork);
+        m_thController.addTab(m_tsMusicLibrary);
         
         m_thController.setCurrentTab(1);
         

@@ -31,9 +31,10 @@ public class MusicPlayerDAO {
 	
 	public void insertUtilityValue(String label, String value){
 		ContentValues cv = new ContentValues();
-	    cv.put(label, value);
+	    cv.put("label", label);
+	    cv.put("value", value);
 	    
-	    if(getUtilitiesValues(label) == null)
+	    if (getUtilitiesValues(label) == null)
 	    	m_sqliteDB.insert(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, null, cv);
 	    else
 	    	m_sqliteDB.update(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, cv, "label LIKE \""+label+"\"", null);
@@ -75,12 +76,12 @@ public class MusicPlayerDAO {
 		return 0;
 	}
 	
-	public long deteleteTrackById(int id){
+	public long deleteTrackById(int id){
 		/* ritorna il numero di record eliminati */
 		return m_sqliteDB.delete(MusicPlayerDBHelper.MUSIC_TABLE_NAME, "_id = "+id, null);
 	}
 	
-	public long deteleteTrackByPathAndFilename(String strPath, String strFileName){
+	public long deleteTrackByPathAndFilename(String strPath, String strFileName){
 		/* ritorna il numero di record eliminati */
 		return m_sqliteDB.delete(MusicPlayerDBHelper.MUSIC_TABLE_NAME, "path='"+strPath+"' AND filename='"+strFileName+"'", null);
 	}
@@ -98,7 +99,16 @@ public class MusicPlayerDAO {
 								null,									/* String having */
 								null);									/* String orderBy */
 	}
-
+	
+	public Cursor getAllTracks(String strFilterKey, String strFilterValue){
+		return m_sqliteDB.query(MusicPlayerDBHelper.MUSIC_TABLE_NAME,				/* String table */
+								null,												/* String[] columns */
+								strFilterKey + " LIKE \"" + strFilterValue + "\"", 	/* String selection */
+								null,												/* String[] selectionArgs */
+								null,												/* String groupBy */
+								null,												/* String having */
+								null);												/* String orderBy */
+	}
 	
 	/**
 	 * OPERAZIONI SULLA CRONOLOGIA
@@ -115,12 +125,12 @@ public class MusicPlayerDAO {
 		return m_sqliteDB.insert(MusicPlayerDBHelper.HISTORY_TABLE_NAME, null, values);
 	}
 	
-	public long deteleteHistoryItemById(int id){
+	public long deleteHistoryItemById(int id){
 		/* ritorna il numero di record eliminati */
 		return m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, "_id = "+id, null);
 	}
 	
-	public long deteleteHistoryItemByPathAndFilename(String strPath, String strFileName){
+	public long deleteHistoryItemByPathAndFilename(String strPath, String strFileName){
 		/* ritorna il numero di record eliminati */
 		return m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, "path='"+strPath+"' AND filename='"+strFileName+"'", null);
 	}

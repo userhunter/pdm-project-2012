@@ -85,6 +85,10 @@ public class MP3Player extends MediaPlayer {
 	
 	/** GETTER AND SETTER **/
 	
+	public Hashtable<String, MP3Item> getAllMp3s() {
+		return this.m_htMp3sSongs;
+	}
+	
 	public MP3Item getMp3ElementById(String strKey) {
 		return this.m_htMp3sSongs.get(strKey);
 	}
@@ -123,6 +127,10 @@ public class MP3Player extends MediaPlayer {
 	
 	public int getPlaylistCursor(){
 		return m_iCursor;
+	}
+	
+	public String getMp3sPath() {
+		return this.m_mp3Manager.getMp3sPath();
 	}
 	
 	public void resetPlaylistCursor(){

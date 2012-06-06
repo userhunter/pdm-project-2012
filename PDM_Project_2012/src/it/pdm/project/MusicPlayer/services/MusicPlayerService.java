@@ -1,8 +1,8 @@
 package it.pdm.project.MusicPlayer.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 
 import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
@@ -17,7 +17,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MusicPlayerService extends Service {
 	private static final String SERVICE_TAG = "MUSIC_PLAYER_SERVICE";
@@ -124,6 +123,10 @@ public class MusicPlayerService extends Service {
 		return this.m_mpMP3Player.getCurrentPlaying();
 	}
 	
+	public String getMp3sPath() {
+		return this.m_mpMP3Player.getMp3sPath();
+	}
+	
 	public void pausePlaying() {
 		//Se il riproduttore sta riproducendo, metto in pausa
 		if (this.m_mpMP3Player.isPlaying()) {
@@ -134,6 +137,10 @@ public class MusicPlayerService extends Service {
 	//Metodo per ottenere l'oggetto di tipo MP3Item a partire dall'id (path+filename)
 	public MP3Item getItemFromFileName(String strKey) {
 		return this.m_mpMP3Player.getMp3ElementById(strKey);
+	}
+	
+	public Hashtable<String, MP3Item> getAllMp3s() {
+		return this.m_mpMP3Player.getAllMp3s();
 	}
 	
 }
