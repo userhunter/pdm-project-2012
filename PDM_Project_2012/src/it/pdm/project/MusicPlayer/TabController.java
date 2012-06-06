@@ -16,6 +16,7 @@ import android.widget.TabHost.TabSpec;
 
 @SuppressWarnings("deprecation")
 public class TabController extends TabActivity {
+	private boolean m_bIsUpdatingDb;
 	private TabHost m_thController;
 	private TabSpec m_tsMusicPlayer;
 	private TabSpec m_tsSocialNetwork;
@@ -28,6 +29,7 @@ public class TabController extends TabActivity {
         
         //Avvio del servizio in background
         this.startService(new Intent(this, MusicPlayerService.class));
+        this.m_bIsUpdatingDb = false;
         
         m_abActionBar = this.getActionBar();
         m_abActionBar.setHomeButtonEnabled(false);
@@ -81,5 +83,9 @@ public class TabController extends TabActivity {
     
     public void switchTab(int tab) {
     	this.m_thController.setCurrentTab(tab);
+    }
+    
+    public void checkForUpdate() {
+    	
     }
 }

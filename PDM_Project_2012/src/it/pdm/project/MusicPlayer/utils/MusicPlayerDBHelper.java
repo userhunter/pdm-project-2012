@@ -10,6 +10,9 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	private static int DB_VERSION = 1;
 	
 	public static String MUSIC_TABLE_NAME = "MusicArchive";
+	public static String UTILITIES_TABLE_NAME = "Utilities";
+	public static String HISTORY_TABLE_NAME = "History";
+	
 	private static String CREATE_MUSIC_TABLE_syntax = 
 			"CREATE TABLE IF NOT EXISTS " + MUSIC_TABLE_NAME + "(" +
 			"_id integer primary key autoincrement, " +
@@ -22,13 +25,22 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 			"bitrate real, " +
 			"length real not null ) ";
 	
-	public static String HISTORY_TABLE_NAME = "History";
+	
 	private static String CREATE_HISTORY_TABLE_syntax = 
 			"CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE_NAME + "(" +
 			"_id integer primary key autoincrement, " +
 			"path text not null, " +
 			"filename text not null, " +
 			"timestamp datetime default current_timestamp) ";
+	
+	private static String CREATE_UTILITIES_TABLE_syntax = 
+	        "CREATE TABLE IF NOT EXISTS " + UTILITIES_TABLE_NAME + "(" +
+	        "label text not null, " +
+	        "value text not null ) ";
+	
+	private static String INITIALIZE_VAR_DB_LASTMODIFIED_syntax = 
+	        "INSERT INTO " + UTILITIES_TABLE_NAME + "(label,value) " +
+	        "values('dblastmodified','')";
 
 	public MusicPlayerDBHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -39,6 +51,8 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_MUSIC_TABLE_syntax);
 		db.execSQL(CREATE_HISTORY_TABLE_syntax);
+		db.execSQL(CREATE_UTILITIES_TABLE_syntax);
+		db.execSQL(INITIALIZE_VAR_DB_LASTMODIFIED_syntax);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
-import it.pdm.project.MusicPlayer.utils.MP3Player;
+import it.pdm.project.MusicPlayer.objects.MP3Player;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;

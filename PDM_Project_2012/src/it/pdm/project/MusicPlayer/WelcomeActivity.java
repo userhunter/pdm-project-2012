@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer;
 
+import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,11 @@ public class WelcomeActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.welcome_layout);
         
+        MusicPlayerDAO daoDb = new MusicPlayerDAO(this.getApplicationContext());
+        daoDb.open();
+       
+        daoDb.close();
+        
         btntest = (Button)this.findViewById(R.id.test_button);
         
         btntest.setOnClickListener(this);
@@ -31,7 +37,6 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
 			this.sendBroadcast(newIntent);
-			Log.d("WELCOMEACTIVITY", "SENDING INTENT");
 			this.switchTabInActivity(0);
 		}
 	}
