@@ -2,15 +2,12 @@ package it.pdm.project.MusicPlayer;
 
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import android.app.ActionBar;
-import android.app.SearchManager;
 import android.app.TabActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.SearchView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -50,11 +47,11 @@ public class TabController extends TabActivity {
         
         m_thController.setCurrentTab(1);
         
-        //m_thController.getTabWidget().getLayoutParams().height = 35;
-        //m_thController.getTabWidget().getChildAt(1).getLayoutParams().height = 35;
+        /*
+        m_thUpdaterChecker = this.createThread();
+        m_thUpdaterChecker.start();
+        */
     }
-    
-    
     
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -85,9 +82,5 @@ public class TabController extends TabActivity {
     
     public void switchTab(int tab) {
     	this.m_thController.setCurrentTab(tab);
-    }
-    
-    public void checkForUpdate() {
-    	
     }
 }

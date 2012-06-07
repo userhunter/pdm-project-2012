@@ -82,5 +82,40 @@
             android:text=" Radio"
             android:textSize="15sp" />
     </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/loading_popup"
+        android:background="#FF000000"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent">
+        
+            <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:orientation="vertical" >
 
+            <ProgressBar
+                android:id="@+id/updating_circle"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/updating_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:text="@string/library_update"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+	</RelativeLayout>
 </RelativeLayout>
