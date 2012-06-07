@@ -11,6 +11,8 @@ import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,31 +27,68 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	private ArrayList<HashMap<String, String>> m_alRootElements;
 	private ArrayList<ArrayList<HashMap<String, String>>> m_alChildElements;
 	
+	private Thread m_thUpdateChecker = new Thread(new Runnable() {
+    	@Override
+    	public void run() {
+    		boolean bIsUpdating = true;
+    		
+    		while (bIsUpdating) {
+    			bIsUpdating = checkIfIsUpdating();
+    			
+				Bundle data = new Bundle();
+				Message msg = new Message();
+				data.putBoolean("CURRENT_STATUS", bIsUpdating);
+				msg.setData(data);
+				
+				m_hndUpdateChecker.sendMessage(msg);
+
+    			try {
+    				Thread.sleep(1000);
+    			} catch (InterruptedException e) {}
+    		}
+    	}
+    });
+	
+	private Handler m_hndUpdateChecker = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			
+			if (!msg.getData().getBoolean("CURRENT_STATUS")) {
+				findViewById(R.id.loading_popup).setVisibility(View.GONE);
+				applyFilter("all_tracks");
+				m_expListAdapter.notifyDataSetChanged();
+			}
+		}
+	};
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
+    	this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
+    	
     	setContentView(R.layout.music_browser_layout);
     	initMemberVars();
+    	this.m_thUpdateChecker.start();
    
-    	this.m_expListAdapter = new SimpleExpandableListAdapter(
-    		this,
-    		this.m_alRootElements,			 					//ArrayList contenente le root
-            R.layout.music_browser_root,     					//XML relativo al layout delle root
-            new String[] { "key" },  		 					//Chiave delle hashtable relative alle root
-            new int[] { R.id.element_title },     				//Nome della text view a cui associare il valore della root
-            this.m_alChildElements,			 					//ArrayList contenente i child per le root
-            R.layout.music_browser_child,    					//XML relativo al layout dei child
-            new String[] { "item_title", "item_album" },       	//Chiave delle hashtable relative ai childs
-            new int[] { R.id.item_title, R.id.item_album }     	//Nome della text view a cui associare il valore della root
-    	);
-    	
-    	this.setListAdapter(this.m_expListAdapter);
+	    this.m_expListAdapter = new SimpleExpandableListAdapter(
+	    	this,
+	    	this.m_alRootElements,			 					//ArrayList contenente le root
+	        R.layout.music_browser_root,     					//XML relativo al layout delle root
+	        new String[] { "key" },  		 					//Chiave delle hashtable relative alle root
+	        new int[] { R.id.element_title },     				//Nome della text view a cui associare il valore della root
+	        this.m_alChildElements,			 					//ArrayList contenente i child per le root
+	        R.layout.music_browser_child,    					//XML relativo al layout dei child
+	        new String[] { "item_title", "item_album" },       	//Chiave delle hashtable relative ai childs
+	        new int[] { R.id.item_title, R.id.item_album }     	//Nome della text view a cui associare il valore della root
+		);
+		
+		this.setListAdapter(this.m_expListAdapter);
     }
     
     private void initMemberVars() {
     	this.m_expListView = this.getExpandableListView();
     	
-    	this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
     	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
     	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
     	
@@ -87,6 +126,14 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.createListFromFilter(strFilter);
     	this.m_expListAdapter.notifyDataSetChanged();
     	
+		if (this.m_expListAdapter.getGroupCount() > 0)
+		{
+			if (strFilter.equalsIgnoreCase("all_tracks"))
+				m_expListView.expandGroup(0);
+			else
+				m_expListView.collapseGroup(0);
+		}
+    	
     	this.m_daoDatabase.close();
     }
     
@@ -105,7 +152,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 			HashMap<String, String> hmNewArtist = new HashMap<String, String>();
 			hmNewArtist.put("key", cursor.getString(cursor.getColumnIndex(strKey)));
 			
-			this.m_alRootElements.add(hmNewArtist);
+			if (!this.m_alRootElements.contains(hmNewArtist))
+				this.m_alRootElements.add(hmNewArtist);
 		}
 		
 		for (int rootCounter = 0; rootCounter < this.m_alRootElements.size(); rootCounter++) {
@@ -176,6 +224,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
         return true;
     }
     
+    
     private String[] getPlaylistFromClick(int group, int clickedChild) {
     	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
     	ArrayList<String> alResultList = new ArrayList<String>();
@@ -199,5 +248,12 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		
 		thController.switchTab(indexTabToSwitch);
 	}
-
+	
+	private boolean checkIfIsUpdating() {
+		this.m_daoDatabase.open();
+		String strStatus = this.m_daoDatabase.getUtilitiesValues("DbIsUpdating");
+		this.m_daoDatabase.close();
+		
+		return strStatus.equals("true") ? true : false;
+	}
 }
