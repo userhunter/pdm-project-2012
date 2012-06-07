@@ -15,6 +15,7 @@ import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Shader.TileMode;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -68,11 +69,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		//con UnregisterReceiver, richiedo di non voler più ricevere notifiche da parte del Service
 		unregisterReceiver(broadcastReceiver);
 	}
-	
-	public void test() {
-		this.m_daoDatabase.open();
-		this.m_daoDatabase.close();
-	}
 	  
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
@@ -94,7 +90,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    }
 	};
 	
-	//Questo handler aggiorna i timer d'esecuzione del brano
+	//Questo handler aggiorna i timer d'esecuzione del brano (se non stiamo interagendo con la bar)
 	private Handler positionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -112,6 +108,16 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			int lCurrentPercentage = m_utUtils.getProgressPercentage(lCurrentDuration, lTotalDuration);
 			if(!m_bProgressBarTouching)
 				m_pbPositionBar.setProgress(lCurrentPercentage);
+		}
+	};
+	
+	//Questo handler imposta la cover dell'album
+	private Handler coverArtHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			/* l'oggetto Bitmap da impostare, viene passato serializzato tramite Parcelable */
+			m_ivCover.setImageBitmap((Bitmap) msg.getData().getParcelable("SKEWED COVER"));
 		}
 	};
 	
@@ -164,11 +170,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    public void onReceive(Context context, Intent intent) {
 			
 			if (intent.getStringExtra("ACTION")!=null && intent.getStringExtra("ACTION").equals("PLAY_SONG")) {
-				Log.d("DUNABUG", "BROADCAST ARRIVATO");
-				if(m_mpService == null)
-					System.out.println("SERVICE NULL");
+				
 				MP3Item currentPlaying = m_mpService.getCurrentPlayingItem();
 				
+				//Aggiorno le label di info sulla canzone in esecuzione
 				if (currentPlaying != null) {
 					m_tvSongAlbum.setText(currentPlaying.getLocalID3Field(currentPlaying.ALBUM));
 					m_tvSongArtist.setText(currentPlaying.getLocalID3Field(currentPlaying.ARTIST));
@@ -176,10 +181,51 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 					m_tvSongYear.setText(currentPlaying.getLocalID3Field(currentPlaying.YEAR));
 				}
 				
+				//Mostro il pulsante di pausa e nascondo quello di play
 				m_btnPauseButton.setVisibility(View.VISIBLE);
 				m_btnPlayButton.setVisibility(View.GONE);
 				
-				updateCoverImage(m_mpService.getCurrentPlayingItem());
+				//Thread che tramite l'handler imposta - se c'è - la cover dell'album
+				Thread updateCoverImage = new Thread (new Runnable() {
+					@Override
+					public void run() {
+						Artwork artCover = m_mpService.getCurrentPlayingItem().getCover();
+						Bitmap originalCover = null;
+						
+						if(artCover != null) {
+							originalCover = BitmapFactory.decodeByteArray(artCover.getBinaryData(), 0, artCover.getBinaryData().length);
+						}
+						else {
+							/* imposto la cover di default se non presente */
+							originalCover = BitmapFactory.decodeResource(getResources(), R.drawable.sample_cover);
+						}
+						
+						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
+				        
+				        /* ora modifichiamo la prospettiva del bitmap */
+				        float curScale = 1F;			float curRotate = 0F;
+				        float curSkewX = 0F;			float curSkewY = -0.063F;
+				        
+				        /* creiamo la matrice deformante da applicare al nuovo bitmap */
+				        Matrix matrix = new Matrix();
+				        //matrix.postScale(curScale, curScale);matrix.postRotate(curRotate);
+				        matrix.postSkew(curSkewX, curSkewY);
+				        int width = reflectedCover.getWidth();
+				        int height = reflectedCover.getHeight();
+				        
+				        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
+				        
+				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterà come cover */
+				        Bundle data = new Bundle();
+						Message msg = new Message();
+						data.putParcelable("SKEWED COVER", skewedCover);
+						msg.setData(data);
+						
+						coverArtHandler.sendMessage(msg);
+					}
+				});
+				
+				updateCoverImage.start();
 				
 				//Thread che tramite l'handler aggiorna la progress bar del brano in esecuzione (ogni 500 msec)
 				Thread updateProgressBar = new Thread (new Runnable() {
@@ -243,48 +289,14 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    this.m_daoDatabase = new MusicPlayerDAO(this.getApplicationContext());
 	}
 	
-	//Aggiorna la cover dell'album visualizzata
-	public void updateCoverImage(MP3Item mp3){
-		Artwork artCover = mp3.getCover();
-		Bitmap originalCover = null;
-		
-		if(artCover != null) {
-			originalCover = BitmapFactory.decodeByteArray(artCover.getBinaryData(), 0, artCover.getBinaryData().length);
-		}
-		else {
-			/* imposto la cover di default se non presente */
-			originalCover = BitmapFactory.decodeResource(getResources(), R.drawable.sample_cover);
-		}
-		
-		Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
-        
-        /* ora modifichiamo la prospettiva del bitmap */
-        float curScale = 1F;
-        float curRotate = 0F;
-        float curSkewX = 0F;
-        float curSkewY = -0.063F;
-        
-        Matrix matrix = new Matrix();
-        //matrix.postScale(curScale, curScale);
-        //matrix.postRotate(curRotate);
-        matrix.postSkew(curSkewX, curSkewY);
-        int width = reflectedCover.getWidth();
-        int height = reflectedCover.getHeight();
-        
-        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
-        m_ivCover.setImageBitmap(skewedCover);
-	}
 	
-	/**
-	 * REFLECTED IMAGE METHOD
-	 */
+	//Crea un Bitmap con il riflesso
 	public static Bitmap createReflectedImage(Context context, Bitmap originalImage) {
 		//The gap we want between the reflection and the original image
 		final int reflectionGap = 5;
 
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
-
 
 		//This will not scale but will flip on the Y axis
 		Matrix matrix = new Matrix();
@@ -293,7 +305,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		//Create a Bitmap with the flip matrix applied to it.
 		//We only want the bottom half of the image
 		Bitmap reflectionImage = Bitmap.createBitmap(originalImage, 0, height/2, width, height/2, matrix, false);
-
 
 		//Create a new bitmap with same width but taller to fit reflection
 		Bitmap bitmapWithReflection = Bitmap.createBitmap(width, (height + height/2), Config.ARGB_8888);
@@ -323,4 +334,6 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 
 		return bitmapWithReflection;
 	}
+	
+	
 }
