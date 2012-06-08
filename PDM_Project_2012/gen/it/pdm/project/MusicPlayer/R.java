@@ -40,7 +40,8 @@ public final class R {
         public static final int seekbar_progress=0x7f02001a;
         public static final int seekbar_progress_bg=0x7f02001b;
         public static final int song_icon=0x7f02001c;
-        public static final int webradio_icon=0x7f02001d;
+        public static final int streaming_cover=0x7f02001d;
+        public static final int webradio_icon=0x7f02001e;
     }
     public static final class id {
         public static final int bottom_container=0x7f070019;
