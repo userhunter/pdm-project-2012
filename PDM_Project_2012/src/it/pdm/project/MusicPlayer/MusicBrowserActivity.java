@@ -1,6 +1,7 @@
 package it.pdm.project.MusicPlayer;
 
 import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
+import it.pdm.project.MusicPlayer.utils.CustomEditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Set;
 import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +26,7 @@ import android.widget.SimpleExpandableListAdapter;
 
 public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener, OnKeyListener {
 	private Button m_btnFilterAll, m_btnFilterAlbum, m_btnFilterArtists, m_btnFilterRadio;
-	private EditText m_txtSearchBar;
+	private CustomEditText m_txtSearchBar;
 	private ExpandableListView m_expListView;
 	private SimpleExpandableListAdapter m_expListAdapter;
 	private MusicPlayerDAO m_daoDatabase;
@@ -97,7 +99,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
     	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
     	
-    	this.m_txtSearchBar = (EditText)findViewById(R.id.search_input);
+    	this.m_txtSearchBar = (CustomEditText)findViewById(R.id.search_input);
     	
     	this.m_btnFilterAll = (Button)findViewById(R.id.btnAll);
     	this.m_btnFilterAlbum = (Button)findViewById(R.id.btnAlbum);
@@ -128,8 +130,15 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     
 	@Override
 	public boolean onKey(View source, int keyCode, KeyEvent event) {
-		if (source.getId() == this.m_txtSearchBar.getId() && event.getAction() == KeyEvent.ACTION_DOWN)
+		if (source.getId() == this.m_txtSearchBar.getId() && event.getAction() == KeyEvent.ACTION_UP){
 			this.applyFilter(this.m_strSection);
+
+			/* mostro/nascondo il clear button */
+			if(!this.m_txtSearchBar.getText().toString().equals(""))
+				this.m_txtSearchBar.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.delete_icon), null);
+			else
+				this.m_txtSearchBar.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+		}
 		
 		return false;
 	}
