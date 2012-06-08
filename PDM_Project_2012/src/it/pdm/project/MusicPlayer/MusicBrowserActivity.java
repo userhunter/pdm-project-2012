@@ -13,19 +13,24 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
-public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener {
+public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener, OnKeyListener {
 	private Button m_btnFilterAll, m_btnFilterAlbum, m_btnFilterArtists, m_btnFilterRadio;
+	private EditText m_txtSearchBar;
 	private ExpandableListView m_expListView;
 	private SimpleExpandableListAdapter m_expListAdapter;
 	private MusicPlayerDAO m_daoDatabase;
 	private ArrayList<HashMap<String, String>> m_alRootElements;
 	private ArrayList<ArrayList<HashMap<String, String>>> m_alChildElements;
+	private String m_strSection;
 	
 	private Thread m_thUpdateChecker = new Thread(new Runnable() {
     	@Override
@@ -92,6 +97,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.m_alRootElements = new ArrayList<HashMap<String, String>>();
     	this.m_alChildElements = new ArrayList<ArrayList<HashMap<String, String>>>();
     	
+    	this.m_txtSearchBar = (EditText)findViewById(R.id.search_input);
+    	
     	this.m_btnFilterAll = (Button)findViewById(R.id.btnAll);
     	this.m_btnFilterAlbum = (Button)findViewById(R.id.btnAlbum);
     	this.m_btnFilterArtists = (Button)findViewById(R.id.btnArtist);
@@ -101,6 +108,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.m_btnFilterAlbum.setOnClickListener(this);
     	this.m_btnFilterArtists.setOnClickListener(this);
     	//this.m_btnFilterRadio.setOnClickListener(this);
+    	
+    	this.m_txtSearchBar.setOnKeyListener(this);
     }
     
     @Override
@@ -117,8 +126,18 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	
     }
     
+	@Override
+	public boolean onKey(View source, int keyCode, KeyEvent event) {
+		if (source.getId() == this.m_txtSearchBar.getId() && event.getAction() == KeyEvent.ACTION_DOWN)
+			this.applyFilter(this.m_strSection);
+		
+		return false;
+	}
+    
     private void applyFilter(String strFilter) {
     	this.m_daoDatabase.open();
+    	
+    	this.m_strSection = strFilter;
     	
     	this.m_alRootElements.clear();
     	this.m_alChildElements.clear();
@@ -147,7 +166,13 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
 	
 	private void artistsOrAlbumCase(String strKey) {
-		Cursor cursor = this.m_daoDatabase.getAllTracks();
+		Cursor cursor;
+		
+		if (this.m_txtSearchBar.getText().length() > 0) 
+			cursor = this.m_daoDatabase.getAllTracks("album", "%" + this.m_txtSearchBar.getText() + "%");
+		else
+			cursor = this.m_daoDatabase.getAllTracks();
+		
 		while (cursor.moveToNext()) {
 			HashMap<String, String> hmNewArtist = new HashMap<String, String>();
 			hmNewArtist.put("key", cursor.getString(cursor.getColumnIndex(strKey)));
@@ -191,7 +216,13 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		this.m_alRootElements.add(hmAllTracksNode);
 		
 		//Creazione dei childs
-		Cursor cursor = this.m_daoDatabase.getAllTracks();
+		Cursor cursor;
+		
+		if (this.m_txtSearchBar.getText().length() > 0) 
+			cursor = this.m_daoDatabase.getAllTracks("title", "%" + this.m_txtSearchBar.getText() + "%");
+		else
+			cursor = this.m_daoDatabase.getAllTracks();
+		
 		ArrayList<HashMap<String, String>> alAllTracksChilds = new ArrayList<HashMap<String, String>>();
 		
 		while (cursor.moveToNext()) {
