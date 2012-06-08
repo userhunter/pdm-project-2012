@@ -177,8 +177,12 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	private void artistsOrAlbumCase(String strKey) {
 		Cursor cursor;
 		
-		if (this.m_txtSearchBar.getText().length() > 0) 
+		if (this.m_txtSearchBar.getText().length() > 0 && strKey.equals("album"))
 			cursor = this.m_daoDatabase.getAllTracks("album", "%" + this.m_txtSearchBar.getText() + "%");
+		
+		else if(this.m_txtSearchBar.getText().length() > 0 && strKey.equals("artist"))
+			cursor = this.m_daoDatabase.getAllTracks("artist", "%" + this.m_txtSearchBar.getText() + "%");
+		
 		else
 			cursor = this.m_daoDatabase.getAllTracks();
 		
