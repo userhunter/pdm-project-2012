@@ -40,31 +40,11 @@ public class MusicPlayerDAO {
 		return this.m_sqliteDB.isDbLockedByOtherThreads();
 	}
 	
+	
 	/**
 	 * OPERAZIONI SULL'ARCHIVIO MUSICALE
 	 */
-	
-	public void insertUtilityValue(String label, String value){
-		ContentValues cv = new ContentValues();
-	    cv.put("label", label);
-	    cv.put("value", value);
-	    
-	    if (getUtilitiesValues(label) == null)
-	    	m_sqliteDB.insert(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, null, cv);
-	    else
-	    	m_sqliteDB.update(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, cv, "label LIKE \""+label+"\"", null);
-	}
-	
-	public String getUtilitiesValues(String label) {
-		Cursor cursor = m_sqliteDB.query(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, new String[] {"label", "value"}, 
-                "label LIKE \"" + label + "\"", null, null, null, null);
-		
-		while (cursor.moveToNext())
-			return cursor.getString(cursor.getColumnIndex("value"));
-		
-		return null;
-	}
-	
+
 	public long insertTrack(MP3Item mp3){
 		/* ritorna l'id del record inserito oppure -1 in caso di errore */
 		
@@ -126,6 +106,40 @@ public class MusicPlayerDAO {
 	}
 	
 	/**
+	 * OPERAZIONI SUGLI STREAMING
+	 */
+	
+	public long insertStream(String strName, String strUrl){
+		/* ritorna l'id del record inserito oppure -1 in caso di errore */
+		
+		ContentValues values = new ContentValues();
+		values.put("name", strName);
+		values.put("url", strUrl);
+		
+		return m_sqliteDB.insert(MusicPlayerDBHelper.STREAMS_TABLE_NAME, null, values);
+	}
+	
+	public long deleteStreamById(int id){
+		/* ritorna il numero di record eliminati */
+		return m_sqliteDB.delete(MusicPlayerDBHelper.STREAMS_TABLE_NAME, "_id = "+id, null);
+	}
+	
+	public void deleteAllStreams(){
+		m_sqliteDB.delete(MusicPlayerDBHelper.STREAMS_TABLE_NAME, null, null);
+	}
+	
+	public Cursor getAllStreams(){
+		return m_sqliteDB.query(MusicPlayerDBHelper.STREAMS_TABLE_NAME, null, null, null, null, null, null);
+	}
+	
+	public Cursor getAllStreams(String strFilterKey, String strFilterValue){
+		return m_sqliteDB.query(MusicPlayerDBHelper.STREAMS_TABLE_NAME,
+								null,
+								strFilterKey + " LIKE \"" + strFilterValue + "\"",
+								null, null, null, null);
+	}
+	
+	/**
 	 * OPERAZIONI SULLA CRONOLOGIA
 	 */
 	
@@ -183,4 +197,29 @@ public class MusicPlayerDAO {
 		return res;
 	}
 
+	/**
+	 * OPERAZIONI SULLE UTILITY
+	 */
+	
+	public void insertUtilityValue(String label, String value){
+		ContentValues cv = new ContentValues();
+		cv.put("label", label);
+		cv.put("value", value);
+		
+		if (getUtilitiesValues(label) == null)
+			m_sqliteDB.insert(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, null, cv);
+		else
+			m_sqliteDB.update(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, cv, "label LIKE \""+label+"\"", null);
+	}
+	
+	public String getUtilitiesValues(String label) {
+		Cursor cursor = m_sqliteDB.query(MusicPlayerDBHelper.UTILITIES_TABLE_NAME, new String[] {"label", "value"}, 
+				"label LIKE \"" + label + "\"", null, null, null, null);
+		
+		while (cursor.moveToNext())
+			return cursor.getString(cursor.getColumnIndex("value"));
+		
+		return null;
+	}
+	
 }
