@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer.services;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -38,10 +39,7 @@ public class MusicPlayerService extends Service {
 		
 		//Registro il servizio abilitandolo alla ricezione di Broadcast da parte di SearchActivity
 		registerReceiver(broadcastReceiver, new IntentFilter(WelcomeActivity.BROADCAST_ACTION));
-		
-		//Se l'inizializzazione del player fallisce gestisco l'errore.
-		if (!this.m_mpMP3Player.initPlayer())
-			Log.d(SERVICE_TAG, "ERROR DURING INITIALIZATION OF PLAYER.");
+
 	}
 	
 	@Override
@@ -64,6 +62,8 @@ public class MusicPlayerService extends Service {
 	    public void onReceive(Context context, Intent intent) {
 			
 			if (intent.getStringExtra("ACTION").equals("PLAY_PLAYLIST")){
+				//Disabilito lo streaming, se attivo
+				disableStreaming();
 				//Imposto la playlist che ricevo come playlist del mediaplayer e avvio la riproduzione del primo elemento
 				String[] playlistContent = intent.getStringArrayExtra("PLAYLIST");
 				ArrayList<String> alNewPlaylist  = new ArrayList(Arrays.asList(playlistContent));
@@ -72,11 +72,21 @@ public class MusicPlayerService extends Service {
 				m_mpMP3Player.resetPlaylistCursor();
 				playNextSong();
 			}
+			else if (intent.getStringExtra("ACTION").equals("PLAY_STREAM")){
+				//Abilito lo streaming
+				enableStreaming();
+				String strStreamingName = intent.getStringExtra("STREAM_NAME");
+				String strStreamingUrl = intent.getStringExtra("STREAM_URL");
+				playStream(strStreamingName, strStreamingUrl);
+			}
 		}
 	};
 
 	/** PLAYER METHODS **/
 	public void playSong() {
+		//Disabilito lo streaming, se attivo
+		disableStreaming();
+		
 		//Se il riproduttore non sta riproducendo, avvio la riproduzione
 		if (!this.m_mpMP3Player.isPlaying()) {
 			this.m_mpMP3Player.playSong();
@@ -141,6 +151,53 @@ public class MusicPlayerService extends Service {
 	
 	public Hashtable<String, MP3Item> getAllMp3s() {
 		return this.m_mpMP3Player.getAllMp3s();
+	}
+	
+	/*
+	 * 	STREAMING
+	 */
+	
+	public boolean isStreaming(){
+		return this.m_mpMP3Player.isStreaming();
+	}
+	
+	public void enableStreaming(){
+		this.m_mpMP3Player.enableStreaming();
+	}
+	
+	public void disableStreaming(){
+		this.m_mpMP3Player.disableStreaming();
+	}
+	
+	public String getStreamingStatus(){
+		return this.m_mpMP3Player.getStreamingStatus();
+	}
+	
+	public void playStream(String strName, String strUrl){
+		try
+		{
+			this.m_mpMP3Player.playStream(strName, strUrl);
+		} 	
+			catch (IllegalArgumentException e) {e.printStackTrace();}
+			catch (SecurityException e) {e.printStackTrace();}
+			catch (IllegalStateException e) {e.printStackTrace();}
+			catch (IOException e) {e.printStackTrace();}
+		
+		//Preparo l'intent per la notifica da inviare all'activity
+		Intent intent = new Intent(MusicPlayerService.BROADCAST_ACTION);
+		intent.putExtra("ACTION", "PLAY_STREAM");
+		intent.putExtra("STREAM_NAME", strName);
+		intent.putExtra("STREAM_URL", strUrl);
+		this.getApplicationContext().sendBroadcast(intent);
+		
+	}
+	
+	public void resumeStream(){
+		this.m_mpMP3Player.playSong();
+	}
+	
+	public boolean isPlaying(){
+		return this.m_mpMP3Player.isPlaying();
 	}
 	
 }

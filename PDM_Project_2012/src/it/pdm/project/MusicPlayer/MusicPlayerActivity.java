@@ -120,6 +120,29 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		}
 	};
 	
+	//Questo handler visualizza le info sullo stato dello streaming
+	public Handler streamingHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			
+			//Se il messaggio contiene la cover di default impostala
+			if(msg.getData().containsKey("SKEWED COVER"))
+				/* l'oggetto Bitmap da impostare, viene passato serializzato tramite Parcelable */
+				m_ivCover.setImageBitmap((Bitmap) msg.getData().getParcelable("SKEWED COVER"));
+			
+			if(m_mpService.getStreamingStatus().equals("DISABLED"))
+				m_tvSongYear.setText("");
+			else if(m_mpService.getStreamingStatus().equals("BUFFERING"))
+				m_tvSongYear.setText("Buffering...");
+			else if(m_mpService.getStreamingStatus().equals("STREAMING"))
+				m_tvSongYear.setText("");
+			else if(m_mpService.getStreamingStatus().equals("ERROR"))
+				m_tvSongYear.setText("Impossibile caricare lo stream");
+			
+		}
+	};
+	
 	//Questo listener gestisce l'avanzamento "manuale" effettuato sulla barra di progresso
 	private OnSeekBarChangeListener positionListener = new OnSeekBarChangeListener() {
 		@Override
@@ -132,30 +155,38 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		}
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
-			int progress = seekBar.getProgress();
-			int iNewPosition = Utilities.progressToTimer(progress, m_mpService.getCurrentPlayingTotalDuration());
-			m_mpService.setCurrentPlayingPosition(iNewPosition);
-			m_bProgressBarTouching = false;
+			if(!m_mpService.isStreaming()){
+				int progress = seekBar.getProgress();
+				int iNewPosition = Utilities.progressToTimer(progress, m_mpService.getCurrentPlayingTotalDuration());
+				m_mpService.setCurrentPlayingPosition(iNewPosition);
+				m_bProgressBarTouching = false;
+			}
+			else
+				seekBar.setProgress(0);
 		}
 	};
 	
 	@Override
 	public void onClick(View sourceClick) {
 		if (sourceClick.getId() == this.m_btnPlayButton.getId()) {
-			if(m_mpService.getCurrentPlayingItem()!=null){
+			if(m_mpService.getCurrentPlayingItem() != null && !this.m_mpService.isStreaming()){
 				this.m_btnPauseButton.setVisibility(View.VISIBLE);
 				this.m_btnPlayButton.setVisibility(View.GONE);
 				this.m_mpService.playSong();
+			} else if (this.m_mpService.isStreaming()){
+				this.m_btnPauseButton.setVisibility(View.VISIBLE);
+				this.m_btnPlayButton.setVisibility(View.GONE);
+				this.m_mpService.resumeStream();
 			}
 		} else if (sourceClick.getId() == this.m_btnPauseButton.getId()) {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
 			this.m_mpService.pausePlaying();
-		} else if (sourceClick.getId() == this.m_btnForwardButton.getId()) {
+		} else if (sourceClick.getId() == this.m_btnForwardButton.getId() && !this.m_mpService.isStreaming()) {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playNextSong();
-		} else if (sourceClick.getId() == this.m_btnBackwardButton.getId()) {
+		} else if (sourceClick.getId() == this.m_btnBackwardButton.getId() && !this.m_mpService.isStreaming()) {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playPreviousSong();
@@ -232,7 +263,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 					
 					@Override
 					public void run() {
-						while (!isFinished) {
+						while (!isFinished && !m_mpService.isStreaming()) {
 							Bundle data = new Bundle();
 							Message msg = new Message();
 							data.putInt("CURRENT_DURATION", m_mpService.getCurrentPlayingPosition());
@@ -256,6 +287,73 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 				});
 				
 				updateProgressBar.start();
+			}
+			
+			else if (intent.getStringExtra("ACTION")!=null && intent.getStringExtra("ACTION").equals("PLAY_STREAM")) {
+				//Aggiorno le label di info sullo streaming
+				m_tvSongArtist.setText(intent.getStringExtra("STREAM_URL"));
+				m_tvSongTitle.setText(intent.getStringExtra("STREAM_NAME"));
+				m_tvSongAlbum.setText("");
+				
+				//Azzero la ProgressBar e timer d'esecuzione
+				m_pbPositionBar.setProgress(0);
+				m_tvSongTotalDuration.setText("--");
+				m_tvSongActualPosition.setText("--");
+				
+				//Mostro il pulsante di pausa e nascondo quello di play
+				m_btnPauseButton.setVisibility(View.VISIBLE);
+				m_btnPlayButton.setVisibility(View.GONE);
+				
+				//Thread che tramite l'handler imposta la cover di default dello streaming
+				Thread updateCoverImage = new Thread (new Runnable() {
+					@Override
+					public void run() {
+						Bitmap originalCover = BitmapFactory.decodeResource(getResources(), R.drawable.streaming_cover);
+						
+						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
+				        
+				        /* ora modifichiamo la prospettiva del bitmap */
+				        float curScale = 1F;			float curRotate = 0F;
+				        float curSkewX = 0F;			float curSkewY = -0.063F;
+				        
+				        /* creiamo la matrice deformante da applicare al nuovo bitmap */
+				        Matrix matrix = new Matrix();
+				        //matrix.postScale(curScale, curScale);matrix.postRotate(curRotate);
+				        matrix.postSkew(curSkewX, curSkewY);
+				        int width = reflectedCover.getWidth();
+				        int height = reflectedCover.getHeight();
+				        
+				        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
+				        
+				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterˆ come cover */
+				        Bundle data = new Bundle();
+						Message msg = new Message();
+						data.putParcelable("SKEWED COVER", skewedCover);
+						msg.setData(data);
+						
+						coverArtHandler.sendMessage(msg);
+					}
+				});
+				
+				updateCoverImage.start();
+				
+				//Thread che va ad aggiornare e visualizzare - tramite handler - lo stato dello streaming
+				Thread thStreamingStatusUpdater = new Thread(new Runnable(){
+					@Override
+					public void run() {
+						while (m_mpService.isStreaming()) {
+							Bundle data = new Bundle();
+							Message msg = new Message();
+							msg.setData(data);
+							streamingHandler.sendMessage(msg);
+							
+							try {	Thread.sleep(500);	}
+							catch (InterruptedException e) {e.printStackTrace();}
+						}
+					}
+				});
+				thStreamingStatusUpdater.start();
+				
 			}
 	    }
 	};

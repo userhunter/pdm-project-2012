@@ -9,11 +9,19 @@ import java.util.Random;
 import java.util.Stack;
 
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 
 public class MP3Player extends MediaPlayer {
 	private boolean m_bIsReady;
+	
+	private boolean m_bIsStreaming;
+	private String m_strStreamingName;
+	private String m_strStreamingUrl;
+	private String m_strStreamingStatus;
+	
 	private MP3Manager m_mp3Manager; //Manager responsabile del reperimento degli mp3
 	
 	private MP3Item m_mp3CurrentPlaying; //Mp3 in riproduzione
@@ -26,50 +34,26 @@ public class MP3Player extends MediaPlayer {
 	
 	public MP3Player() {
 		this.m_bIsReady = false;
+		this.m_bIsStreaming = false;
+		this.m_strStreamingName = null;
+		this.m_strStreamingUrl = null;
 		this.m_mp3Manager = new MP3Manager("/sdcard/Music/");
 		this.m_mp3CurrentPlaying = null;
 		this.setCurrentPlaylist(null);
 		this.m_iCursor = -1;
 		this.m_htMp3sSongs = this.m_mp3Manager.getMp3sTable();
-	}
-	
-	public boolean initPlayer() {
-    	try {
-    		//Se non c'è nessun mp3 in riproduzione, ne scelgo uno a caso. Se è di nuovo null ritorno false
-    		if (this.m_mp3CurrentPlaying == null){
-    			
-    			/*ArrayList<String> alTemp = new ArrayList<String>();
-    			alTemp.add(this.getRandomMp3().getId());
-    			alTemp.add(this.getRandomMp3().getId());
-    			alTemp.add(this.getRandomMp3().getId());
-    			alTemp.add(this.getRandomMp3().getId());
-    			alTemp.add(this.getRandomMp3().getId());
-    			this.setCurrentPlaylist(alTemp);*/
-    			
-    		}
-    		
-    		//Inizializzo il player dicendo di riprodurre come primo mp3 m_mp3CurrentPlaying. 
-			/*this.reset();
-			this.setDataSource(this.m_mp3CurrentPlaying.getPath() + this.m_mp3CurrentPlaying.getFileName());
-			this.prepare();
-			this.m_bIsReady = true;*/
-			
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+		setStreamingStatus("DISABLED");
 	}
 	
 	public MP3Item getRandomMp3() {
 		//Ottengo le chiavi della tabella degli mp3
 		Enumeration<String> keys = this.m_htMp3sSongs.keys();
+		
 		//Associo la lista di chiavi ad un array
 		ArrayList<String> alKeys = Collections.list(keys);
 		
 		if (alKeys.size() > 0) {
 			int randomInt = new Random().nextInt(alKeys.size());
-			
 			return this.m_htMp3sSongs.get(alKeys.get(randomInt));
 		} else
 			return null;
@@ -79,8 +63,39 @@ public class MP3Player extends MediaPlayer {
 	//Riproduco la canzone (se e solo se il player è pronto) che è stata impostata come dataSource
 	public void playSong() {
 		if (this.m_bIsReady) 
-			this.start();
-		
+			this.start();	
+	}
+	
+	//Riproduce lo stream passato come parametro
+	public void playStream(String strName, String strUrl) throws IllegalArgumentException, SecurityException, IllegalStateException, IOException{
+		this.m_strStreamingName = strName;
+		this.m_strStreamingUrl = strUrl;
+		reset();
+		setStreamingStatus("BUFFERING");
+		setDataSource(strUrl);
+		prepareAsync();
+		setOnPreparedListener(new OnPreparedListener(){
+			@Override
+			public void onPrepared(MediaPlayer mp) {
+				m_bIsReady = true;
+				mp.start();
+				setStreamingStatus("STREAMING");
+			}
+		});
+		setOnBufferingUpdateListener(new OnBufferingUpdateListener(){
+			@Override
+			public void onBufferingUpdate(MediaPlayer mp, int arg1) {
+				
+			}
+		});
+		setOnErrorListener(new OnErrorListener(){
+			@Override
+			public boolean onError(MediaPlayer mp, int what, int extra) {
+				setStreamingStatus("ERROR");
+				Log.d("STREAMING", "ERROR");
+				return false;
+			}
+		});
 	}
 	
 	/** GETTER AND SETTER **/
@@ -110,17 +125,15 @@ public class MP3Player extends MediaPlayer {
 	}
 	
 	public boolean incrementPlaylistCursor(){
-		if(m_iCursor >= m_alCurrentPlaylist.size()-1){
+		if(m_iCursor >= m_alCurrentPlaylist.size()-1)
 			return false;
-		}
 		m_iCursor++;
 		return true;
 	}
 	
 	public boolean decrementPlaylistCursor(){
-		if(m_iCursor <= 0){
+		if(m_iCursor <= 0)
 			return false;
-		}
 		m_iCursor--;
 		return true;
 	}
@@ -135,6 +148,28 @@ public class MP3Player extends MediaPlayer {
 	
 	public void resetPlaylistCursor(){
 		m_iCursor = -1;
+	}
+	
+	public boolean isStreaming(){
+		return m_bIsStreaming;
+	}
+	
+	public void enableStreaming(){
+		m_bIsStreaming = true;
+	}
+	
+	public void disableStreaming(){
+		m_bIsStreaming = false;
+		this.m_strStreamingName = null;
+		this.m_strStreamingUrl = null;
+	}
+	
+	public void setStreamingStatus(String strStatus){
+		this.m_strStreamingStatus = strStatus;
+	}
+	
+	public String getStreamingStatus(){
+		return this.m_strStreamingStatus;
 	}
 	
 	public void playNextSong(){
