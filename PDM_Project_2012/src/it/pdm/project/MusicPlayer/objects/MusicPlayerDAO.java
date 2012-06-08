@@ -15,14 +15,29 @@ public class MusicPlayerDAO {
 	
 	public MusicPlayerDAO(Context context){
 		m_dbHelper = new MusicPlayerDBHelper(context);
+		m_sqliteDB = null;
 	}
 	
-	public void open(){
-		m_sqliteDB = m_dbHelper.getWritableDatabase();
+	public void open() {
+		if (this.m_sqliteDB == null || !this.m_sqliteDB.isOpen())
+			m_sqliteDB = m_dbHelper.getWritableDatabase();
 	}
 	
 	public void close(){
-		m_sqliteDB.close();
+		if (m_sqliteDB.isOpen())
+			m_sqliteDB.close();
+	}
+	
+	public boolean isOpen() {
+		return this.m_sqliteDB.isOpen();
+	}
+	
+	public boolean isDbLockedByCurrentThread() {
+		return this.m_sqliteDB.isDbLockedByCurrentThread();
+	}
+	
+	public boolean isDbLockedByOtherThreads() {
+		return this.m_sqliteDB.isDbLockedByOtherThreads();
 	}
 	
 	/**
