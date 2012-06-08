@@ -10,6 +10,7 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	private static int DB_VERSION = 1;
 	
 	public static String MUSIC_TABLE_NAME = "MusicArchive";
+	public static String STREAMS_TABLE_NAME = "Streams";
 	public static String UTILITIES_TABLE_NAME = "Utilities";
 	public static String HISTORY_TABLE_NAME = "History";
 	
@@ -25,6 +26,11 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 			"bitrate real, " +
 			"length real not null ) ";
 	
+	private static String CREATE_STREAMS_TABLE_syntax = 
+			"CREATE TABLE IF NOT EXISTS " + STREAMS_TABLE_NAME + "(" +
+			"_id integer primary key autoincrement, " +
+			"name text not null, " +
+			"url text not null ) ";
 	
 	private static String CREATE_HISTORY_TABLE_syntax = 
 			"CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE_NAME + "(" +
@@ -48,6 +54,7 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_MUSIC_TABLE_syntax);
 		db.execSQL(CREATE_HISTORY_TABLE_syntax);
 		db.execSQL(CREATE_UTILITIES_TABLE_syntax);
+		db.execSQL(CREATE_STREAMS_TABLE_syntax);
 	}
 
 	@Override
