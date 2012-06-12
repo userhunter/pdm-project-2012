@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
-        android:id="@+id/search_ab_item"
-        android:icon="@drawable/ic_action_search"
-        android:title="Search"
+        android:id="@+id/settings_item"
+        android:icon="@drawable/ic_settings"
+        android:title="Impostazioni"
         android:showAsAction="always" 
     />
 </menu>

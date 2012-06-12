@@ -56,7 +56,7 @@ public class TabController extends TabActivity {
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.search_ab_item:
+			case R.id.settings_item:
 				return true;
 			default: 
 				return super.onOptionsItemSelected(item);
