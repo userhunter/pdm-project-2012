@@ -16,8 +16,8 @@ import android.util.Log;
 
 public class MP3Player extends MediaPlayer {
 	private boolean m_bIsReady;
-	
 	private boolean m_bIsStreaming;
+	
 	private String m_strStreamingName;
 	private String m_strStreamingUrl;
 	private String m_strStreamingStatus;

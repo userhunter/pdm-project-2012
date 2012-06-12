@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer;
 
+import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,11 @@ public class WelcomeActivity extends Activity implements OnClickListener {
         btntest = (Button)this.findViewById(R.id.test_button);
         
         btntest.setOnClickListener(this);
+        
+        MusicPlayerDAO mpDao = new MusicPlayerDAO(this);
+        mpDao.open();
+        //mpDao.insertStream("Radio DarkSin", "http://radio.darksin.ch:8000");
+        mpDao.close();
     }
 	
 	@Override
@@ -27,8 +33,8 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 		{
 			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
 			newIntent.putExtra("ACTION", "PLAY_STREAM");
-			newIntent.putExtra("STREAM_NAME", "radio chlame.net");
-			newIntent.putExtra("STREAM_URL", "http://radio.chlame.net:8695");
+			newIntent.putExtra("STREAM_NAME", "Radio DarkSin");
+			newIntent.putExtra("STREAM_URL", "http://radio.darksin.ch:8000");
 			this.sendBroadcast(newIntent);
 			this.switchTabInActivity(0);
 		}

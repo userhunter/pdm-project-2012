@@ -1,6 +1,5 @@
 package it.pdm.project.MusicPlayer.utils;
 
-import it.pdm.project.MusicPlayer.R;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -42,6 +41,7 @@ public class CustomEditText extends EditText
 		if(right != null){
 			m_dRight = right;
 		}
+		
 		super.setCompoundDrawablesWithIntrinsicBounds(left, top, right, bottom);
 	}
 
@@ -56,7 +56,7 @@ public class CustomEditText extends EditText
 			m_rBounds = m_dRight.getBounds();
 			final int x = (int)event.getX();
 			final int y = (int)event.getY();
-			if(x >= (this.getRight() - m_rBounds.width()) && x <= (this.getRight() - this.getPaddingRight())
+			if (x >= (this.getRight() - (m_rBounds.width() * 1.3) ) && x <= (this.getRight() - this.getPaddingRight())
 					&& y >= this.getPaddingTop() && y <= (this.getHeight() - this.getPaddingBottom()))
 			{
 				this.setText("");
