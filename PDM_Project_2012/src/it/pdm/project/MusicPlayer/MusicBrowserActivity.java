@@ -27,7 +27,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
@@ -307,7 +309,44 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 			HashMap<String, String> hmSelectedRadio = this.m_alChildElements.get(groupPosition).get(childPosition); 
 			
 			if (hmSelectedRadio.get("item_title").equalsIgnoreCase("Aggiungi una Web Radio..")) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(MusicBrowserActivity.this);
+				LinearLayout linearLayout = new LinearLayout(this);
+				final EditText txtURL = new EditText(this);
+				final EditText txtLabel = new EditText(this);
 				
+				linearLayout.setOrientation(1);
+				txtURL.setHint("URL della radio");
+				txtLabel.setHint("Etichetta");
+				
+				linearLayout.addView(txtLabel);
+				linearLayout.addView(txtURL);
+				
+				builder.setTitle("Aggiungi")
+					   .setMessage("Inserisci l'URL ed il nome della Web Radio da aggiungere")
+				       .setCancelable(false)
+				       .setView(linearLayout)
+				       .setPositiveButton("Aggiungi", new DialogInterface.OnClickListener() {
+		    	   			public void onClick(DialogInterface dialog, int id) {
+								m_daoDatabase.open();
+								m_daoDatabase.insertStream(txtLabel.getText().toString(), txtURL.getText().toString());
+								m_daoDatabase.close();
+								
+								applyFilter("radios");
+								m_expListAdapter.notifyDataSetChanged();
+								
+								Toast.makeText(getApplicationContext(), "Elemento aggiunto con successo", Toast.LENGTH_SHORT).show();
+		    	   			}
+				       	})
+				       	.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+				       		public void onClick(DialogInterface dialog, int id) {
+				       			System.out.println("NO");
+				                dialog.cancel();
+				           }
+				       });
+				
+				AlertDialog alertDialog = builder.create();
+				alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+				alertDialog.show();
 			} else {
 				Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
 				newIntent.putExtra("ACTION", "PLAY_STREAM");
