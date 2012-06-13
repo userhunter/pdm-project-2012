@@ -40,7 +40,7 @@ public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view;
-		TextView textTitle, textAlbum, textArtist;
+		TextView textTitle, textAlbum, textArtist, textName, textSurname;
 	    final ImageView image;
 	
 	    view = inflater.inflate(resourceId, parent, false);
@@ -49,6 +49,8 @@ public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
 	    	textTitle = (TextView)view.findViewById(R.id.record_title);
 	    	textAlbum = (TextView)view.findViewById(R.id.record_album);
 	    	textArtist = (TextView)view.findViewById(R.id.record_artist);
+	    	textName = (TextView)view.findViewById(R.id.record_name);
+	    	textSurname = (TextView)view.findViewById(R.id.record_surname);
 	    	
 	    	image = (ImageView)view.findViewById(R.id.img);
 	    } catch( ClassCastException e ) {
@@ -73,6 +75,8 @@ public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
 	    textTitle.setText(item.strSongTitle);
 	    textAlbum.setText(item.strSongAlbum);
 	    textArtist.setText(item.strSongArtist);
+	    textName.setText(item.strName);
+	    textSurname.setText(item.strSurname);
 
 	    if( cachedImage != null )
 	    	image.setImageDrawable(addTransparentGradient(cachedImage));
