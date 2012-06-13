@@ -15,5 +15,12 @@
 	    <item name="android:shadowRadius">2</item>
   	</style>
     <string name="library_update">Aggiornamento\ndella libreria\nin corso..</string>
+    <style name="TrackInfoStyle">
+	    <item name="android:textColor">#ffffffff</item>
+	    <item name="android:shadowColor">#000000</item>
+	    <item name="android:shadowDx">1</item>
+	    <item name="android:shadowDy">1</item>
+	    <item name="android:shadowRadius">1</item>
+  	</style>
 
 </resources>
