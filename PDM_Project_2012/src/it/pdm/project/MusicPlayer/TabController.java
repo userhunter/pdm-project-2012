@@ -1,6 +1,7 @@
 package it.pdm.project.MusicPlayer;
 
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
+import it.pdm.project.MusicPlayer.social.SocialActivity;
 import android.app.ActionBar;
 import android.app.TabActivity;
 import android.content.Intent;
@@ -38,7 +39,7 @@ public class TabController extends TabActivity {
         m_tsMusicLibrary = m_thController.newTabSpec("music_library");
         
         m_tsMusicPlayer.setIndicator("Player").setContent(new Intent(this, MusicPlayerActivity.class));
-        m_tsSocialNetwork.setIndicator("Amici").setContent(new Intent(this, WelcomeActivity.class));
+        m_tsSocialNetwork.setIndicator("Amici").setContent(new Intent(this, SocialActivity.class));
         m_tsMusicLibrary.setIndicator("Libreria").setContent(new Intent(this, MusicBrowserActivity.class));
         
         m_thController.addTab(m_tsMusicPlayer);
