@@ -26,7 +26,7 @@ public class SocialActivity extends ListActivity {
         
         this.m_strSource = new ArrayList<SocialItem>();
         this.m_listView = (ListView)findViewById(android.R.id.list);
-        this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource);
+        this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
         
         this.setListAdapter(m_lstAdapter);
         
