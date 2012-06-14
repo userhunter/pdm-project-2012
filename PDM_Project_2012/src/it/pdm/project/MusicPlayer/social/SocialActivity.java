@@ -57,7 +57,7 @@ public class SocialActivity extends ListActivity {
 		public void handleMessage(Message msg) {
 			int randomNumber = (int)Math.random()*100;
 			
-			SocialItem newSocialItem = new SocialItem("http://wecare.acmos.net/files/avatars/65/070519_124183_bokito-avatar1.jpg", "Rovine", "Clementino", "I.E.N.A", "Andrea", "Vitale");
+			SocialItem newSocialItem = new SocialItem("http://wecare.acmos.net/files/avatars/65/070519_124183_bokito-avatar1.jpg", "Rovine", "Clementino", "I.E.N.A", "Andrea Vitale", "14/06 @11:39", 5);
 			m_strSource.add(newSocialItem);
 			
 			m_lstAdapter.notifyDataSetChanged();
