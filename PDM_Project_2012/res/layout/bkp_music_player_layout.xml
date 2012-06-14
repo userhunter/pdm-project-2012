@@ -7,75 +7,63 @@
     <!-- COVER -->
     <ImageView 
         android:id="@+id/cover"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="180dp"
+        android:layout_height="200dp"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="5dp"/>
     
     <!-- SONGINFO -->
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+    <TextView
+        android:id="@+id/labelYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/labelAlbumTitle"
         android:layout_alignRight="@+id/timerDisplay"
         android:layout_alignLeft="@+id/timerDisplay"
-        android:layout_alignBottom="@+id/songProgressBar"
-        android:gravity="bottom" >
-	    <TextView
-	        android:id="@+id/labelYear"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_above="@+id/labelAlbumTitle"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentLeft="true"
-	        android:textSize="12sp"
-	        android:background="#55000000"
-	        android:text=""
-	        style="@style/AudioFileInfoOverlayText"
-	        android:gravity="right" />
-	    <TextView
-	        android:id="@+id/labelAlbumTitle"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_above="@+id/labelArtists"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentLeft="true"
-	        android:textSize="12sp"
-	        android:background="#55000000"
-	        android:text=""
-	        style="@style/AudioFileInfoOverlayText"
-	        android:gravity="right" />
-	    <TextView
-	        android:id="@+id/labelArtists"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_above="@+id/labelSongTitle"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentLeft="true"
-	        android:textSize="12sp"
-	        android:background="#55000000"
-	        android:text=""
-	        style="@style/AudioFileInfoOverlayText"
-	        android:gravity="right" />
-	    <TextView
-	        android:id="@+id/labelSongTitle"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_marginBottom="45dp"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentLeft="true"
-	        android:layout_alignParentBottom="true"
-	        android:text="Nessun brano in riproduzione"
-	        android:background="#55000000"
-	        style="@style/AudioFileInfoOverlayText"
-	        android:gravity="right"/>
-    </RelativeLayout>
+        android:textSize="12sp"
+        android:text=""
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelAlbumTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/labelArtists"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:textSize="12sp"
+        android:text=""
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelArtists"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/labelSongTitle"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:textSize="12sp"
+        android:text=""
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right" />
+    <TextView
+        android:id="@+id/labelSongTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/timerDisplay"
+        android:layout_alignLeft="@+id/timerDisplay"
+        android:layout_alignBottom="@+id/timerDisplay"
+        android:layout_marginBottom="30dp"
+        android:text="Nessun brano in riproduzione"
+        style="@style/AudioFileInfoOverlayText"
+        android:gravity="right"/>
     
     <!-- ############################################################ -->
     
     <!-- TIMER DISPLAY -->
     <LinearLayout
         android:id="@+id/timerDisplay"
-        android:layout_below="@+id/songProgressBar"
+        android:layout_above="@+id/songProgressBar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"
@@ -83,26 +71,22 @@
         android:layout_marginBottom="10dp">
         <TextView 
             android:id="@+id/songCurrentDurationLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="left" 
             android:textColor="#EEEEEE"
             android:textStyle="bold"
-            android:text="00:00"
-            android:paddingLeft="15dp"
-            style="@style/TimersStyle" />
+            android:text="00:00"/>
         <TextView 
             android:id="@+id/songTotalDurationLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="right" 
             android:textColor="#EEEEEE"
             android:textStyle="bold"
-            android:text="00:00"
-            android:paddingRight="15dp"
-            style="@style/TimersStyle" />
+            android:text="00:00"/>
     </LinearLayout>
     
     <!-- SEEKBAR -->
