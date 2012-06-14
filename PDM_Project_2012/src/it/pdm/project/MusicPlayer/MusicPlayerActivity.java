@@ -155,7 +155,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		}
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
-			if(!m_mpService.isStreaming()){
+			if(!m_mpService.isStreaming() && m_mpService.isPlaying()){
 				int progress = seekBar.getProgress();
 				int iNewPosition = Utilities.progressToTimer(progress, m_mpService.getCurrentPlayingTotalDuration());
 				m_mpService.setCurrentPlayingPosition(iNewPosition);
@@ -232,23 +232,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 						
 						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
 				        
-				        /* ora modifichiamo la prospettiva del bitmap */
-				        float curScale = 1F;			float curRotate = 0F;
-				        float curSkewX = 0F;			float curSkewY = -0.063F;
-				        
-				        /* creiamo la matrice deformante da applicare al nuovo bitmap */
-				        Matrix matrix = new Matrix();
-				        //matrix.postScale(curScale, curScale);matrix.postRotate(curRotate);
-				        matrix.postSkew(curSkewX, curSkewY);
-				        int width = reflectedCover.getWidth();
-				        int height = reflectedCover.getHeight();
-				        
-				        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
-				        
 				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterˆ come cover */
 				        Bundle data = new Bundle();
 						Message msg = new Message();
-						data.putParcelable("SKEWED COVER", skewedCover);
+						data.putParcelable("SKEWED COVER", reflectedCover);
 						msg.setData(data);
 						
 						coverArtHandler.sendMessage(msg);
@@ -312,23 +299,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 						
 						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
 				        
-				        /* ora modifichiamo la prospettiva del bitmap */
-				        float curScale = 1F;			float curRotate = 0F;
-				        float curSkewX = 0F;			float curSkewY = -0.063F;
-				        
-				        /* creiamo la matrice deformante da applicare al nuovo bitmap */
-				        Matrix matrix = new Matrix();
-				        //matrix.postScale(curScale, curScale);matrix.postRotate(curRotate);
-				        matrix.postSkew(curSkewX, curSkewY);
-				        int width = reflectedCover.getWidth();
-				        int height = reflectedCover.getHeight();
-				        
-				        Bitmap skewedCover = Bitmap.createBitmap(reflectedCover, 0, 0, width, height, matrix, true);
-				        
 				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterˆ come cover */
 				        Bundle data = new Bundle();
 						Message msg = new Message();
-						data.putParcelable("SKEWED COVER", skewedCover);
+						data.putParcelable("SKEWED COVER", reflectedCover);
 						msg.setData(data);
 						
 						coverArtHandler.sendMessage(msg);
