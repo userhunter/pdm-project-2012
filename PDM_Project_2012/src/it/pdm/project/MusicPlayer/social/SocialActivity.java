@@ -3,11 +3,13 @@ package it.pdm.project.MusicPlayer.social;
 import java.util.ArrayList;
 
 import it.pdm.project.MusicPlayer.R;
+import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.social.facebook.FacebookManager;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -56,9 +58,14 @@ public class SocialActivity extends ListActivity {
         this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
         this.m_fbManager = new FacebookManager(this);
         
+        this.m_lytLoginLayout = (RelativeLayout)findViewById(R.id.facebook_login_layout);
         this.m_txtUsername = (TextView)findViewById(R.id.social_account_name);
         
+        this.registerReceiver(broadcastReceiver, new IntentFilter("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent"));
         this.setListAdapter(m_lstAdapter);
+        
+        if (!this.m_fbManager.isLogged())
+        	this.m_fbManager.login();
         
         Thread child = new Thread(new Runnable() {
         	int i = 0;
