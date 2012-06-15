@@ -1,7 +1,9 @@
 package it.pdm.project.MusicPlayer.social.facebook;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +11,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
@@ -25,8 +28,7 @@ public class FacebookManager {
 	public static String APP_ID = "237120273069387";
 	
 	//Autorizzazioni necessarie per accedere alle informazioni dell'utente loggato
-	public static String[] PERMISSION= { "offline_access", "publish_stream", "user_photos", "publish_checkins",
-        "photo_upload", "read_stream", "read_insights" };
+	public static String[] PERMISSION= { "offline_access", "publish_stream", "user_photos", "publish_checkins", "photo_upload", "read_stream", "read_insights" };
 	
 	//Variabile che fornisce i metodi per interagire con fb
 	private Facebook mFacebook;
@@ -39,7 +41,7 @@ public class FacebookManager {
 	
 	//Necessario renderla globale a causa delle risposte che vengono gestite nei listener
 	private Hashtable<String, Post> mPostFriendApp;
-    
+
     //Costruttore senza parametri
     public FacebookManager(Activity mActivityChimante){
     	this.mFacebook = new Facebook(APP_ID);
@@ -322,6 +324,17 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {	
     		//Inserire codice una volta che è avvenuto la richiesta degli amici, usare parser
+    		try {
+				User loggedUser = FacebookManager.this.getMyInfo(response);
+				
+				Intent intent = new Intent();
+				intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED");
+				intent.putExtra("ID", loggedUser.getId());
+				intent.putExtra("USERNAME", loggedUser.getName());
+				intent.putExtra("AVATAR", loggedUser.getPicture());
+				
+				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+			} catch (JSONException e) {}
 		}
     }
    
@@ -354,7 +367,6 @@ public class FacebookManager {
         public void onFacebookError(FacebookError e, final Object state) {
             //Toast errore
         }
-    		
     }
     
     //Listener invocato alla conclusione della richiesta per titolo, autore e brano
@@ -457,11 +469,9 @@ public class FacebookManager {
     
     //Listener invocato alla fine dell'invio della richiesta di login
     private class LoginRequestListener implements DialogListener {
-
 		@Override
 		public void onComplete(Bundle values) {
-			// TODO Auto-generated method stub
-			
+			FacebookManager.this.getUserInfo();
 		}
 
 		@Override
