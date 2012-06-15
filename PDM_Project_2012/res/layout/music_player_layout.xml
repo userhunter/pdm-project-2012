@@ -134,7 +134,7 @@
             <!-- PREVIOUS -->
             <ImageButton
                 android:id="@+id/btnPrevious"
-                android:src="@drawable/previous_scheme"
+                android:src="@drawable/btn_prev_music"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -143,7 +143,7 @@
             <!-- PLAY -->
             <ImageButton
                 android:id="@+id/btnPlay"
-                android:src="@drawable/play_scheme"
+                android:src="@drawable/btn_play_music"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -152,7 +152,7 @@
             <!-- PAUSE -->
             <ImageButton
                 android:id="@+id/btnPause"
-                android:src="@drawable/pause_scheme"
+                android:src="@drawable/btn_pause_music"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -162,7 +162,7 @@
             <!-- NEXT -->
             <ImageButton
                 android:id="@+id/btnNext"
-                android:src="@drawable/next_scheme"
+                android:src="@drawable/btn_next_music"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"

@@ -6,9 +6,13 @@ import android.app.ActionBar;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -20,10 +24,34 @@ public class TabController extends TabActivity {
 	private TabSpec m_tsMusicLibrary;
 	private ActionBar m_abActionBar;
 	
+	private Handler m_hndSplashScreen = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			
+			RelativeLayout rlSplashLayout = (RelativeLayout)findViewById(R.id.splash_screen_layout);
+			rlSplashLayout.setVisibility(View.GONE);
+		}
+	};
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        @SuppressWarnings("unused")
+		Thread thSplashScreen = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5000);
+					
+					m_hndSplashScreen.sendEmptyMessage(0);
+				} catch (InterruptedException e) {}
+			}
+        });
+        
+        thSplashScreen.start();
         
         //Avvio del servizio in background
         this.startService(new Intent(this, MusicPlayerService.class));
@@ -47,11 +75,6 @@ public class TabController extends TabActivity {
         m_thController.addTab(m_tsMusicLibrary);
         
         m_thController.setCurrentTab(1);
-        
-        /*
-        m_thUpdaterChecker = this.createThread();
-        m_thUpdaterChecker.start();
-        */
     }
     
     @Override

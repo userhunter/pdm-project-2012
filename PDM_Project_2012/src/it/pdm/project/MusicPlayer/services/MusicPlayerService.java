@@ -94,8 +94,8 @@ public class MusicPlayerService extends Service {
 			m_mpMP3Player.setOnCompletionListener(new OnCompletionListener() {
 						@Override
 						public void onCompletion(MediaPlayer arg0) {
-							// TODO Auto-generated method stub
-							playNextSong();
+							if (!isStreaming())
+								playNextSong();
 						}});
 			
 			//Preparo l'intent per la notifica da inviare all'activity
