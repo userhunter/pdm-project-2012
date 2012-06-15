@@ -74,7 +74,7 @@ public class FacebookManager {
     	String name = "";
     	String picture = "";
     	JSONArray json = new JSONArray(response);
-    	if(json.length() != 0){
+    	if (json.length() != 0) {
     		for(int i=0; i<json.length(); i++){
     			id = json.getJSONObject(i).getString("uid");
     			name = json.getJSONObject(i).getString("name");
@@ -275,10 +275,11 @@ public class FacebookManager {
     //Funzione che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazione e l'immagine di default
     public void postOnWall(Activity activity, String song, String album, String singer){
     	Bundle params = new Bundle();
-        params.putString("caption", "SocialMediaPlayer for Android");
-        params.putString("description", "Album: "+album+" Artist: "+singer);
+        params.putString("caption", singer);
+        params.putString("description", album);
         params.putString("picture", "http://4.bp.blogspot.com/-Z57TwcYK41U/T7-LXXc9GSI/AAAAAAAAGBc/sxV4gzPJ_cg/s1600/musica+android.jpg");
-        params.putString("name", "I am listening "+song);
+        params.putString("name", song);
+        params.putString("redirect_uri", "https://www.facebook.com/dialog/feed?app_id=" + APP_ID + "&redirect_uri=http://youtube.com?q=" + song);
         
         mFacebook.dialog(activity, "feed", params, new PostDialogListener());
     }
@@ -314,14 +315,18 @@ public class FacebookManager {
         @Override
         public void onComplete(String response, final Object state) {
         	//Inserire codice una volta che è avvenuto il logout
+
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+			intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED_OUT");
+			
+			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
         }
     }
     
     //Listener invocato alla conclusione della richiesta per ottenere gli amici che usano l'app
     public class FQLRequestListener extends BaseRequestListener {
     	@Override
-    	public void onComplete(final String response, final Object state) {	
-    		System.out.println("LOG OK");
+    	public void onComplete(final String response, final Object state) {
     		//Inserire codice una volta che è avvenuto la richiesta degli amici, usare parser
     		try {
 				User loggedUser = FacebookManager.this.getMyInfo(response);
@@ -436,15 +441,16 @@ public class FacebookManager {
     
     //Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
     private class PostDialogListener implements DialogListener {
-
         public void onComplete(String response, final Object state) {
-            //Toast.makeText(getApplicationContext(), "Il messaggio Ã¨ stato postato sulla bacheca!", Toast.LENGTH_SHORT).show();
+
         }
 
 		@Override
 		public void onComplete(Bundle values) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+			intent.putExtra("ACTION", "SONG_SUCCESSFULLY_POSTED");
 			
+			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
 
 		@Override
