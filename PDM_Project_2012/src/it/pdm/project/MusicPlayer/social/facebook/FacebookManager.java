@@ -424,6 +424,14 @@ public class FacebookManager {
 		public void onComplete(String response, Object state) {
 			try {
 				m_userMe = getMyInfo(response);
+				
+				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+				intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED");
+				intent.putExtra("ID", m_userMe.getId());
+				intent.putExtra("USERNAME", m_userMe.getName());
+				intent.putExtra("AVATAR", m_userMe.getPicture());
+				
+				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			} catch (Exception e) {}
 		}
     }
