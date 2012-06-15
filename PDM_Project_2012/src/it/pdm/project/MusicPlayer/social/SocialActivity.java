@@ -3,14 +3,14 @@ package it.pdm.project.MusicPlayer.social;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
-import it.pdm.project.MusicPlayer.MusicPlayerActivity;
 import it.pdm.project.MusicPlayer.R;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
-import it.pdm.project.MusicPlayer.objects.MusicPlayerUpdater;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
 import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
 import it.pdm.project.MusicPlayer.social.facebook.FacebookManager;
+import it.pdm.project.MusicPlayer.social.facebook.User;
+
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -33,10 +33,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SocialActivity extends ListActivity implements OnClickListener {
     /** Called when the activity is first created. */
+	private User m_userMe;
 	private ListView m_listView;
 	private SocialItemAdapter m_lstAdapter;
 	private ArrayList<SocialItem> m_strSource;
@@ -77,7 +77,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         
 	    if (!this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE))
 	    	Log.d("BINDSERVICE", "ERROR DURING BINDING");
-        
+       
+	    this.initMemberVars();
+	    
         this.m_strSource = new ArrayList<SocialItem>();
         this.m_listView = (ListView)findViewById(android.R.id.list);
         this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
@@ -121,7 +123,33 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			}
         });
         
+        if (this.m_fbManager.isLogged())
+        	this.testPost();
+        
         //child.start();
+    }
+    
+    private void testPost() {
+    	/*
+    	Hashtable<String, Post> posts = new Hashtable<String, Post>();
+    	
+    	this.m_fbManager.getAllPost();
+    	posts = this.m_fbManager.getHashTablePostApp();
+    	
+    	System.out.println("SIZE: " + posts.size());
+    	
+    	Hashtable ht = new Hashtable();
+    	Enumeration keys = ht.keys();
+    	
+    	while (keys.hasMoreElements()) {
+    		Object key = keys.nextElement();
+    		Object value = ht.get(key);
+    		
+    		System.out.println("POST: key: " + key + " value: " + ht.get(key));
+    	}
+    	*/
+    	
+    	this.m_fbManager.getFriendsPostsSorted();
     }
     
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -172,6 +200,28 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				MP3Item mp3Item = this.m_mpService.getCurrentPlayingItem();
 				this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
 			}
+		} else if (arg0.getId() == this.m_btnRefresh.getId()) {
+			this.testPost();
 		}
+	}
+	
+	private void initMemberVars() {
+        this.m_strSource = new ArrayList<SocialItem>();
+        this.m_listView = (ListView)findViewById(android.R.id.list);
+        this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
+        this.m_fbManager = new FacebookManager(this);
+        
+        this.m_lytLoginLayout = (RelativeLayout)findViewById(R.id.facebook_login_layout);
+        this.m_txtUsername = (TextView)findViewById(R.id.social_account_name);
+        
+        this.m_btnLogout = (ImageButton)findViewById(R.id.social_logout_btn);
+        this.m_btnRefresh = (ImageButton)findViewById(R.id.social_refresh_btn);
+        this.m_btnShare = (ImageButton)findViewById(R.id.social_share_btn);
+        
+        this.m_btnLogout.setOnClickListener(this);
+        this.m_btnShare.setOnClickListener(this);
+        this.m_btnRefresh.setOnClickListener(this);
+        
+        this.m_userMe = this.m_fbManager.getCurrentUser();
 	}
 }
