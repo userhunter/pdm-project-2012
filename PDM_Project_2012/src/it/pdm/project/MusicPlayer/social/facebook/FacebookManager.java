@@ -48,7 +48,6 @@ public class FacebookManager {
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
     	this.mActivityChiamante = mActivityChimante;
     	this.mPostFriendApp = new Hashtable<String, Post>();
-    	login();
     }
     
     //Costruttore con parametri
@@ -56,7 +55,6 @@ public class FacebookManager {
     	this.mFacebook = facebook;
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
     	this.mPostFriendApp = new Hashtable<String, Post>();
-    	login();
     }
     
     /**Utility**/
@@ -323,11 +321,12 @@ public class FacebookManager {
     public class FQLRequestListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {	
+    		System.out.println("LOG OK");
     		//Inserire codice una volta che è avvenuto la richiesta degli amici, usare parser
     		try {
 				User loggedUser = FacebookManager.this.getMyInfo(response);
 				
-				Intent intent = new Intent();
+				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
 				intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED");
 				intent.putExtra("ID", loggedUser.getId());
 				intent.putExtra("USERNAME", loggedUser.getName());

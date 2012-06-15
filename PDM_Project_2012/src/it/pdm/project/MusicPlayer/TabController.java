@@ -29,8 +29,8 @@ public class TabController extends TabActivity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			
-			RelativeLayout rlSplashLayout = (RelativeLayout)findViewById(R.id.splash_screen_layout);
-			rlSplashLayout.setVisibility(View.GONE);
+			//RelativeLayout rlSplashLayout = (RelativeLayout)findViewById(R.id.splash_screen_layout);
+			//rlSplashLayout.setVisibility(View.GONE);
 		}
 	};
 	
@@ -39,6 +39,7 @@ public class TabController extends TabActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        /*
         @SuppressWarnings("unused")
 		Thread thSplashScreen = new Thread(new Runnable() {
 			@Override
@@ -52,6 +53,7 @@ public class TabController extends TabActivity {
         });
         
         thSplashScreen.start();
+        */
         
         //Avvio del servizio in background
         this.startService(new Intent(this, MusicPlayerService.class));
