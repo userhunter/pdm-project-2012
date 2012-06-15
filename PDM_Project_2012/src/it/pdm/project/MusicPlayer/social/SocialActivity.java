@@ -3,6 +3,7 @@ package it.pdm.project.MusicPlayer.social;
 import java.util.ArrayList;
 
 import it.pdm.project.MusicPlayer.R;
+import it.pdm.project.MusicPlayer.social.facebook.FacebookManager;
 import android.app.ListActivity;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
@@ -17,6 +18,7 @@ public class SocialActivity extends ListActivity {
 	private ListView m_listView;
 	private SocialItemAdapter m_lstAdapter;
 	private ArrayList<SocialItem> m_strSource;
+	private FacebookManager m_fbManager;
 	private MatrixCursor m_mtxCursor;
 			
     @Override
@@ -27,6 +29,7 @@ public class SocialActivity extends ListActivity {
         this.m_strSource = new ArrayList<SocialItem>();
         this.m_listView = (ListView)findViewById(android.R.id.list);
         this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
+        this.m_fbManager = new FacebookManager(this);
         
         this.setListAdapter(m_lstAdapter);
         
