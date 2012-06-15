@@ -1,5 +1,13 @@
 package it.pdm.project.MusicPlayer.social.facebook;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -279,9 +287,48 @@ public class FacebookManager {
         params.putString("description", album);
         params.putString("picture", "http://4.bp.blogspot.com/-Z57TwcYK41U/T7-LXXc9GSI/AAAAAAAAGBc/sxV4gzPJ_cg/s1600/musica+android.jpg");
         params.putString("name", song);
-        params.putString("redirect_uri", "https://www.facebook.com/dialog/feed?app_id=" + APP_ID + "&redirect_uri=http://youtube.com?q=" + song);
+        params.putString("link", "http://www.youtube.com/results?search_query=" + album + "+-+" + singer);
+        //params.putString("link", this.getDetailLink(album));
         
         mFacebook.dialog(activity, "feed", params, new PostDialogListener());
+    }
+    
+    public String getDetailLink(String album) {
+    	String searchQuery = "http://itunes.apple.com/search?term=" + album + "&entity=album&limit=1";
+    	
+		try {
+			InputStream is = new URL(searchQuery).openStream();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+			StringBuilder sb = new StringBuilder();
+		    int cp;
+		    
+		    while ((cp = rd.read()) != -1)
+		      sb.append((char) cp);
+		    
+		    String jsonText = "";
+	    	JSONObject json = Util.parseJson(jsonText);
+	    	JSONArray jArray = json.getJSONArray("results");
+	    	
+	    	if(jArray.length() != 0){
+	    		for(int i=0; i<jArray.length(); i++){
+	    			return jArray.getJSONObject(i).getString("collectionViewUrl");
+	    		}
+	    	}
+		} catch (MalformedURLException e) {
+			System.out.println("MALFORMED");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("IOEXC");
+			e.printStackTrace();
+		} catch (FacebookError e) {
+			System.out.println("FBERR");
+			e.printStackTrace();
+		} catch (JSONException e) {
+			System.out.println("JSONEXC");
+			e.printStackTrace();
+		}
+		
+		return "http://www.youtube.com/results?search_query=" + album;
     }
     
     //Funzione che posta sul profilo dell'utente loggato (Implementata anche se non usata)
