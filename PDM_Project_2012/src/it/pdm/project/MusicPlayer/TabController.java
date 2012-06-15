@@ -39,6 +39,7 @@ public class TabController extends TabActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        @SuppressWarnings("unused")
 		Thread thSplashScreen = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -91,6 +92,14 @@ public class TabController extends TabActivity {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.actionbar_layout, menu);
+
+        /*
+        //Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.abSearch).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        */
         
         return true;
     }
