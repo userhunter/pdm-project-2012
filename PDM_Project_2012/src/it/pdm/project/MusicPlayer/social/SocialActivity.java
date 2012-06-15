@@ -1,5 +1,6 @@
 package it.pdm.project.MusicPlayer.social;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import it.pdm.project.MusicPlayer.MusicPlayerActivity;
@@ -8,6 +9,7 @@ import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.objects.MusicPlayerUpdater;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
+import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
 import it.pdm.project.MusicPlayer.social.facebook.FacebookManager;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -17,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.MatrixCursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,6 +46,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	private ImageButton m_btnLogout, m_btnRefresh, m_btnShare;
 	private TextView m_txtUsername;
 	private RelativeLayout m_lytLoginLayout;
+	private ImageView m_imgAvatar;
+	
+	private ImageThreadLoader m_thImageLoader;
 	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
@@ -49,7 +56,8 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
 				m_txtUsername.setText(intent.getStringExtra("USERNAME"));
 				m_lytLoginLayout.setVisibility(View.GONE);
-			} else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT"))
+			}
+			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT"))
 				m_lytLoginLayout.setVisibility(View.VISIBLE);
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
 				System.out.println("OK POST");
@@ -81,9 +89,12 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.m_btnLogout = (ImageButton)findViewById(R.id.social_logout_btn);
         this.m_btnRefresh = (ImageButton)findViewById(R.id.social_refresh_btn);
         this.m_btnShare = (ImageButton)findViewById(R.id.social_share_btn);
+        this.m_imgAvatar = (ImageView)findViewById(R.id.social_account_avatar);
         
         this.m_btnLogout.setOnClickListener(this);
         this.m_btnShare.setOnClickListener(this);
+        
+        this.m_thImageLoader = new ImageThreadLoader();
         
         this.registerReceiver(broadcastReceiver, new IntentFilter("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent"));
         this.setListAdapter(m_lstAdapter);
@@ -138,6 +149,19 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			m_lstAdapter.notifyDataSetChanged();
 		}
 	};
+	
+	public void updateAccountInfo(String strAvatarURL, String strName){
+		try {
+	    	m_thImageLoader.loadImage(strAvatarURL, new ImageLoadedListener() {
+	    		public void imageLoaded(Bitmap imageBitmap) {
+	    			m_imgAvatar.setImageBitmap(imageBitmap);                
+	    		}
+	    	});
+	    } catch (MalformedURLException e) {
+	    	Log.d("UPDATE ACCOUNT INFO", "Bad remote image URL: " + strAvatarURL, e);
+	    }
+		m_txtUsername.setText(strName);
+	}
 
 	@Override
 	public void onClick(View arg0) {
