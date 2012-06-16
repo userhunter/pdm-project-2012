@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -130,15 +132,21 @@ public class FacebookManager {
     	return new User(id, name, picture);
     }
     
-    //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
-    public void getGenericInfoPost(String response) throws JSONException{
+  //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
+    public void getInfoPost(String response) throws JSONException{
     	String idPost = "";
     	String message = "";
     	String idUser= "";
+    	String name="";
+    	String caption="";
+    	String desc="";
+    	int count =0;
+    	
   
     	response = "{\"data\":" + response + "}";
     	JSONObject json = Util.parseJson(response);
-    	JSONArray jArray = json.getJSONArray("data");
+    	JSONArray jArrayD = json.getJSONArray("data");
+    	JSONArray jArray = jArrayD.getJSONObject(1).getJSONArray("fql_result_set");
     	
     	if(jArray.length() != 0){
     		for(int i=0; i<jArray.length(); i++){
@@ -146,29 +154,6 @@ public class FacebookManager {
     			message = jArray.getJSONObject(i).getString("message");
     			idUser = jArray.getJSONObject(i).getString("actor_id");
     			java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
-    			
-    			if(!this.mPostFriendApp.containsKey(idPost)){
-	    			this.mPostFriendApp.put(idPost, new Post(idPost));
-    			}
-
-    			this.mPostFriendApp.get(idPost).setMessage(message);
-    			this.mPostFriendApp.get(idPost).setUser(idUser);
-    			this.mPostFriendApp.get(idPost).setCreatedPost(time);
-    		}
-    	}
-    }
-    
-  //Funzione che Album, Titolo e Artista di un post (Da usare per parsare le risposte ottenute nel listener)
-    public void getAttachementPost(String response) throws JSONException{
-    	String name = "";
-    	String caption = "";
-    	
-    	response = "{\"data\":" + response + "}";
-    	JSONObject json = Util.parseJson(response);
-    	JSONArray jArray = json.optJSONArray("data");
-
-    	if(jArray.length() != 0){
-    		for(int i=0; i<jArray.length(); i++){
     			if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
     				name = jArray.getJSONObject(i).getJSONObject("attachment").getString("name");
     			else
@@ -177,57 +162,50 @@ public class FacebookManager {
     				caption = jArray.getJSONObject(i).getJSONObject("attachment").getString("caption");
     			else
     				caption= "";
-      			String desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
-      			String index = jArray.getJSONObject(i).getString("post_id");
-      			if(!this.mPostFriendApp.containsKey(index)){
-	    			this.mPostFriendApp.put(index, new Post(index));
+      			desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
+      			count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
+      			   			
+    			if(!this.mPostFriendApp.containsKey(idPost)){
+	    			this.mPostFriendApp.put(idPost, new Post(idPost));
     			}
-      			if(!desc.equals(""))
-      				this.mPostFriendApp.get(index).setAlbum(desc);
-      			if(!name.equals(""))
-      				this.mPostFriendApp.get(index).setTitle(name);
-      			if(!caption.equals(""))
-      				this.mPostFriendApp.get(index).setArtist(caption);
-    		}
-    	}
-    }
-    
-    //Funzione che ottiene il numero di likes (Da usare per parsare le risposte ottenute nel listener)
-    public void getLikesPost(String response) throws JSONException{
-    	response = "{\"data\":" + response + "}";
-    	JSONObject json = Util.parseJson(response);
-    	JSONArray jArray = json.getJSONArray("data");
 
-    	if(jArray.length() != 0){
-    		for(int i=0; i<jArray.length(); i++){
-      			int count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
-      			String index = jArray.getJSONObject(i).getString("post_id");
-      			
-      			if(!this.mPostFriendApp.containsKey(index)){
-	    			this.mPostFriendApp.put(index, new Post(index));
-    			}
-      			this.mPostFriendApp.get(index).setLikeUser(count);
+    			this.mPostFriendApp.get(idPost).setMessage(message);
+    			this.mPostFriendApp.get(idPost).setUser(idUser);
+    			this.mPostFriendApp.get(idPost).setCreatedPost(time);
+    			if(!desc.equals(""))
+      				this.mPostFriendApp.get(idPost).setAlbum(desc);
+      			if(!name.equals(""))
+      				this.mPostFriendApp.get(idPost).setTitle(name);
+      			if(!caption.equals(""))
+      				this.mPostFriendApp.get(idPost).setArtist(caption);
+    			this.mPostFriendApp.get(idPost).setLikeUser(count);
     		}
+    	}
+	
+	
+    	if(this.mPostFriendApp.size()>0){
+    		JSONArray jArrayN = jArrayD.getJSONObject(0).getJSONArray("fql_result_set");
+    		if(jArrayN.length() != 0){
+    			String str;
+				Set set = getHashTablePostApp().keySet();
+				Iterator itr = set.iterator(); 
+				while(itr.hasNext()) { 
+					str = (String) itr.next();
+					for(int i=0; i<jArrayN.length(); i++){
+						if(getHashTablePostApp().get(str).getUser().equals(jArrayN.getJSONObject(i).getString("uid"))){
+							String id = jArray.getJSONObject(i).getString("uid");
+							String nameU = jArray.getJSONObject(i).getString("name");
+							String picture = jArray.getJSONObject(i).getString("pic_square");
+							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
+						}	
+	    			}
+				} 
+								
+			}
     	}
     }
     
-    //Parser per ottenere album
-    public String parseForAlbum(String desc){
-    	desc = desc.substring(7, desc.length());
-    	return desc.substring(0, desc.indexOf(':')-7);
-    }
-    
-    //Parser per ottenere l'artista
-    public String parseForArtist(String desc){
-    	desc = desc.substring(7, desc.length());
-    	return desc.substring(desc.indexOf(':')+2, desc.length());
-    }
-    
-    //Parser per ottenere il titolo
-    public String parseForTitle(String name){
-    	return name.substring(15, name.length());
-    }
-    
+   
     /**Function**/
     
     //Funzione che effettua il login con le autorizzazioni per la nostra app
@@ -255,40 +233,10 @@ public class FacebookManager {
     	mAsyncRunner.logout(context ,new LogoutRequestListener());
     }
     
-    //Interrogazione FQL che richiede la lista di amici che usano l'app
-    public void getFriendApp(){
-    	String query = "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1";
-    	this.FQLQuery(query, new FriendAppRequestListener());
-    }
-    
-    //Interrogazione FQL che richiede la lista di amici che usano l'app dato il listener
-    public void getFriendApp(BaseRequestListener listener){
-    	String query = "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1";
-    	this.FQLQuery(query, listener);
-    }
-    
     //Interrogazione FQL che richiede le info di un utente dato l'id
     public void getUserById(String uid){
     	String query = "SELECT name, pic_square FROM user WHERE uid = " + uid;
     	this.FQLQuery(query, new GetUserByIDListener());
-    }
-    
-    //Interrogazione FQL che richiede le info di un post dato l'id
-    public void getInfoPostAppById(String uid){
-    	String query = "SELECT post_id, actor_id, created_time, message FROM stream WHERE app_id = 237120273069387 AND source_id = "+ uid + " AND actor_id = "+ uid;
-    	this.FQLQuery(query, new GetGenericInfoPostRequestListener());
-    }
-    
-    //Interrogazione FQL che richiede la description(contenuta negli attachment) di un post dato l'id utente
-    public void getAttachmentPostAppById(String uid){
-    	String query = "SELECT post_id, attachment.name, attachment.description FROM stream WHERE app_id = 237120273069387 AND source_id = "+ uid + " AND actor_id = "+ uid;
-    	this.FQLQuery(query, new AttachmentPostAppRequestListener());
-    }
-    
-    //Interrogazione FQL che richiede i likes di un post dato l'id utente
-    public void getLikesPostAppById(String uid){
-    	String query = "SELECT post_id, likes.count FROM stream WHERE app_id = 237120273069387 AND source_id = "+ uid + " AND actor_id = "+ uid;
-    	this.FQLQuery(query, new LikesPostAppRequestListener());
     }
     
     //Interrogazione FQL che richiede le info dell'utente loggato
@@ -300,10 +248,11 @@ public class FacebookManager {
     //Interrogazione FQL che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazioni con un'immagine passata
     public void postOnWall(Activity activity, String imageAlbumUrl, String song, String album, String singer){
     	Bundle params = new Bundle();
-        params.putString("caption", "SocialMediaPlayer for Andorid");
-        params.putString("description", "Album: "+album+" Artist: "+singer);
+    	params.putString("caption", singer);
+        params.putString("description", album);
         params.putString("picture", imageAlbumUrl);
-        params.putString("name", "I am listening "+song);
+        params.putString("name", song);
+        params.putString("link", "http://www.youtube.com/results?search_query=" + album + "+-+" + singer);
         mFacebook.dialog(activity, "feed", params, new PostDialogListener());
     }
     
@@ -337,10 +286,6 @@ public class FacebookManager {
     	}
     }
     
-    //Funzione che restituisce tutti i post
-    public void getAllPost() {
-    	FacebookManager.this.getFriendApp();
-    }
     
     public String getDetailLink(String album) {
     	String searchQuery = "http://itunes.apple.com/search?term=" + album + "&entity=album&limit=1";
@@ -378,13 +323,6 @@ public class FacebookManager {
 		}
 		
 		return "http://www.youtube.com/results?search_query=" + album;
-    }
-    
-    //Funzione che posta sul profilo dell'utente loggato (Implementata anche se non usata)
-    public void inviteFriends(Activity activity){
-    	Bundle lparameters = new Bundle();
-	    lparameters.putString("message","Friend request");
-	    mFacebook.dialog(activity, "apprequests", lparameters ,new SendRequestDialogListener()); 
     }
     
     //Funzione che restituisce vero se l'utente corrente è loggato altrimenti falso
@@ -450,7 +388,8 @@ public class FacebookManager {
     }
     
     //Listener invocato alla conclusione della richiesta per ottenere gli amici che usano l'app
-    private class FQLRequestListener extends BaseRequestListener {
+    @SuppressWarnings("unused")
+	private class FQLRequestListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		//Inserire codice una volta che è avvenuto la richiesta degli amici, usare parser
@@ -468,25 +407,6 @@ public class FacebookManager {
 		}
     }
     
-  //Listener invocato alla conclusione della richiesta per ottenere gli amici che usano l'app
-    private class FriendAppRequestListener extends BaseRequestListener {
-    	@Override
-    	public void onComplete(final String response, final Object state) {	
-    		ArrayList<User> friendApp = new ArrayList<User>();
-    		try {
-				friendApp = FacebookManager.this.getFriendAppArray(response);
-				for(int i=0; i<friendApp.size(); i++){
-					FacebookManager.this.getInfoPostAppById(friendApp.get(i).getId());
-					FacebookManager.this.getAttachmentPostAppById(friendApp.get(i).getId());
-					FacebookManager.this.getLikesPostAppById(friendApp.get(i).getId());
-				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-    }
-   
     //Listener invocato alla conclusione della richiesta per le info di un utente dato l'id
     private class GetUserByIDListener extends BaseRequestListener {
     	@Override
@@ -512,78 +432,8 @@ public class FacebookManager {
         }
     }
     
-    //Listener invocato alla conclusione della richiesta per titolo, autore e brano
-    private class AttachmentPostAppRequestListener extends BaseRequestListener {
-    	@Override
-    	public void onComplete(final String response, final Object state) {
-    		try {
-    			getAttachementPost(response);
-    		} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	@Override
-        public void onFacebookError(FacebookError e, final Object state) {
-            //Toast errore
-        }
-    }
-    
-    //Listener invocato alla conclusione della richiesta dei likes dei post
-    private class LikesPostAppRequestListener extends BaseRequestListener {
-    	@Override
-    	public void onComplete(final String response, final Object state) {
-    		try {
-    			getLikesPost(response);
-				
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	@Override
-        public void onFacebookError(FacebookError e, final Object state) {
-            //Toast errore
-        }
-    }
-    
-    //Listener invocato alla fine dell'invio della richiesta di utilizzo dell'app
-    private class SendRequestDialogListener implements DialogListener {
-        public void onComplete(String response, final Object state) {
-            //Toast.makeText(getApplicationContext(), "La richiesta ï¿½ stata inviata agli amici selezionati!", Toast.LENGTH_SHORT).show();
-        }
-
-		@Override
-		public void onComplete(Bundle values) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onFacebookError(FacebookError e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onError(DialogError e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onCancel() {
-			// TODO Auto-generated method stub
-			
-		}
-    }
-    
     //Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
     private class PostDialogListener implements DialogListener {
-        public void onComplete(String response, final Object state) {
-
-        }
-
 		@Override
 		public void onComplete(Bundle values) {
 			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
