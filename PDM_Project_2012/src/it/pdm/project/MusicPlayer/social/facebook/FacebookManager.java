@@ -132,7 +132,7 @@ public class FacebookManager {
     	return new User(id, name, picture);
     }
     
-  //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
+    //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
     public void getInfoPost(String response) throws JSONException{
     	String idPost = "";
     	String message = "";
@@ -199,8 +199,7 @@ public class FacebookManager {
 							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
 						}	
 	    			}
-				} 
-								
+				} 				
 			}
     	}
     }
@@ -424,7 +423,17 @@ public class FacebookManager {
     private class GetGenericInfoPostRequestListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {
-    		Log.d("REQUEST", response);
+    		try {
+    			Log.d("RESPONSE", response);
+				getInfoPost(response);
+				
+				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+				intent.putExtra("ACTION", "TABLE_SUCCESSFULLY_UPDATED");
+				
+				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
     	}
     	@Override
         public void onFacebookError(FacebookError e, final Object state) {
