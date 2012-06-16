@@ -193,9 +193,9 @@ public class FacebookManager {
 					str = (String) itr.next();
 					for(int i=0; i<jArrayN.length(); i++){
 						if(getHashTablePostApp().get(str).getUser().equals(jArrayN.getJSONObject(i).getString("uid"))){
-							String id = jArray.getJSONObject(i).getString("uid");
-							String nameU = jArray.getJSONObject(i).getString("name");
-							String picture = jArray.getJSONObject(i).getString("pic_square");
+							String id = jArrayN.getJSONObject(i).getString("uid");
+							String nameU = jArrayN.getJSONObject(i).getString("name");
+							String picture = jArrayN.getJSONObject(i).getString("pic_square");
 							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
 						}	
 	    			}
