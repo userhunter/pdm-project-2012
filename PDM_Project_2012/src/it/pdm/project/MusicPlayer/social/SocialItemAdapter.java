@@ -2,6 +2,7 @@ package it.pdm.project.MusicPlayer.social;
 
 import it.pdm.project.MusicPlayer.R;
 import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
+import it.pdm.project.MusicPlayer.social.facebook.Post;
 
 import java.net.MalformedURLException;
 import java.util.List;
@@ -20,7 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
+public class SocialItemAdapter extends ArrayAdapter<Post> {
 	private final static String TAG = "MediaItemAdapter";
 	private int resourceId = 0;
 	private LayoutInflater inflater;
@@ -29,7 +30,7 @@ public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
 
 	private ImageThreadLoader imageLoader = new ImageThreadLoader();
 
-	public SocialItemAdapter(Context context, int resourceId, List<SocialItem> mediaItems, Resources res) {
+	public SocialItemAdapter(Context context, int resourceId, List<Post> mediaItems, Resources res) {
 		super(context, 0, mediaItems);
 		this.resourceId = resourceId;
 		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -59,26 +60,27 @@ public class SocialItemAdapter extends ArrayAdapter<SocialItem> {
 	    	throw e;
 	    }
 
-	    SocialItem item = getItem(position);
+	    Post item = getItem(position);
 	    Bitmap cachedImage = null;
     
 	    try {
-	    	cachedImage = imageLoader.loadImage(item.strUrl, new ImageLoadedListener() {
+	    	cachedImage = imageLoader.loadImage(item.getUserPosted().getPicture().replace("https://", "http://"), new ImageLoadedListener() {
 	    		public void imageLoaded(Bitmap imageBitmap) {
 	    			image.setImageDrawable(addTransparentGradient(imageBitmap));
 	    			notifyDataSetChanged();                
 	    		}
 	    	});
 	    } catch (MalformedURLException e) {
-	    	Log.e(TAG, "Bad remote image URL: " + item.strUrl, e);
+	    	Log.e(TAG, "Bad remote image URL: " + item.getUserPosted().getPicture(), e);
 	    }
 
-	    textTitle.setText(item.strSongTitle);
-	    textAlbum.setText(item.strSongAlbum);
-	    textArtist.setText(item.strSongArtist);
-	    textName.setText(item.strName);
-	    textLikesCount.setText(""+item.iLikesCount);
-	    textDateTime.setText(item.strDateTime);
+	    textTitle.setText(item.getTitle());
+	    textAlbum.setText(item.getAlbum());
+	    textArtist.setText(item.getArtist());
+	    textName.setText(item.getUserPosted().getName());
+	    textLikesCount.setText("" + item.getLikeUser());
+	    textDateTime.setText("");
+	    //textDateTime.setText("" + item.getCreatedPost().getDay() + "/" + item.getCreatedPost().getMonth() + " @ " + item.getCreatedPost().getHours() + ":" + item.getCreatedPost().getMinutes());
 
 	    if( cachedImage != null )
 	    	image.setImageDrawable(addTransparentGradient(cachedImage));

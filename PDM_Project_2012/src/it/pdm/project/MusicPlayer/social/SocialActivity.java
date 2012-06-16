@@ -3,6 +3,8 @@ package it.pdm.project.MusicPlayer.social;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import it.pdm.project.MusicPlayer.R;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
@@ -10,6 +12,7 @@ import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService.LocalBinder;
 import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
 import it.pdm.project.MusicPlayer.social.facebook.FacebookManager;
+import it.pdm.project.MusicPlayer.social.facebook.Post;
 import it.pdm.project.MusicPlayer.social.facebook.User;
 
 import android.app.ListActivity;
@@ -36,12 +39,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SocialActivity extends ListActivity implements OnClickListener {
 	private User m_userMe;
 	private ListView m_listView;
 	private SocialItemAdapter m_lstAdapter;
-	private ArrayList<SocialItem> m_strSource;
+	private ArrayList<Post> m_strSource;
 	private FacebookManager m_fbManager;
 	private MusicPlayerService m_mpService;
 	
@@ -57,22 +61,29 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
-				//m_txtUsername.setText(intent.getStringExtra("USERNAME"));
-				if (m_userMe == null)
-					m_userMe = new User();
-				
-				m_userMe.setId(intent.getStringExtra("ID"));
-				m_userMe.setName(intent.getStringExtra("USERNAME"));
-				m_userMe.setPicture(intent.getStringExtra("AVATAR"));
-				
-				updateAccountInfo(m_userMe.getPicture().replace("https://", "http://"), m_userMe.getName());
-				saveTokens();// Salvo i token della nuova sessione
+				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
+				saveTokens(); // Salvo i token della nuova sessione
 				m_lytLoginLayout.setVisibility(View.GONE);
 			}
-			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT"))
+			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT")) {
 				m_lytLoginLayout.setVisibility(View.VISIBLE);
+				clearTokens();
+				saveTokens();
+			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
-				System.out.println("OK POST");
+				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
+			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED"))
+			{
+		    	Hashtable htCurrentPost = m_fbManager.getHashTablePostApp();
+		    	Enumeration keys = htCurrentPost.keys();
+		    	
+		    	m_strSource.clear();
+		    	
+		    	while (keys.hasMoreElements()) 
+		    		m_strSource.add((Post)htCurrentPost.get(keys.nextElement()));
+		    	
+				m_lstAdapter.notifyDataSetChanged();
+			}
 		}
 	};
 	
@@ -96,52 +107,11 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.setListAdapter(m_lstAdapter);
         
         restoreTokens(); // Ripristino i token dell'ultima sessione
-        if (!this.m_fbManager.isLogged())
-        	this.m_fbManager.login();
         
-        Thread child = new Thread(new Runnable() {
-        	int i = 0;
-        	
-			@Override
-			public void run() {
-				while (i < 30) {
-					updaterHandler.sendEmptyMessage(0);
-					
-					i++;
-				
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-        });
-        
-        //child.start();
-    }
-    
-    private void testPost() {
-    	/*
-    	Hashtable<String, Post> posts = new Hashtable<String, Post>();
-    	
-    	this.m_fbManager.getAllPost();
-    	posts = this.m_fbManager.getHashTablePostApp();
-    	
-    	System.out.println("SIZE: " + posts.size());
-    	
-    	Hashtable ht = new Hashtable();
-    	Enumeration keys = ht.keys();
-    	
-    	while (keys.hasMoreElements()) {
-    		Object key = keys.nextElement();
-    		Object value = ht.get(key);
-    		
-    		System.out.println("POST: key: " + key + " value: " + ht.get(key));
-    	}
-    	*/
-    	
-    	this.m_fbManager.getFriendsPostsSorted();
+        if (this.m_fbManager.isLogged())
+        	this.m_fbManager.getUserInfo();
+        else
+        	this.m_fbManager.logout(this);
     }
     
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -156,18 +126,6 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	    @Override
 	    //Callabck richiamata nel momento in cui il bind tra questa activity ed il service termina.
 	    public void onServiceDisconnected(ComponentName arg0) { }
-	};
-    
-	private Handler updaterHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			int randomNumber = (int)Math.random()*100;
-			
-			SocialItem newSocialItem = new SocialItem("http://wecare.acmos.net/files/avatars/65/070519_124183_bokito-avatar1.jpg", "Rovine", "Clementino", "I.E.N.A", "Andrea Vitale", "14/06 @11:39", 5);
-			m_strSource.add(newSocialItem);
-			
-			m_lstAdapter.notifyDataSetChanged();
-		}
 	};
 	
 	public void updateAccountInfo(String strAvatarURL, String strName){
@@ -196,12 +154,13 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
 			}
 		} else if (arg0.getId() == this.m_btnRefresh.getId()) {
-			this.testPost();
+			//this.m_btnRefresh.setImageResource(R.drawable.loading);
+	    	this.m_fbManager.getFriendsPostsSorted();
 		}
 	}
 	
 	private void initMemberVars() {
-        this.m_strSource = new ArrayList<SocialItem>();
+        this.m_strSource = new ArrayList<Post>();
         this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
         this.m_fbManager = new FacebookManager(this);
         
@@ -220,7 +179,6 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.m_btnShare.setOnClickListener(this);
         this.m_btnRefresh.setOnClickListener(this);
         
-        this.m_userMe = this.m_fbManager.getCurrentUser();
         this.m_thImageLoader = new ImageThreadLoader();
 	}
 	
@@ -230,6 +188,15 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("ACCESS_TOKEN", this.m_fbManager.getFacebook().getAccessToken());
         editor.putLong("EXPIRES_TOKEN", this.m_fbManager.getFacebook().getAccessExpires());
+        editor.commit();
+	}
+	
+	public void clearTokens() {
+        /* Otteniamo il riferimento alle Preferences e vi salviamo i tokens appena ottenuti dopo il login */
+        SharedPreferences prefs = getSharedPreferences("TOKENS", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("ACCESS_TOKEN", null);
+        editor.putLong("EXPIRES_TOKEN", 0);
         editor.commit();
 	}
 	
