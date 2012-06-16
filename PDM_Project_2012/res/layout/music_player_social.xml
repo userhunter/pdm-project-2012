@@ -53,7 +53,7 @@
             android:textSize="13sp"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/social_account_avatar"
-            android:text="TextView" />
+            android:text="" />
         
         <ImageButton
             android:id="@+id/social_share_btn"
