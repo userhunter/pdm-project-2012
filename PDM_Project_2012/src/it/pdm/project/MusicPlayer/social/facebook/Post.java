@@ -15,6 +15,7 @@ public class Post {
 	private String mArtist;
 	private String mTitle;
 	private Date mCreatedPost;
+	private User mUserPosted;
 	
 	public Post(){
 		this.mPost_id = "";
@@ -25,6 +26,7 @@ public class Post {
 		this.mArtist = "";
 		this.mTitle = "";
 		this.mCreatedPost = new Date();
+		this.mUserPosted = new User();
 	}
 	
 	public Post(String post_id){
@@ -36,6 +38,7 @@ public class Post {
 		this.mArtist = "";
 		this.mTitle = "";
 		this.mCreatedPost = new Date();
+		this.mUserPosted = new User();
 	}
 	
 	
@@ -66,6 +69,10 @@ public class Post {
 	
 	public String getTitle(){
 		return this.mTitle;
+	}
+
+	public User getUserPosted(){
+		return this.mUserPosted;
 	}
 	
 	public Date getCreatedPost(){
@@ -98,5 +105,9 @@ public class Post {
 	
 	public void setCreatedPost(Date date){
 		this.mCreatedPost = date;
+	}
+	
+	public void setUserPosted(User user){
+		this.mUserPosted = user;
 	}
 }
