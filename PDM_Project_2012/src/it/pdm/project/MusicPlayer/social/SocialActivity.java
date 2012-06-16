@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -65,6 +66,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				m_userMe.setPicture(intent.getStringExtra("AVATAR"));
 				
 				updateAccountInfo(m_userMe.getPicture().replace("https://", "http://"), m_userMe.getName());
+				saveTokens();// Salvo i token della nuova sessione
 				m_lytLoginLayout.setVisibility(View.GONE);
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT"))
@@ -93,6 +95,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.registerReceiver(broadcastReceiver, new IntentFilter("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent"));
         this.setListAdapter(m_lstAdapter);
         
+        restoreTokens(); // Ripristino i token dell'ultima sessione
         if (!this.m_fbManager.isLogged())
         	this.m_fbManager.login();
         
@@ -219,5 +222,23 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         
         this.m_userMe = this.m_fbManager.getCurrentUser();
         this.m_thImageLoader = new ImageThreadLoader();
+	}
+	
+	public void saveTokens() {
+        /* Otteniamo il riferimento alle Preferences e vi salviamo i tokens appena ottenuti dopo il login */
+        SharedPreferences prefs = getSharedPreferences("TOKENS", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("ACCESS_TOKEN", this.m_fbManager.getFacebook().getAccessToken());
+        editor.putLong("EXPIRES_TOKEN", this.m_fbManager.getFacebook().getAccessExpires());
+        editor.commit();
+	}
+	
+	public void restoreTokens(){
+		/* Ripristiniamo eventuali token precedenti, in modo da verificare se si è loggati o no */
+		SharedPreferences prefs = getSharedPreferences("TOKENS", Context.MODE_PRIVATE);
+        String strACCESS_TOKEN = prefs.getString("ACCESS_TOKEN", null);
+        long lEXPIRES_TOKEN = prefs.getLong("EXPIRES_TOKEN", 0);
+        this.m_fbManager.getFacebook().setAccessToken(strACCESS_TOKEN);
+        this.m_fbManager.getFacebook().setAccessExpires(lEXPIRES_TOKEN);
 	}
 }
