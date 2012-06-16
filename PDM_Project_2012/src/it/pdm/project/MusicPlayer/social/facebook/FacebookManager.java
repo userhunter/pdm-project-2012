@@ -244,6 +244,12 @@ public class FacebookManager {
     	this.FQLQuery(query, new CurrentUserRequestListener());
     }
     
+    //Interrogazione FQL che richiede la social history
+    public void getSocialHistory() {
+    	String query = "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid, name FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user) AND app_id = 237120273069387 LIMIT 50";
+    	this.FQLQuery(query, new GetGenericInfoPostRequestListener());
+    }
+    
     //Interrogazione FQL che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazioni con un'immagine passata
     public void postOnWall(Activity activity, String imageAlbumUrl, String song, String album, String singer){
     	Bundle params = new Bundle();
@@ -270,16 +276,20 @@ public class FacebookManager {
     
     public void getFriendsPostsSorted() {
     	try {
+    		/*
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
 	    	
-	    	jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
-	    	jsonFQL.put("query2", "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid FROM #query1) AND app_id = 237120273069387 ORDER BY created_time DESC");
-	    	 
+	    	//jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
+	    	//jsonFQL.put("query2", "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid FROM #query1) AND app_id = 237120273069387 ORDER BY created_time DESC");
+	    	
+	    	jsonFQL.put("query1", "SELECT message, attachment.name, attachment.caption, attachment.description FROM stream WHERE source_id IN (SELECT uid, name FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user) AND app_id = 237120273069387 LIMIT 50");
+	    	
 	    	params.putString("method", "fql.multiquery");
 	    	params.putString("queries", jsonFQL.toString());
 	    	
-	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
+	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener()); */
+	    	this.getSocialHistory();
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
