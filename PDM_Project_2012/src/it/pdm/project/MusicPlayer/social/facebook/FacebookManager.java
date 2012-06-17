@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -137,6 +139,8 @@ public class FacebookManager {
     }
 
     public void getInfoPost(String response) throws JSONException{
+    	Format formatter = new SimpleDateFormat("dd/MM HH:mm");
+    	
     	String idPost = "";
     	String message = "";
     	String idUser = "";
@@ -171,16 +175,12 @@ public class FacebookManager {
     					caption= "";
       				desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
       				count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
-      			   			
-    				//if(!this.mPostFriendApp.containsKey(idPost)){
-	    			//	this.mPostFriendApp.put(idPost, new Post(idPost));
-    				//}
       				
       				this.mPostFriendApp.put(time.getTime(), new Post(idPost));
 
     				this.mPostFriendApp.get(time.getTime()).setMessage(message);
     				this.mPostFriendApp.get(time.getTime()).setUser(idUser);
-    				this.mPostFriendApp.get(time.getTime()).setCreatedPost(time);
+    				this.mPostFriendApp.get(time.getTime()).setCreatedPost(formatter.format(time));
     				
     				if(!desc.equals(""))
       					this.mPostFriendApp.get(time.getTime()).setAlbum(desc);
