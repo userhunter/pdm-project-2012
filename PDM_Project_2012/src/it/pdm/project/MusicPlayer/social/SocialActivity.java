@@ -112,13 +112,18 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         
         restoreTokens(); // Ripristino i token dell'ultima sessione
         
-        if (this.m_fbManager.isLogged()){
-        	showLoginSpinner();
-        	this.m_fbManager.getUserInfo();
-        	this.m_fbManager.populateHashTable();
+        if (!isOnline(this)) {
+			Toast.makeText(getApplicationContext(), "Connessione Assente!", Toast.LENGTH_SHORT).show();
+		}
+        else{
+	        if (this.m_fbManager.isLogged()){
+	        	showLoginSpinner();
+	        	this.m_fbManager.getUserInfo();
+	        	this.m_fbManager.populateHashTable();
+	        }
+	        else
+	        	this.m_fbManager.logout(this);
         }
-        else
-        	this.m_fbManager.logout(this);
     }
     
     public boolean isOnline(Context c) {
