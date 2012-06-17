@@ -27,6 +27,8 @@ import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -77,7 +79,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				saveTokens();
 			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
-				Toast.makeText(SocialActivity.this, "Il messaggio apparirà sulla tua bacheca.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(SocialActivity.this, "Il messaggio apparirÀÜ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
 			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED")){
 				refreshSocialItems();
 				stopRefreshAnimation();
@@ -119,12 +121,23 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         	this.m_fbManager.logout(this);
     }
     
+    public boolean isOnline(Context c) {
+    	ConnectivityManager cm = (ConnectivityManager) c
+    	.getSystemService(Context.CONNECTIVITY_SERVICE);
+    	NetworkInfo ni = cm.getActiveNetworkInfo();
+
+    	if (ni != null && ni.isConnected())
+    	  return true;
+    	else
+    	  return false;
+    }
+    
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		//Callback richiamata nel momento in cui il bind tra questa activity e il service è avvenuto con successo.
+		//Callback richiamata nel momento in cui il bind tra questa activity e il service ÔøΩ avvenuto con successo.
 	    public void onServiceConnected(ComponentName className, IBinder service) {
 	        LocalBinder binder = (LocalBinder) service;
-	        //Valorizzo m_mpService con il servizio a cui l'activity di è appena linkata in modo da poter richiamare metodi pubblici
+	        //Valorizzo m_mpService con il servizio a cui l'activity di ÔøΩ appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
 		}
 
@@ -149,22 +162,28 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		if (arg0.getId() == this.m_btnLoginButton.getId()){
-			this.m_fbManager.login();
-			showLoginSpinner();
+		if (!isOnline(this)) {
+			Toast.makeText(getApplicationContext(), "Connessione Assente!", Toast.LENGTH_SHORT).show();
 		}
-		else if (arg0.getId() == this.m_btnLogout.getId())
-			this.m_fbManager.logout(this);
-		else if (arg0.getId() == this.m_btnShare.getId()) {
-			if (this.m_mpService != null && this.m_mpService.getCurrentPlayingItem() != null) {
-				MP3Item mp3Item = this.m_mpService.getCurrentPlayingItem();
-				this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
-			} else
-				Toast.makeText(this, "Nessun brano attualmente in riproduzione", Toast.LENGTH_SHORT).show();
-		} else if (arg0.getId() == this.m_btnRefresh.getId()) {
-			//this.m_btnRefresh.setImageResource(R.drawable.loading);
-			showRefreshAnimation();
-	    	this.m_fbManager.populateHashTable();
+		else {
+			  //Internet available. Do what's required when internet is available.
+			if (arg0.getId() == this.m_btnLoginButton.getId()){
+				this.m_fbManager.login();
+				showLoginSpinner();
+			}
+			else if (arg0.getId() == this.m_btnLogout.getId())
+				this.m_fbManager.logout(this);
+			else if (arg0.getId() == this.m_btnShare.getId()) {
+				if (this.m_mpService != null && this.m_mpService.getCurrentPlayingItem() != null) {
+					MP3Item mp3Item = this.m_mpService.getCurrentPlayingItem();
+					this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
+				} else
+					Toast.makeText(this, "Nessun brano attualmente in riproduzione", Toast.LENGTH_SHORT).show();
+			} else if (arg0.getId() == this.m_btnRefresh.getId()) {
+				//this.m_btnRefresh.setImageResource(R.drawable.loading);
+				showRefreshAnimation();
+		    	this.m_fbManager.populateHashTable();
+			}
 		}
 	}
 	
@@ -226,7 +245,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	}
 	
 	public void restoreTokens(){
-		/* Ripristiniamo eventuali token precedenti, in modo da verificare se si è loggati o no */
+		/* Ripristiniamo eventuali token precedenti, in modo da verificare se si ÔøΩ loggati o no */
 		SharedPreferences prefs = getSharedPreferences("TOKENS", Context.MODE_PRIVATE);
         String strACCESS_TOKEN = prefs.getString("ACCESS_TOKEN", null);
         long lEXPIRES_TOKEN = prefs.getLong("EXPIRES_TOKEN", 0);
