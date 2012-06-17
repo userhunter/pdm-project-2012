@@ -89,11 +89,14 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	}
 	
 	public Drawable addTransparentGradient(Bitmap bitmap){
+		/*
 		Drawable dBitmap = new BitmapDrawable(m_res, bitmap);
 		Drawable[] layers = new Drawable[2];
         layers[0] = dBitmap;
         layers[1] = m_res.getDrawable(R.drawable.gradient_overlay);
         LayerDrawable layerDrawable = new LayerDrawable(layers);
         return layerDrawable;
+        */
+        return new BitmapDrawable(bitmap);
 	}
 }

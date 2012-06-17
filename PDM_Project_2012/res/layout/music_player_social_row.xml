@@ -12,14 +12,15 @@
         android:layout_marginBottom="3dp" >
         <ImageView 
             android:id="@+id/img"
-            android:layout_height="60dp"
-            android:layout_width="60dp"/>
+            android:layout_height="46dp"
+            android:layout_width="46dp"
+            android:background="@drawable/avatar_border" />
         
         <LinearLayout 
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="2dp">
+            android:paddingLeft="4dp">
             
             <RelativeLayout 
                 android:layout_width="fill_parent"
@@ -63,7 +64,7 @@
                 android:id="@+id/record_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
+                android:textSize="14sp"
                 style="@style/TrackInfoStyle" />
             
             <RelativeLayout 
@@ -74,6 +75,7 @@
 	                android:id="@+id/record_artist"
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
+	                android:textSize="11sp"
 	                style="@style/TrackInfoStyle" />
 
 	            <TextView
@@ -85,7 +87,7 @@
 	                android:layout_alignBottom="@+id/record_artist"
 	                android:layout_marginLeft="10dp"
 	                android:layout_toRightOf="@+id/record_artist"
-	                android:textSize="12sp"
+	                android:textSize="11sp"
 	                android:textStyle="italic" />
             
             </RelativeLayout>
