@@ -3,6 +3,7 @@ package it.pdm.project.MusicPlayer.social;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -236,14 +237,16 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	private void refreshSocialItems() {
 		showRefreshAnimation();
 		
-    	Hashtable htCurrentPost = m_fbManager.getHashTablePostApp();
-    	Enumeration keys = htCurrentPost.keys();
+    	Hashtable<Long, Post> htCurrentPost = m_fbManager.getHashTablePostApp();
     	
-    	m_strSource.clear();
-    	
-    	while (keys.hasMoreElements()) 
-    		m_strSource.add((Post)htCurrentPost.get(keys.nextElement()));
-    	
+    	ArrayList<Long> keys = new ArrayList<Long>(htCurrentPost.keySet());
+        Collections.sort(keys);
+
+        m_strSource.clear();
+        
+        for (int i = keys.size()-1; i >= 0; i--)
+        	m_strSource.add(htCurrentPost.get(keys.get(i)));
+        
 		m_lstAdapter.notifyDataSetChanged();
 	}
 	

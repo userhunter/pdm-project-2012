@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
@@ -53,7 +54,7 @@ public class FacebookManager {
 	private Activity mActivityChiamante;
 	
 	//Necessario renderla globale a causa delle risposte che vengono gestite nei listener
-	private Hashtable<String, Post> mPostFriendApp;
+	private Hashtable<Long, Post> mPostFriendApp;
 	
 	//ArrayList contenenti gli id degli utenti che usano l'applicazione
 	private ArrayList<User> mUserFriendsApp;
@@ -65,7 +66,7 @@ public class FacebookManager {
     	this.mUserFriendsApp = new ArrayList<User>();
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
     	this.mActivityChiamante = mActivityChimante;
-    	this.mPostFriendApp = new Hashtable<String, Post>();
+    	this.mPostFriendApp = new Hashtable<Long, Post>();
     }
     
     //Costruttore con parametri
@@ -74,7 +75,7 @@ public class FacebookManager {
     	this.mFacebook = facebook;
     	this.mUserFriendsApp = new ArrayList<User>();
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
-    	this.mPostFriendApp = new Hashtable<String, Post>();
+    	this.mPostFriendApp = new Hashtable<Long, Post>();
     }
     
     /**Utility**/
@@ -134,90 +135,15 @@ public class FacebookManager {
     	}
     	return new User(id, name, picture);
     }
-    /*
-    //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
-    public void getInfoPost(String response) throws JSONException{
-    	String idPost = "";
-    	String message = "";
-    	String idUser= "";
-    	String name="";
-    	String caption="";
-    	String desc="";
-    	int count =0;
-    	
-  
-    	response = "{\"data\":" + response + "}";
-    	JSONObject json = Util.parseJson(response);
-    	JSONArray jArrayD = json.getJSONArray("data");
-    	JSONArray jArray = jArrayD.getJSONObject(1).getJSONArray("fql_result_set");
-    	
-    	if (jArray.length() != 0) {
-    		for(int i=0; i<jArray.length(); i++){
-    			if (message.equals("")) message = " ";
-    			
-    			idPost = jArray.getJSONObject(i).getString("post_id");
-    			message = jArray.getJSONObject(i).getString("message");
-    			idUser = jArray.getJSONObject(i).getString("actor_id");
-    			java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
-    			if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
-    				name = jArray.getJSONObject(i).getJSONObject("attachment").getString("name");
-    			else
-    				name= "";
-    			if(jArray.getJSONObject(i).getJSONObject("attachment").has("caption"))
-    				caption = jArray.getJSONObject(i).getJSONObject("attachment").getString("caption");
-    			else
-    				caption= "";
-      			desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
-      			count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
-      			   			
-    			if(!this.mPostFriendApp.containsKey(idPost)){
-	    			this.mPostFriendApp.put(idPost, new Post(idPost));
-    			}
-
-    			this.mPostFriendApp.get(idPost).setMessage(message);
-    			this.mPostFriendApp.get(idPost).setUser(idUser);
-    			this.mPostFriendApp.get(idPost).setCreatedPost(time);
-    			if(!desc.equals(""))
-      				this.mPostFriendApp.get(idPost).setAlbum(desc);
-      			if(!name.equals(""))
-      				this.mPostFriendApp.get(idPost).setTitle(name);
-      			if(!caption.equals(""))
-      				this.mPostFriendApp.get(idPost).setArtist(caption);
-    			this.mPostFriendApp.get(idPost).setLikeUser(count);
-    		}
-    	}
-	
-	
-    	if(this.mPostFriendApp.size()>0){
-    		JSONArray jArrayN = jArrayD.getJSONObject(0).getJSONArray("fql_result_set");
-    		if(jArrayN.length() != 0){
-    			String str;
-				Set set = getHashTablePostApp().keySet();
-				Iterator itr = set.iterator(); 
-				while(itr.hasNext()) { 
-					str = (String) itr.next();
-					for(int i=0; i<jArrayN.length(); i++){
-						if(getHashTablePostApp().get(str).getUser().equals(jArrayN.getJSONObject(i).getString("uid"))){
-							String id = jArrayN.getJSONObject(i).getString("uid");
-							String nameU = jArrayN.getJSONObject(i).getString("name");
-							String picture = jArrayN.getJSONObject(i).getString("pic_square");
-							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
-						}	
-	    			}
-				} 				
-			}
-    	}
-    }
-    */
 
     public void getInfoPost(String response) throws JSONException{
     	String idPost = "";
     	String message = "";
-    	String idUser= "";
-    	String name="";
-    	String caption="";
-    	String desc="";
-    	int count =0;
+    	String idUser = "";
+    	String name = "";
+    	String caption = "";
+    	String desc = "";
+    	int count = 0;
     	
   
     	response = "{\"data\":" + response + "}";
@@ -225,61 +151,65 @@ public class FacebookManager {
     	JSONArray jArrayD = json.getJSONArray("data");
 	
 		for(int k=0; k<jArrayD.length(); k++){
-	    		JSONArray jArray = jArrayD.getJSONObject(k).getJSONArray("fql_result_set");
-	    	
-	    		if (jArray.length() != 0) {
-	    			for(int i=0; i<jArray.length(); i++){
-	    				if (message.equals("")) message = " ";
-	    			
-	    				idPost = jArray.getJSONObject(i).getString("post_id");
-	    				message = jArray.getJSONObject(i).getString("message");
-	    				idUser = jArray.getJSONObject(i).getString("actor_id");
-	    				java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
-	    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
-	    					name = jArray.getJSONObject(i).getJSONObject("attachment").getString("name");
-	    				else
-	    					name= "";
-	    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("caption"))
-	    					caption = jArray.getJSONObject(i).getJSONObject("attachment").getString("caption");
-	    				else
-	    					caption= "";
-	      				desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
-	      				count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
-	      			   			
-	    				if(!this.mPostFriendApp.containsKey(idPost)){
-		    				this.mPostFriendApp.put(idPost, new Post(idPost));
-	    				}
-	
-	    				this.mPostFriendApp.get(idPost).setMessage(message);
-	    				this.mPostFriendApp.get(idPost).setUser(idUser);
-	    				this.mPostFriendApp.get(idPost).setCreatedPost(time);
-	    				if(!desc.equals(""))
-	      					this.mPostFriendApp.get(idPost).setAlbum(desc);
-	      				if(!name.equals(""))
-	      					this.mPostFriendApp.get(idPost).setTitle(name);
-	      				if(!caption.equals(""))
-	      					this.mPostFriendApp.get(idPost).setArtist(caption);
-	    				this.mPostFriendApp.get(idPost).setLikeUser(count);
-	    			}
-	    		}
+	    	JSONArray jArray = jArrayD.getJSONObject(k).getJSONArray("fql_result_set");
+    	
+    		if (jArray.length() != 0) {
+    			for(int i=0; i<jArray.length(); i++){
+    				if (message.equals("")) message = " ";
+    			
+    				idPost = jArray.getJSONObject(i).getString("post_id");
+    				message = jArray.getJSONObject(i).getString("message");
+    				idUser = jArray.getJSONObject(i).getString("actor_id");
+    				java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
+    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
+    					name = jArray.getJSONObject(i).getJSONObject("attachment").getString("name");
+    				else
+    					name= "";
+    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("caption"))
+    					caption = jArray.getJSONObject(i).getJSONObject("attachment").getString("caption");
+    				else
+    					caption= "";
+      				desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
+      				count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
+      			   			
+    				//if(!this.mPostFriendApp.containsKey(idPost)){
+	    			//	this.mPostFriendApp.put(idPost, new Post(idPost));
+    				//}
+      				
+      				this.mPostFriendApp.put(time.getTime(), new Post(idPost));
+
+    				this.mPostFriendApp.get(time.getTime()).setMessage(message);
+    				this.mPostFriendApp.get(time.getTime()).setUser(idUser);
+    				this.mPostFriendApp.get(time.getTime()).setCreatedPost(time);
+    				
+    				if(!desc.equals(""))
+      					this.mPostFriendApp.get(time.getTime()).setAlbum(desc);
+      				if(!name.equals(""))
+      					this.mPostFriendApp.get(time.getTime()).setTitle(name);
+      				if(!caption.equals(""))
+      					this.mPostFriendApp.get(time.getTime()).setArtist(caption);
+      				
+    				this.mPostFriendApp.get(time.getTime()).setLikeUser(count);
+    			}
+    		}
 		}
 		
-    	if(this.mPostFriendApp.size()>0){
+    	if (this.mPostFriendApp.size()>0){
     		if(mUserFriendsApp.size()!=0){
-    			String str;
-				Set set = getHashTablePostApp().keySet();
+    			Long str;
+				Set set = this.mPostFriendApp.keySet();
 				Iterator itr = set.iterator(); 
 				while(itr.hasNext()) { 
-					str = (String) itr.next();
+					str = (Long) itr.next();
 					for(int i=0; i<mUserFriendsApp.size(); i++){
-						if(getHashTablePostApp().get(str).getUser().equals(mUserFriendsApp.get(i).getId())){
+						if(this.mPostFriendApp.get(str).getUser().equals(mUserFriendsApp.get(i).getId())){
 							String id = mUserFriendsApp.get(i).getId();
 							String nameU = mUserFriendsApp.get(i).getName();
 							String picture = mUserFriendsApp.get(i).getPicture();
-							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
+							this.mPostFriendApp.get(str).setUserPosted(new User(id, nameU, picture));
 						}	
 	    			}
-				} 				
+				}			
     		}
     	}
     }
@@ -358,23 +288,6 @@ public class FacebookManager {
     }
     
     public void getFriendsPostsSorted() {
-    	/*
-    	try {
-	    	Bundle params = new Bundle();
-	    	JSONObject jsonFQL = new JSONObject();
-	    	
-	    	//jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user");
-	    	jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user");
-	    	jsonFQL.put("query2", "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid FROM #query1) AND app_id = 237120273069387");
-	    	
-	    	params.putString("method", "fql.multiquery");
-	    	params.putString("queries", jsonFQL.toString());
-	    	
-	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-    	*/
     	try {
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
@@ -436,21 +349,20 @@ public class FacebookManager {
     }
     
     //Funzione che restituisce l'hashtable dei post 
-    public Hashtable<String, Post> getHashTablePostApp(){
-    	this.sortValue();
+    public Hashtable<Long, Post> getHashTablePostApp(){ 
     	return this.mPostFriendApp;
     }
     
-    public void sortValue(){
-        //Transfer as List and sort it
-        ArrayList<Map.Entry<String, Post>> l = new ArrayList(mPostFriendApp.entrySet());
-        Collections.sort(l, new Comparator<Map.Entry<String, Post>>(){
-
-			@Override
-			public int compare(Entry<String, Post> arg0, Entry<String, Post> arg1) {
-				return arg0.getValue().getCreatedPost().compareTo(arg1.getValue().getCreatedPost());
-			}
-        });
+    public Hashtable<Long, Post> sortValue(){
+    	ArrayList<Long> keys = new ArrayList<Long>(this.mPostFriendApp.keySet());
+        Collections.sort(keys);
+        
+        Hashtable<Long, Post> newHtable = new Hashtable<Long, Post>();
+        
+        for (int i = keys.size()-1; i >= 0; i--)
+        	newHtable.put(keys.get(i), this.mPostFriendApp.get(keys.get(i)));
+        
+        return newHtable;
      }
     
   //Funzione che restituisce l'hashtable dei post 
@@ -517,7 +429,6 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		try {
-    			Log.d("RESPONSE GETUSERLISTENER", response);
 				mUserFriendsApp = getFriendAppArray(response);
 				getFriendsPostsSorted();
 			} catch (JSONException e) {
