@@ -33,8 +33,6 @@ import com.facebook.android.FacebookError;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.Util;
 
-
-
 public class FacebookManager {
 	//Utente che ha effettuato il login
 	private User m_userMe;
@@ -56,11 +54,15 @@ public class FacebookManager {
 	
 	//Necessario renderla globale a causa delle risposte che vengono gestite nei listener
 	private Hashtable<String, Post> mPostFriendApp;
+	
+	//ArrayList contenenti gli id degli utenti che usano l'applicazione
+	private ArrayList<User> mUserFriendsApp;
 
     //Costruttore senza parametri
     public FacebookManager(Activity mActivityChimante){
     	this.m_userMe = null;
     	this.mFacebook = new Facebook(APP_ID);
+    	this.mUserFriendsApp = new ArrayList<User>();
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
     	this.mActivityChiamante = mActivityChimante;
     	this.mPostFriendApp = new Hashtable<String, Post>();
@@ -70,6 +72,7 @@ public class FacebookManager {
     public FacebookManager(Facebook facebook){
     	this.m_userMe = new User();
     	this.mFacebook = facebook;
+    	this.mUserFriendsApp = new ArrayList<User>();
     	this.mAsyncRunner = new AsyncFacebookRunner(this.mFacebook);
     	this.mPostFriendApp = new Hashtable<String, Post>();
     }
@@ -131,7 +134,7 @@ public class FacebookManager {
     	}
     	return new User(id, name, picture);
     }
-    
+    /*
     //Funzione che restituisce una lista di post di un utente dell'app (Da usare per parsare le risposte ottenute nel listener)
     public void getInfoPost(String response) throws JSONException{
     	String idPost = "";
@@ -205,8 +208,81 @@ public class FacebookManager {
 			}
     	}
     }
-    
-   
+    */
+
+    public void getInfoPost(String response) throws JSONException{
+    	String idPost = "";
+    	String message = "";
+    	String idUser= "";
+    	String name="";
+    	String caption="";
+    	String desc="";
+    	int count =0;
+    	
+  
+    	response = "{\"data\":" + response + "}";
+    	JSONObject json = Util.parseJson(response);
+    	JSONArray jArrayD = json.getJSONArray("data");
+	
+		for(int k=0; k<jArrayD.length(); k++){
+	    		JSONArray jArray = jArrayD.getJSONObject(k).getJSONArray("fql_result_set");
+	    	
+	    		if (jArray.length() != 0) {
+	    			for(int i=0; i<jArray.length(); i++){
+	    				if (message.equals("")) message = " ";
+	    			
+	    				idPost = jArray.getJSONObject(i).getString("post_id");
+	    				message = jArray.getJSONObject(i).getString("message");
+	    				idUser = jArray.getJSONObject(i).getString("actor_id");
+	    				java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
+	    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
+	    					name = jArray.getJSONObject(i).getJSONObject("attachment").getString("name");
+	    				else
+	    					name= "";
+	    				if(jArray.getJSONObject(i).getJSONObject("attachment").has("caption"))
+	    					caption = jArray.getJSONObject(i).getJSONObject("attachment").getString("caption");
+	    				else
+	    					caption= "";
+	      				desc = jArray.getJSONObject(i).getJSONObject("attachment").getString("description");
+	      				count = jArray.getJSONObject(i).getJSONObject("likes").getInt("count");
+	      			   			
+	    				if(!this.mPostFriendApp.containsKey(idPost)){
+		    				this.mPostFriendApp.put(idPost, new Post(idPost));
+	    				}
+	
+	    				this.mPostFriendApp.get(idPost).setMessage(message);
+	    				this.mPostFriendApp.get(idPost).setUser(idUser);
+	    				this.mPostFriendApp.get(idPost).setCreatedPost(time);
+	    				if(!desc.equals(""))
+	      					this.mPostFriendApp.get(idPost).setAlbum(desc);
+	      				if(!name.equals(""))
+	      					this.mPostFriendApp.get(idPost).setTitle(name);
+	      				if(!caption.equals(""))
+	      					this.mPostFriendApp.get(idPost).setArtist(caption);
+	    				this.mPostFriendApp.get(idPost).setLikeUser(count);
+	    			}
+	    		}
+		}
+		
+    	if(this.mPostFriendApp.size()>0){
+    		if(mUserFriendsApp.size()!=0){
+    			String str;
+				Set set = getHashTablePostApp().keySet();
+				Iterator itr = set.iterator(); 
+				while(itr.hasNext()) { 
+					str = (String) itr.next();
+					for(int i=0; i<mUserFriendsApp.size(); i++){
+						if(getHashTablePostApp().get(str).getUser().equals(mUserFriendsApp.get(i).getId())){
+							String id = mUserFriendsApp.get(i).getId();
+							String nameU = mUserFriendsApp.get(i).getName();
+							String picture = mUserFriendsApp.get(i).getPicture();
+							getHashTablePostApp().get(str).setUserPosted(new User(id, nameU, picture));
+						}	
+	    			}
+				} 				
+    		}
+    	}
+    }
     /**Function**/
     
     //Funzione che effettua il login con le autorizzazioni per la nostra app
@@ -234,10 +310,8 @@ public class FacebookManager {
     	mAsyncRunner.logout(context ,new LogoutRequestListener());
     }
     
-    //Interrogazione FQL che richiede le info di un utente dato l'id
-    public void getUserById(String uid){
-    	String query = "SELECT name, pic_square FROM user WHERE uid = " + uid;
-    	this.FQLQuery(query, new GetUserByIDListener());
+    public String getAllFriendsIds() {
+    	return "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user";
     }
     
     //Interrogazione FQL che richiede le info dell'utente loggato
@@ -276,7 +350,15 @@ public class FacebookManager {
         mFacebook.dialog(activity, "feed", params, new PostDialogListener());
     }
     
+    public void populateHashTable() {
+    	if (this.mUserFriendsApp.size() == 0)
+    		this.FQLQuery(getAllFriendsIds(), new GetUsersListener());
+    	else
+    		this.getFriendsPostsSorted();
+    }
+    
     public void getFriendsPostsSorted() {
+    	/*
     	try {
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
@@ -290,6 +372,21 @@ public class FacebookManager {
 	    	
 	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
     	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	*/
+    	try {
+	    	Bundle params = new Bundle();
+	    	JSONObject jsonFQL = new JSONObject();
+	    	
+	    	for (User user : this.mUserFriendsApp)
+	    		jsonFQL.put(user.getId(), "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id = " + user.getId() + " AND app_id = 237120273069387");
+	    	
+	    	params.putString("method", "fql.multiquery");
+	    	params.putString("queries", jsonFQL.toString());
+	    	
+	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
+    	} catch (JSONException e) {
     		e.printStackTrace();
     	}
     }
@@ -416,10 +513,16 @@ public class FacebookManager {
     }
     
     //Listener invocato alla conclusione della richiesta per le info di un utente dato l'id
-    private class GetUserByIDListener extends BaseRequestListener {
+    private class GetUsersListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {
-    		//Inserire codice una volta che è si è ottenuta l'info, usare parser
+    		try {
+    			Log.d("RESPONSE GETUSERLISTENER", response);
+				mUserFriendsApp = getFriendAppArray(response);
+				getFriendsPostsSorted();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
     	}
     	@Override
         public void onFacebookError(FacebookError e, final Object state) {
