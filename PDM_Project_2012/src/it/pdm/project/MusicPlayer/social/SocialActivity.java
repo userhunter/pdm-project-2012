@@ -64,7 +64,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	    public void onReceive(Context context, Intent intent) {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
 				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
-				saveTokens(); // Salvo i token della nuova sessione 
+				saveTokens(); // Salvo i token della nuova sessione
 				refreshSocialItems();
 				m_lytLoginLayout.setVisibility(View.GONE);
 				hideLoginSpinner();
@@ -110,6 +110,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         restoreTokens(); // Ripristino i token dell'ultima sessione
         
         if (this.m_fbManager.isLogged()){
+        	showLoginSpinner();
         	this.m_fbManager.getUserInfo();
         	this.m_fbManager.populateHashTable();
         }
@@ -233,6 +234,8 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	}
 	
 	private void refreshSocialItems() {
+		showRefreshAnimation();
+		
     	Hashtable htCurrentPost = m_fbManager.getHashTablePostApp();
     	Enumeration keys = htCurrentPost.keys();
     	
