@@ -62,7 +62,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	    public void onReceive(Context context, Intent intent) {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
 				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
-				saveTokens(); // Salvo i token della nuova sessione
+				saveTokens(); // Salvo i token della nuova sessione 
 				m_lytLoginLayout.setVisibility(View.GONE);
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT")) {
