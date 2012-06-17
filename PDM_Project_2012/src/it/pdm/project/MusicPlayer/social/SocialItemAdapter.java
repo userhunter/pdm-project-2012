@@ -79,7 +79,7 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	    textArtist.setText(item.getArtist());
 	    textName.setText(item.getUserPosted().getName());
 	    textLikesCount.setText("" + item.getLikeUser());
-	    textDateTime.setText("");
+	    textDateTime.setText("" + item.getCreatedPost());
 	    //textDateTime.setText("" + item.getCreatedPost().getDay() + "/" + item.getCreatedPost().getMonth() + " @ " + item.getCreatedPost().getHours() + ":" + item.getCreatedPost().getMinutes());
 
 	    if( cachedImage != null )
