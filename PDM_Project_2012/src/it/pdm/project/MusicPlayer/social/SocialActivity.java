@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,8 +50,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	private FacebookManager m_fbManager;
 	private MusicPlayerService m_mpService;
 	
-	private ImageButton m_btnLogout, m_btnRefresh, m_btnShare;
-	private Button m_btnLoginButton;
+	private ImageButton m_btnLoginButton, m_btnLogout, m_btnRefresh, m_btnShare;
 	private TextView m_txtUsername;
 	private RelativeLayout m_lytLoginLayout;
 	private ImageView m_imgAvatar;
@@ -64,11 +64,16 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
 				saveTokens(); // Salvo i token della nuova sessione
 				m_lytLoginLayout.setVisibility(View.GONE);
+				hideLoginSpinner();
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT")) {
 				m_lytLoginLayout.setVisibility(View.VISIBLE);
 				clearTokens();
 				saveTokens();
+			}
+			else if (intent.getStringExtra("ACTION").equals("USER_LOGIN_ABORT")) {
+				/* In caso di annullamento o fail del login, nascondiamo lo spinner di caricamento */
+				hideLoginSpinner();
 			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
 				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
@@ -144,8 +149,10 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		if (arg0.getId() == this.m_btnLoginButton.getId())
+		if (arg0.getId() == this.m_btnLoginButton.getId()){
 			this.m_fbManager.login();
+			showLoginSpinner();
+		}
 		else if (arg0.getId() == this.m_btnLogout.getId())
 			this.m_fbManager.logout(this);
 		else if (arg0.getId() == this.m_btnShare.getId()) {
@@ -169,7 +176,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.m_imgAvatar = (ImageView)findViewById(R.id.social_account_avatar);
         this.m_listView = (ListView)findViewById(android.R.id.list);
         
-        this.m_btnLoginButton = (Button)findViewById(R.id.login_button);
+        this.m_btnLoginButton = (ImageButton)findViewById(R.id.login_button);
         this.m_btnLogout = (ImageButton)findViewById(R.id.social_logout_btn);
         this.m_btnRefresh = (ImageButton)findViewById(R.id.social_refresh_btn);
         this.m_btnShare = (ImageButton)findViewById(R.id.social_share_btn);
@@ -207,5 +214,21 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         long lEXPIRES_TOKEN = prefs.getLong("EXPIRES_TOKEN", 0);
         this.m_fbManager.getFacebook().setAccessToken(strACCESS_TOKEN);
         this.m_fbManager.getFacebook().setAccessExpires(lEXPIRES_TOKEN);
+	}
+	
+	public void showLoginSpinner(){
+		ProgressBar spinner = (ProgressBar)findViewById(R.id.pb_login_live);
+		TextView txtLogin = (TextView)findViewById(R.id.txt_login_live);
+		spinner.setVisibility(View.VISIBLE);
+		txtLogin.setVisibility(View.VISIBLE);
+		this.m_btnLoginButton.setVisibility(View.GONE);
+	}
+	
+	public void hideLoginSpinner(){
+		ProgressBar spinner = (ProgressBar)findViewById(R.id.pb_login_live);
+		TextView txtLogin = (TextView)findViewById(R.id.txt_login_live);
+		spinner.setVisibility(View.GONE);
+		txtLogin.setVisibility(View.GONE);
+		this.m_btnLoginButton.setVisibility(View.VISIBLE);
 	}
 }
