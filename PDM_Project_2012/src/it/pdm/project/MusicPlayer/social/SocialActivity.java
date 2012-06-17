@@ -65,6 +65,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				saveTokens(); // Salvo i token della nuova sessione 
 				refreshSocialItems();
 				m_lytLoginLayout.setVisibility(View.GONE);
+				hideLoginSpinner();
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT")) {
 				m_lytLoginLayout.setVisibility(View.VISIBLE);
@@ -104,8 +105,10 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         
         restoreTokens(); // Ripristino i token dell'ultima sessione
         
-        if (this.m_fbManager.isLogged())
+        if (this.m_fbManager.isLogged()){
         	this.m_fbManager.getUserInfo();
+        	this.m_fbManager.populateHashTable();
+        }
         else
         	this.m_fbManager.logout(this);
     }
@@ -140,8 +143,10 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		if (arg0.getId() == this.m_btnLoginButton.getId())
+		if (arg0.getId() == this.m_btnLoginButton.getId()){
+			showLoginSpinner();
 			this.m_fbManager.login();
+		}
 		else if (arg0.getId() == this.m_btnLogout.getId())
 			this.m_fbManager.logout(this);
 		else if (arg0.getId() == this.m_btnShare.getId()) {
