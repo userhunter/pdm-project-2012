@@ -489,20 +489,26 @@ public class FacebookManager {
 
 		@Override
 		public void onFacebookError(FacebookError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
 			
+			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
 
 		@Override
 		public void onError(DialogError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
 			
+			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
 
 		@Override
 		public void onCancel() {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
 			
+			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
     }
 }
