@@ -33,6 +33,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -75,8 +77,10 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
 				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
-			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED"))
+			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED")){
 				refreshSocialItems();
+				stopRefreshAnimation();
+			}
 			else if (intent.getStringExtra("ACTION").equals("USER_LOGIN_ABORT")) {
 				/* In caso di annullamento o fail del login, nascondiamo lo spinner di caricamento */
 	            hideLoginSpinner();
@@ -144,8 +148,8 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	@Override
 	public void onClick(View arg0) {
 		if (arg0.getId() == this.m_btnLoginButton.getId()){
-			showLoginSpinner();
 			this.m_fbManager.login();
+			showLoginSpinner();
 		}
 		else if (arg0.getId() == this.m_btnLogout.getId())
 			this.m_fbManager.logout(this);
@@ -157,6 +161,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				Toast.makeText(this, "Nessun brano attualmente in riproduzione", Toast.LENGTH_SHORT).show();
 		} else if (arg0.getId() == this.m_btnRefresh.getId()) {
 			//this.m_btnRefresh.setImageResource(R.drawable.loading);
+			showRefreshAnimation();
 	    	this.m_fbManager.populateHashTable();
 		}
 	}
@@ -237,5 +242,18 @@ public class SocialActivity extends ListActivity implements OnClickListener {
     		m_strSource.add((Post)htCurrentPost.get(keys.nextElement()));
     	
 		m_lstAdapter.notifyDataSetChanged();
+	}
+	
+	public void showRefreshAnimation(){
+		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
+		rotation.setRepeatCount(Animation.INFINITE);
+		this.m_btnRefresh.setAnimation(rotation);
+		this.m_btnRefresh.startAnimation(rotation);
+	}
+	
+	public void stopRefreshAnimation(){
+		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
+		rotation.setRepeatCount(Animation.INFINITE);
+		this.m_btnRefresh.clearAnimation();
 	}
 }
