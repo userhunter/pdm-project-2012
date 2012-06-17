@@ -148,8 +148,10 @@ public class FacebookManager {
     	JSONArray jArrayD = json.getJSONArray("data");
     	JSONArray jArray = jArrayD.getJSONObject(1).getJSONArray("fql_result_set");
     	
-    	if(jArray.length() != 0){
+    	if (jArray.length() != 0) {
     		for(int i=0; i<jArray.length(); i++){
+    			if (message.equals("")) message = " ";
+    			
     			idPost = jArray.getJSONObject(i).getString("post_id");
     			message = jArray.getJSONObject(i).getString("message");
     			idUser = jArray.getJSONObject(i).getString("actor_id");
@@ -276,20 +278,17 @@ public class FacebookManager {
     
     public void getFriendsPostsSorted() {
     	try {
-    		/*
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
 	    	
-	    	//jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
-	    	//jsonFQL.put("query2", "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid FROM #query1) AND app_id = 237120273069387 ORDER BY created_time DESC");
-	    	
-	    	jsonFQL.put("query1", "SELECT message, attachment.name, attachment.caption, attachment.description FROM stream WHERE source_id IN (SELECT uid, name FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user) AND app_id = 237120273069387 LIMIT 50");
+	    	//jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user");
+	    	jsonFQL.put("query1", "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user");
+	    	jsonFQL.put("query2", "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid FROM #query1) AND app_id = 237120273069387");
 	    	
 	    	params.putString("method", "fql.multiquery");
 	    	params.putString("queries", jsonFQL.toString());
 	    	
-	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener()); */
-	    	this.getSocialHistory();
+	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
@@ -490,25 +489,25 @@ public class FacebookManager {
 		@Override
 		public void onFacebookError(FacebookError e) {
 			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
-			
-			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	        intent.putExtra("ACTION", "USER_LOGIN_ABORT");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
 
 		@Override
 		public void onError(DialogError e) {
 			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
-			
-			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	        intent.putExtra("ACTION", "USER_LOGIN_ABORT");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
 
 		@Override
 		public void onCancel() {
 			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-			intent.putExtra("ACTION", "USER_LOGIN_ABORT");
-			
-			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	        intent.putExtra("ACTION", "USER_LOGIN_ABORT");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 		}
     }
 }
