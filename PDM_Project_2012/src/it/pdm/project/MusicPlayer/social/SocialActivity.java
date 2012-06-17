@@ -63,27 +63,20 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
 				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
 				saveTokens(); // Salvo i token della nuova sessione 
+				refreshSocialItems();
 				m_lytLoginLayout.setVisibility(View.GONE);
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED_OUT")) {
 				m_lytLoginLayout.setVisibility(View.VISIBLE);
+				refreshSocialItems();
 				clearTokens();
 				saveTokens();
 			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
 				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
 			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED"))
-			{
-		    	Hashtable htCurrentPost = m_fbManager.getHashTablePostApp();
-		    	Enumeration keys = htCurrentPost.keys();
-		    	
-		    	m_strSource.clear();
-		    	
-		    	while (keys.hasMoreElements()) 
-		    		m_strSource.add((Post)htCurrentPost.get(keys.nextElement()));
-		    	
-				m_lstAdapter.notifyDataSetChanged();
-			} else if (intent.getStringExtra("ACTION").equals("USER_LOGIN_ABORT")) {
+				refreshSocialItems();
+			else if (intent.getStringExtra("ACTION").equals("USER_LOGIN_ABORT")) {
 				/* In caso di annullamento o fail del login, nascondiamo lo spinner di caricamento */
 	            hideLoginSpinner();
 	        }
@@ -152,13 +145,14 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		else if (arg0.getId() == this.m_btnLogout.getId())
 			this.m_fbManager.logout(this);
 		else if (arg0.getId() == this.m_btnShare.getId()) {
-			if (this.m_mpService != null) {
+			if (this.m_mpService != null && this.m_mpService.getCurrentPlayingItem() != null) {
 				MP3Item mp3Item = this.m_mpService.getCurrentPlayingItem();
 				this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
-			}
+			} else
+				Toast.makeText(this, "Nessun brano attualmente in riproduzione", Toast.LENGTH_SHORT).show();
 		} else if (arg0.getId() == this.m_btnRefresh.getId()) {
 			//this.m_btnRefresh.setImageResource(R.drawable.loading);
-	    	this.m_fbManager.getFriendsPostsSorted();
+	    	this.m_fbManager.populateHashTable();
 		}
 	}
 	
@@ -226,5 +220,17 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         long lEXPIRES_TOKEN = prefs.getLong("EXPIRES_TOKEN", 0);
         this.m_fbManager.getFacebook().setAccessToken(strACCESS_TOKEN);
         this.m_fbManager.getFacebook().setAccessExpires(lEXPIRES_TOKEN);
+	}
+	
+	private void refreshSocialItems() {
+    	Hashtable htCurrentPost = m_fbManager.getHashTablePostApp();
+    	Enumeration keys = htCurrentPost.keys();
+    	
+    	m_strSource.clear();
+    	
+    	while (keys.hasMoreElements()) 
+    		m_strSource.add((Post)htCurrentPost.get(keys.nextElement()));
+    	
+		m_lstAdapter.notifyDataSetChanged();
 	}
 }
