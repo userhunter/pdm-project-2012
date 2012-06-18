@@ -68,7 +68,8 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			if (intent.getStringExtra("ACTION").equals("USER_SUCCESSFULLY_LOGGED")) {
 				updateAccountInfo(m_fbManager.getCurrentUser().getPicture().replace("https://", "http://"), m_fbManager.getCurrentUser().getName());
 				saveTokens(); // Salvo i token della nuova sessione
-				refreshSocialItems();
+				m_fbManager.populateHashTable();
+				showRefreshAnimation();
 				m_lytLoginLayout.setVisibility(View.GONE);
 				hideLoginSpinner();
 			}
@@ -82,7 +83,6 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
 			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED")){
 				refreshSocialItems();
-				stopRefreshAnimation();
 			}
 			else if (intent.getStringExtra("ACTION").equals("USER_LOGIN_ABORT")) {
 				/* In caso di annullamento o fail del login, nascondiamo lo spinner di caricamento */
@@ -259,9 +259,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	}
 	
 	private void refreshSocialItems() {
-		showRefreshAnimation();
-		
-    	Hashtable<Long, Post> htCurrentPost = m_fbManager.getHashTablePostApp();
+		Hashtable<Long, Post> htCurrentPost = m_fbManager.getHashTablePostApp();
     	
     	ArrayList<Long> keys = new ArrayList<Long>(htCurrentPost.keySet());
         Collections.sort(keys);
@@ -272,6 +270,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         	m_strSource.add(htCurrentPost.get(keys.get(i)));
         
 		m_lstAdapter.notifyDataSetChanged();
+		stopRefreshAnimation();
 	}
 	
 	public void showRefreshAnimation(){
