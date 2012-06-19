@@ -12,7 +12,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,9 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	private final static String TAG = "MediaItemAdapter";
 	private int resourceId = 0;
 	private LayoutInflater inflater;
+	@SuppressWarnings("unused")
 	private Context context;
+	@SuppressWarnings("unused")
 	private Resources m_res;
 
 	private ImageThreadLoader imageLoader = new ImageThreadLoader();

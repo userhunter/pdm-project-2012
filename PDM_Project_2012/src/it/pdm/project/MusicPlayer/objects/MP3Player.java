@@ -6,19 +6,18 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Stack;
 
 
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.util.Log;
 
 public class MP3Player extends MediaPlayer {
 	private boolean m_bIsReady;
 	private boolean m_bIsStreaming;
 	
+	@SuppressWarnings("unused")
 	private String m_strStreamingName;
+	@SuppressWarnings("unused")
 	private String m_strStreamingUrl;
 	private String m_strStreamingStatus;
 	
@@ -29,7 +28,7 @@ public class MP3Player extends MediaPlayer {
 	private ArrayList<String> m_alCurrentPlaylist; //Playlist attuale
 	private int m_iCursor; //Cursore della playlist
 	
-	//Hashtable che conterrà le canzoni
+	//Hashtable che conterrÀÜ le canzoni
 	private Hashtable<String, MP3Item> m_htMp3sSongs;
 	
 	public MP3Player() {
@@ -60,7 +59,7 @@ public class MP3Player extends MediaPlayer {
 	}
 	
 	/** PLAYER METHODS **/
-	//Riproduco la canzone (se e solo se il player è pronto) che è stata impostata come dataSource
+	//Riproduco la canzone (se e solo se il player ÔøΩ pronto) che ÔøΩ stata impostata come dataSource
 	public void playSong() {
 		if (this.m_bIsReady) 
 			this.start();	

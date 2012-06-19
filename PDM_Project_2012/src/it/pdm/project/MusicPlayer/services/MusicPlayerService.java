@@ -23,12 +23,12 @@ public class MusicPlayerService extends Service {
 	private static final String SERVICE_TAG = "MUSIC_PLAYER_SERVICE";
 	public static final String BROADCAST_ACTION = "it.pdm.project.MusicPlayer.service.MusicPlayerService.displayevent";
 
-	//Oggetto di tipo IBinder che verrà restituito nel momento in cui il binding tra activity e servizio sarà completato
+	//Oggetto di tipo IBinder che verrÀÜ restituito nel momento in cui il binding tra activity e servizio sarÀÜ completato
 	private final IBinder m_binderCurrent = new LocalBinder();
 	private final MP3Player m_mpMP3Player = new MP3Player();
 	
 	@Override
-	//Funzione richiamata nel momento in cui il bind è avvenuto con successo e sarà responsabile della callback onServiceConnected() dell'activity
+	//Funzione richiamata nel momento in cui il bind ÔøΩ avvenuto con successo e sarÀÜ responsabile della callback onServiceConnected() dell'activity
 	public IBinder onBind(Intent arg0) {
 		return m_binderCurrent;
 	}
@@ -57,7 +57,7 @@ public class MusicPlayerService extends Service {
 	
 	//Oggetto che gestisce la ricezione di messaggi di tipo Broadcast
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@SuppressWarnings("static-access")
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			

@@ -79,17 +79,26 @@ public class PostCreator implements Runnable {
 	    		}
 	    	}
 		} catch (MalformedURLException e) {
-			System.out.println("MALFORMED");
-			e.printStackTrace();
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 		} catch (IOException e) {
-			System.out.println("IOEXC");
-			e.printStackTrace();
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
+	        
 		} catch (FacebookError e) {
-			System.out.println("FBERR");
-			e.printStackTrace();
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 		} catch (JSONException e) {
-			System.out.println("JSONEXC");
-			e.printStackTrace();
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 		}
 		
 		resultInfo = new String[] { "http://www.youtube.com/results?search_query=" + this.m_strAlbum + "-" + this.m_strArtist, "http://4.bp.blogspot.com/-Z57TwcYK41U/T7-LXXc9GSI/AAAAAAAAGBc/sxV4gzPJ_cg/s1600/musica+android.jpg" };
@@ -109,19 +118,28 @@ public class PostCreator implements Runnable {
 
 		@Override
 		public void onFacebookError(FacebookError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 			
 		}
 
 		@Override
 		public void onError(DialogError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 			
 		}
 
 		@Override
 		public void onCancel() {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "CANCEL");
+	           
+	        m_fbManager.getActivity().sendBroadcast(intent);
 			
 		}
     }
