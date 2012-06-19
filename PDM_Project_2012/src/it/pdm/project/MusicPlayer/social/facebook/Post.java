@@ -1,7 +1,5 @@
 package it.pdm.project.MusicPlayer.social.facebook;
 
-import java.util.Date;
-
 /**
  * Classe per i post
  */

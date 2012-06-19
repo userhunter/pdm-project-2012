@@ -11,8 +11,6 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -24,6 +22,7 @@ public class TabController extends TabActivity {
 	private TabSpec m_tsMusicLibrary;
 	private ActionBar m_abActionBar;
 	
+	@SuppressWarnings("unused")
 	private Handler m_hndSplashScreen = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {

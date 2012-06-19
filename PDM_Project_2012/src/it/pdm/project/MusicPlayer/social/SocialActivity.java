@@ -1,10 +1,8 @@
 package it.pdm.project.MusicPlayer.social;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import it.pdm.project.MusicPlayer.R;
@@ -24,21 +22,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.MatrixCursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,7 +41,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SocialActivity extends ListActivity implements OnClickListener {
+	@SuppressWarnings("unused")
 	private User m_userMe;
+	@SuppressWarnings("unused")
 	private ListView m_listView;
 	private SocialItemAdapter m_lstAdapter;
 	private ArrayList<Post> m_strSource;
@@ -88,6 +83,12 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				/* In caso di annullamento o fail del login, nascondiamo lo spinner di caricamento */
 	            hideLoginSpinner();
 	        }
+			else if(intent.getStringExtra("ACTION").equals("CANCEL")){
+				Toast.makeText(SocialActivity.this, "Azione annullata. Il post non sarà pubblicato.", Toast.LENGTH_SHORT).show();
+			}
+			else if(intent.getStringExtra("ACTION").equals("ERROR")){
+				Toast.makeText(SocialActivity.this, "Errore nella richiesta. Riprovare.", Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 	
@@ -126,6 +127,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         }
     }
     
+    //Funzione che controlla lo stato della rete
     public boolean isOnline(Context c) {
     	ConnectivityManager cm = (ConnectivityManager) c
     	.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -165,6 +167,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		m_txtUsername.setText(strName);
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void onClick(View arg0) {
 		if (!isOnline(this)) {

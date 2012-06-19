@@ -1,22 +1,12 @@
 package it.pdm.project.MusicPlayer.social.facebook;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -90,6 +80,7 @@ public class FacebookManager {
 		mAsyncRunner.request(params, listener);
     }
     
+    //Funzione che esegue una multiquery
     public void FQLMultiQuery(Bundle params, BaseRequestListener listener) {
     	mAsyncRunner.request(params, listener);
     }
@@ -116,7 +107,8 @@ public class FacebookManager {
     	
     	return friendList;
     }
-
+    
+    //Funzione che restituisce l'utente corrente
     public User getCurrentUser() {
     	if (this.m_userMe == null)
     		this.getUserInfo();
@@ -138,7 +130,8 @@ public class FacebookManager {
     	return new User(id, name, picture);
     }
 
-    public void getInfoPost(String response) throws JSONException{
+    @SuppressWarnings("rawtypes")
+	public void getInfoPost(String response) throws JSONException{
     	Format formatter = new SimpleDateFormat("dd/MM HH:mm");
     	
     	String idPost = "";
@@ -159,10 +152,10 @@ public class FacebookManager {
     	
     		if (jArray.length() != 0) {
     			for(int i=0; i<jArray.length(); i++){
-    				if (message.equals("")) message = " ";
-    			
+    				
     				idPost = jArray.getJSONObject(i).getString("post_id");
     				message = jArray.getJSONObject(i).getString("message");
+    				if (message.equals("")) message = " ";
     				idUser = jArray.getJSONObject(i).getString("actor_id");
     				java.util.Date time = new java.util.Date((long)jArray.getJSONObject(i).getInt("created_time")*1000);
     				if(jArray.getJSONObject(i).getJSONObject("attachment").has("name"))
@@ -213,6 +206,7 @@ public class FacebookManager {
     		}
     	}
     }
+    
     /**Function**/
     
     //Funzione che effettua il login con le autorizzazioni per la nostra app
@@ -240,6 +234,7 @@ public class FacebookManager {
     	mAsyncRunner.logout(context ,new LogoutRequestListener());
     }
     
+    //Funzione che restituisce tutti gli amici che utilizzano l'app compreso l'utente loggato
     public String getAllFriendsIds() {
     	return "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user";
     }
@@ -274,6 +269,7 @@ public class FacebookManager {
     	child.start();
     }
     
+    //Funzione che popola l'hashtable degli amici
     public void populateHashTable() {
     	if (this.mUserFriendsApp.size() == 0)
     		this.FQLQuery(getAllFriendsIds(), new GetUsersListener());
@@ -293,8 +289,12 @@ public class FacebookManager {
 	    	params.putString("queries", jsonFQL.toString());
 	    	
 	    	this.FQLMultiQuery(params, new GetGenericInfoPostRequestListener());
-    	} catch (JSONException e) {
-    		e.printStackTrace();
+    	} 
+    	catch (JSONException e) {
+    		Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
     	}
     }
     
@@ -320,13 +320,18 @@ public class FacebookManager {
         return newHtable;
      }
     
-  //Funzione che restituisce l'hashtable dei post 
+    //Funzione che restituisce l'hashtable dei post 
     public Facebook getFacebook(){
     	return this.mFacebook;
     }
     
-    /**Sarebbe meglio metterli nell'activity e mettere un listener generico a mio avviso, per ora li lasciamo tutti qui. 
-      * Nei listener, nei casi in cui serve, serve utilizzare i parser per le risposte
+    //Funzione che restituisce l'activity chiamante 
+    public Activity getActivity(){
+    	return this.mActivityChiamante;
+    }
+    
+    /**
+     * Listener per le richieste
      **/
     
     private class CurrentUserRequestListener extends BaseRequestListener {
@@ -342,41 +347,58 @@ public class FacebookManager {
 				intent.putExtra("AVATAR", m_userMe.getPicture());
 				
 				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			} catch (Exception e) {}
+			} 
+			catch (Exception e) {
+				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+		        intent.putExtra("ACTION", "ERROR");
+		           
+		        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+			}
 		}
+		
+		@Override
+        public void onFacebookError(FacebookError e, final Object state) {
+    		Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+        }
+		
+		@Override
+	    public void onIOException(IOException e, final Object state) {
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	    }
     }
     
     //Listener invocato alla conclusione della richiesta di logout
     private class LogoutRequestListener extends BaseRequestListener {
         @Override
         public void onComplete(String response, final Object state) {
-        	//Inserire codice una volta che è avvenuto il logout
 
 			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
 			intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED_OUT");
 			
 			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
         }
-    }
-    
-    //Listener invocato alla conclusione della richiesta per ottenere gli amici che usano l'app
-    @SuppressWarnings("unused")
-	private class FQLRequestListener extends BaseRequestListener {
-    	@Override
-    	public void onComplete(final String response, final Object state) {
-    		//Inserire codice una volta che è avvenuto la richiesta degli amici, usare parser
-    		try {
-				User loggedUser = FacebookManager.this.getMyInfo(response);
-				
-				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-				intent.putExtra("ACTION", "USER_SUCCESSFULLY_LOGGED");
-				intent.putExtra("ID", loggedUser.getId());
-				intent.putExtra("USERNAME", loggedUser.getName());
-				intent.putExtra("AVATAR", loggedUser.getPicture());
-				
-				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			} catch (JSONException e) {}
-		}
+        
+        @Override
+        public void onFacebookError(FacebookError e, final Object state) {
+    		Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+        }
+		
+		@Override
+	    public void onIOException(IOException e, final Object state) {
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	    }
     }
     
     //Listener invocato alla conclusione della richiesta per le info di un utente dato l'id
@@ -384,16 +406,33 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		try {
+    			Log.d("amici", response);
 				mUserFriendsApp = getFriendAppArray(response);
 				getFriendsPostsSorted();
-			} catch (JSONException e) {
-				e.printStackTrace();
+			} 
+    		catch (JSONException e) {
+    			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+		        intent.putExtra("ACTION", "ERROR");
+		           
+		        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			}
     	}
+    	
     	@Override
         public void onFacebookError(FacebookError e, final Object state) {
-            //Toast errore
+    		Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
         }
+    	
+    	@Override
+	    public void onIOException(IOException e, final Object state) {
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	    }
     		
     }
     
@@ -402,21 +441,37 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		try {
-    			Log.d("RESPONSE", response);
+    			Log.d("response", response);
 				getInfoPost(response);
 				
 				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
 				intent.putExtra("ACTION", "TABLE_SUCCESSFULLY_UPDATED");
 				
 				FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			} catch (JSONException e) {
-				e.printStackTrace();
+			} 
+    		catch (JSONException e) {
+    			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+    	        intent.putExtra("ACTION", "ERROR");
+    	           
+    	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			}
     	}
+    	
     	@Override
         public void onFacebookError(FacebookError e, final Object state) {
-            //Toast errore
+    		Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
         }
+    	
+    	@Override
+	    public void onIOException(IOException e, final Object state) {
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
+	    }
     }
     
     //Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
@@ -431,19 +486,28 @@ public class FacebookManager {
 
 		@Override
 		public void onFacebookError(FacebookError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			
 		}
 
 		@Override
 		public void onError(DialogError e) {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "ERROR");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			
 		}
 
 		@Override
 		public void onCancel() {
-			// TODO Auto-generated method stub
+			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
+	        intent.putExtra("ACTION", "CANCEL");
+	           
+	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 			
 		}
     }
