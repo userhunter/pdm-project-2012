@@ -139,10 +139,10 @@ public class SocialActivity extends ListActivity implements OnClickListener {
     
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		//Callback richiamata nel momento in cui il bind tra questa activity e il service � avvenuto con successo.
+		//Callback richiamata nel momento in cui il bind tra questa activity e il service è avvenuto con successo.
 	    public void onServiceConnected(ComponentName className, IBinder service) {
 	        LocalBinder binder = (LocalBinder) service;
-	        //Valorizzo m_mpService con il servizio a cui l'activity di � appena linkata in modo da poter richiamare metodi pubblici
+	        //Valorizzo m_mpService con il servizio a cui l'activity si è appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
 		}
 

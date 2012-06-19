@@ -268,16 +268,10 @@ public class FacebookManager {
     }
     
     //Funzione che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazione e l'immagine di default
-    public void postOnWall(Activity activity, String song, String album, String singer){
-    	Bundle params = new Bundle();
-        params.putString("caption", singer);
-        params.putString("description", album);
-        params.putString("picture", "http://4.bp.blogspot.com/-Z57TwcYK41U/T7-LXXc9GSI/AAAAAAAAGBc/sxV4gzPJ_cg/s1600/musica+android.jpg");
-        params.putString("name", song);
-        params.putString("link", "http://www.youtube.com/results?search_query=" + album + "+-+" + singer);
-        //params.putString("link", this.getDetailLink(album));
-        
-        mFacebook.dialog(activity, "feed", params, new PostDialogListener());
+    public void postOnWall(Activity activity, String song, String album, String singer) {
+    	PostCreator postCreator = new PostCreator(this.mActivityChiamante, this, song, album, singer);
+    	Thread child = new Thread(postCreator);
+    	child.start();
     }
     
     public void populateHashTable() {
@@ -302,45 +296,6 @@ public class FacebookManager {
     	} catch (JSONException e) {
     		e.printStackTrace();
     	}
-    }
-    
-    
-    public String getDetailLink(String album) {
-    	String searchQuery = "http://itunes.apple.com/search?term=" + album + "&entity=album&limit=1";
-    	
-		try {
-			InputStream is = new URL(searchQuery).openStream();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-			StringBuilder sb = new StringBuilder();
-		    int cp;
-		    
-		    while ((cp = rd.read()) != -1)
-		      sb.append((char) cp);
-		    
-		    String jsonText = "";
-	    	JSONObject json = Util.parseJson(jsonText);
-	    	JSONArray jArray = json.getJSONArray("results");
-	    	
-	    	if(jArray.length() != 0){
-	    		for(int i=0; i<jArray.length(); i++){
-	    			return jArray.getJSONObject(i).getString("collectionViewUrl");
-	    		}
-	    	}
-		} catch (MalformedURLException e) {
-			System.out.println("MALFORMED");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("IOEXC");
-			e.printStackTrace();
-		} catch (FacebookError e) {
-			System.out.println("FBERR");
-			e.printStackTrace();
-		} catch (JSONException e) {
-			System.out.println("JSONEXC");
-			e.printStackTrace();
-		}
-		
-		return "http://www.youtube.com/results?search_query=" + album;
     }
     
     //Funzione che restituisce vero se l'utente corrente è loggato altrimenti falso
