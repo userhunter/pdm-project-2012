@@ -2,7 +2,9 @@ package it.pdm.project.MusicPlayer.objects;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public class MP3Manager {
 	private String m_strMp3sPath;
@@ -14,7 +16,9 @@ public class MP3Manager {
 	//Mappo dentro la hashtable, ogni singolo mp3.
 	public Hashtable<String, MP3Item> getMp3sTable() {
 		Hashtable<String, MP3Item> htMp3Table = new Hashtable<String, MP3Item>();
-		File[] mp3sFiles = this.getMp3Files();
+		List<File> listFiles = new ArrayList<File>();
+		this.getMp3Files(listFiles, m_strMp3sPath);
+		File[] mp3sFiles = listFiles.toArray(new File[listFiles.size()]);
 		
 		if (mp3sFiles != null)
 			for (File mp3File : mp3sFiles) {
@@ -26,23 +30,22 @@ public class MP3Manager {
 		return htMp3Table;
 	}
 	
-	//Ottengo la lista di mp3 interne alla cartella passata al costruttore
-	private File[] getMp3Files() {
-		File mp3sDirectory = new File(this.m_strMp3sPath);
-		File[] mp3sFiles   = null;
+	/**
+	 * Prelievo ricorsivo di tutti gli mp3 presenti nella sdcard.
+	 * @param listFiles
+	 * @param listDirectory
+	 */
+	private void getMp3Files(List<File> listFiles, String listDirectory) {
+		File mp3sDirectory = new File(listDirectory);
+		File[] mp3sFiles   = mp3sDirectory.listFiles();
 		
-		if (mp3sDirectory.isDirectory()) {
-			
-			FileFilter dumpsFilter = new FileFilter() {
-			    public boolean accept(File file) {
-			    	return (file.getName().endsWith(".mp3") || file.getName().endsWith(".m4a"));
-				}
-			};
-			
-			mp3sFiles = mp3sDirectory.listFiles(dumpsFilter);
+		for (File fileItem : mp3sFiles) {
+			if (fileItem.isDirectory())
+				this.getMp3Files(listFiles, listDirectory + fileItem.getName());
+			else
+				if (fileItem.getName().endsWith(".mp3"))
+					listFiles.add(fileItem);
 		}
-		
-		return mp3sFiles;
 	}
 	
 	public String getMp3sPath() {

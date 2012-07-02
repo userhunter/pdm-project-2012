@@ -348,7 +348,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 				alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 				alertDialog.show();
 			} else {
-				Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
+				Intent newIntent = new Intent("it.pdm.project.MusicPlayer.playerevents");
 				newIntent.putExtra("ACTION", "PLAY_STREAM");
 				newIntent.putExtra("STREAM_NAME", hmSelectedRadio.get("item_title"));
 				newIntent.putExtra("STREAM_URL", hmSelectedRadio.get("url"));
@@ -357,7 +357,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 			}
 		}
 		else if (playlistContent.length > 0) {
-			Intent newIntent = new Intent(WelcomeActivity.BROADCAST_ACTION);
+			Intent newIntent = new Intent("it.pdm.project.MusicPlayer.playerevents");
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
 			newIntent.putExtra("PLAYLIST", playlistContent);
 			this.sendBroadcast(newIntent);
@@ -372,15 +372,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
     	ArrayList<String> alResultList = new ArrayList<String>();
     	
-    	for (int i = clickedChild; i < clickedGroupChilds.size(); i++) {
+    	for (int i = clickedChild; i < clickedGroupChilds.size(); i++)
     		alResultList.add(clickedGroupChilds.get(i).get("item_id"));
-    		System.out.println("Adding: " + i + " -> " + clickedGroupChilds.get(i).get("item_id"));
-    	}
-    	
-    	for (int i = 0; i < clickedGroupChilds.size()-alResultList.size()-1; i++) {
-    		alResultList.add(clickedGroupChilds.get(i).get("item_id"));
-    		System.out.println("Adding: " + i + " -> " + clickedGroupChilds.get(i).get("item_id"));
-    	}
     	
     	String[] strResult = (String[])alResultList.toArray(new String[alResultList.size()]);
     	return strResult;
