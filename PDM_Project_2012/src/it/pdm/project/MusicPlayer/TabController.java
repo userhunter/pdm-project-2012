@@ -3,6 +3,7 @@ package it.pdm.project.MusicPlayer;
 import it.pdm.project.MusicPlayer.services.MusicPlayerService;
 import it.pdm.project.MusicPlayer.social.SocialActivity;
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,12 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -21,8 +28,8 @@ public class TabController extends TabActivity {
 	private TabSpec m_tsSocialNetwork;
 	private TabSpec m_tsMusicLibrary;
 	private ActionBar m_abActionBar;
+	private Dialog m_dlgCredits;
 	
-	@SuppressWarnings("unused")
 	private Handler m_hndSplashScreen = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -82,7 +89,7 @@ public class TabController extends TabActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.settings_item:
-				return true;
+				showDialogInfo();
 			default: 
 				return super.onOptionsItemSelected(item);
 		}
@@ -107,5 +114,21 @@ public class TabController extends TabActivity {
     
     public void switchTab(int tab) {
     	this.m_thController.setCurrentTab(tab);
+    }
+    
+    private void showDialogInfo() {
+    	m_dlgCredits = new Dialog(this);
+    	m_dlgCredits.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    	m_dlgCredits.setContentView(R.layout.credits_activity_layout);
+    	
+    	Button dialogButton = (Button) m_dlgCredits.findViewById(R.id.close_button);
+		dialogButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				m_dlgCredits.dismiss();
+			}
+		});
+    	
+    	m_dlgCredits.show();
     }
 }
