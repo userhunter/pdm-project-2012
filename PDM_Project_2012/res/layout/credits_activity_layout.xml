@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FF000000" >
+	
+	<LinearLayout
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:gravity="center"
+	    android:orientation="vertical" >
+
+	    <ImageView
+	        android:id="@+id/logo"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="20dp"
+	        android:layout_marginRight="20dp"
+	        android:src="@drawable/logo_splash" />
+
+	    <TextView
+	        android:id="@+id/developed_by"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Sviluppato da: "
+	        android:textSize="15dp" />
+
+	    <TextView
+	        android:id="@+id/av"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Andrea Vitale"
+	        android:textSize="12dp" />
+
+	    <TextView
+	        android:id="@+id/mp"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Marco Pomponi"
+	        android:textSize="12dp" />
+
+	    <TextView
+	        android:id="@+id/mm"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Marzia Magheri"
+	        android:textSize="12dp" />
+
+	    <TextView
+	        android:id="@+id/sa"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Simone Abate"
+	        android:textSize="12dp" />
+
+	    <Button
+	        android:id="@+id/close_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="10sp"
+	        android:text="Chiudi" />
+
+	</LinearLayout>
+
+</LinearLayout>
