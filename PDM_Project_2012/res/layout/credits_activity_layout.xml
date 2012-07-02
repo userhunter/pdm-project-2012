@@ -29,38 +29,26 @@
 	        android:textSize="15dp" />
 
 	    <TextView
-	        android:id="@+id/av"
+	        android:id="@+id/av_mp"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Andrea Vitale"
-	        android:textSize="12dp" />
-
-	    <TextView
-	        android:id="@+id/mp"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Marco Pomponi"
+	        android:text="Andrea Vitale, Marco Pomponi"
 	        android:textSize="12dp" />
 
 	    <TextView
 	        android:id="@+id/mm"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Marzia Magheri"
-	        android:textSize="12dp" />
-
-	    <TextView
-	        android:id="@+id/sa"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Simone Abate"
+	        android:text="Marzia Magheri, Simone Abate"
 	        android:textSize="12dp" />
 
 	    <Button
 	        android:id="@+id/close_button"
-	        android:layout_width="wrap_content"
+	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_marginTop="10sp"
+	        android:layout_marginBottom="10sp"
+	        android:layout_marginTop="20sp"
+	        android:textSize="13sp"
 	        android:text="Chiudi" />
 
 	</LinearLayout>
