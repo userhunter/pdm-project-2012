@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, PDM_Project_2012Activity!</string>
-    <string name="app_name">PDM_Project_2012</string>
+    <string name="app_name">MP3 Social Hub</string>
     
     <style name="AudioFileInfoOverlayText">
 	    <item name="android:paddingLeft">4px</item>
