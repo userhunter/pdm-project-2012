@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import it.pdm.project.MusicPlayer.WelcomeActivity;
 import it.pdm.project.MusicPlayer.objects.MP3Item;
 import it.pdm.project.MusicPlayer.objects.MP3Player;
 import android.app.Service;
@@ -23,12 +22,12 @@ public class MusicPlayerService extends Service {
 	private static final String SERVICE_TAG = "MUSIC_PLAYER_SERVICE";
 	public static final String BROADCAST_ACTION = "it.pdm.project.MusicPlayer.service.MusicPlayerService.displayevent";
 
-	//Oggetto di tipo IBinder che verrÀÜ restituito nel momento in cui il binding tra activity e servizio sarÀÜ completato
+	//Oggetto di tipo IBinder che verrà restituito nel momento in cui il binding tra activity e servizio sarà completato
 	private final IBinder m_binderCurrent = new LocalBinder();
 	private final MP3Player m_mpMP3Player = new MP3Player();
 	
 	@Override
-	//Funzione richiamata nel momento in cui il bind ÔøΩ avvenuto con successo e sarÀÜ responsabile della callback onServiceConnected() dell'activity
+	//Funzione richiamata nel momento in cui il bind è avvenuto con successo e sarà responsabile della callback onServiceConnected() dell'activity
 	public IBinder onBind(Intent arg0) {
 		return m_binderCurrent;
 	}
@@ -38,7 +37,7 @@ public class MusicPlayerService extends Service {
 		super.onCreate();
 		
 		//Registro il servizio abilitandolo alla ricezione di Broadcast da parte di SearchActivity
-		registerReceiver(broadcastReceiver, new IntentFilter(WelcomeActivity.BROADCAST_ACTION));
+		registerReceiver(broadcastReceiver, new IntentFilter("it.pdm.project.MusicPlayer.playerevents"));
 
 	}
 	
@@ -57,7 +56,7 @@ public class MusicPlayerService extends Service {
 	
 	//Oggetto che gestisce la ricezione di messaggi di tipo Broadcast
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@SuppressWarnings("static-access")
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			
