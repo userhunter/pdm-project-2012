@@ -138,64 +138,6 @@ public class MusicPlayerDAO {
 								strFilterKey + " LIKE \"" + strFilterValue + "\"",
 								null, null, null, null);
 	}
-	
-	/**
-	 * OPERAZIONI SULLA CRONOLOGIA
-	 */
-	
-	public long insertHistoryItem(MP3Item mp3){
-		/* ritorna l'id del record inserito oppure -1 in caso di errore */
-		
-		ContentValues values = new ContentValues();
-		
-		values.put("path", mp3.getPath());
-		values.put("filename", mp3.getFileName());
-		
-		return m_sqliteDB.insert(MusicPlayerDBHelper.HISTORY_TABLE_NAME, null, values);
-	}
-	
-	public long deleteHistoryItemById(int id){
-		/* ritorna il numero di record eliminati */
-		return m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, "_id = "+id, null);
-	}
-	
-	public long deleteHistoryItemByPathAndFilename(String strPath, String strFileName){
-		/* ritorna il numero di record eliminati */
-		return m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, "path='"+strPath+"' AND filename='"+strFileName+"'", null);
-	}
-	
-	public void flushHistory(){
-		m_sqliteDB.delete(MusicPlayerDBHelper.HISTORY_TABLE_NAME, null, null);
-	}
-	
-	public Cursor getHistory(){
-		return m_sqliteDB.query(MusicPlayerDBHelper.HISTORY_TABLE_NAME,	/* String table */
-								null,									/* String[] columns */
-								null,									/* String selection */
-								null,									/* String[] selectionArgs */
-								null,									/* String groupBy */
-								null,									/* String having */
-								"timestamp DESC");						/* String orderBy */
-	}
-	
-	public String[] getFirstHistoryItemPathAndFilename(){
-		/* ritorna un array di stringhe con path e filename del primo elemento della cronologia */
-		Cursor tempCursor;
-		tempCursor = m_sqliteDB.query(MusicPlayerDBHelper.HISTORY_TABLE_NAME,
-								null,
-								null,
-								null,
-								null,
-								null,
-								"timestamp DESC",
-								"LIMIT 1");
-		String[] res = {"",""};							/* se non c'è alcun elemento, ritorna array vuoto */
-		if(tempCursor.isFirst()){
-			res[0] = tempCursor.getString(1);			/* path */
-			res[1] = tempCursor.getString(2);			/* filename */
-		}
-		return res;
-	}
 
 	/**
 	 * OPERAZIONI SULLE UTILITY
