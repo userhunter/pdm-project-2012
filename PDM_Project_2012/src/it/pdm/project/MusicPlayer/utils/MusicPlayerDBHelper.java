@@ -12,7 +12,6 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	public static String MUSIC_TABLE_NAME = "MusicArchive";
 	public static String STREAMS_TABLE_NAME = "Streams";
 	public static String UTILITIES_TABLE_NAME = "Utilities";
-	public static String HISTORY_TABLE_NAME = "History";
 	
 	private static String CREATE_MUSIC_TABLE_syntax = 
 			"CREATE TABLE IF NOT EXISTS " + MUSIC_TABLE_NAME + "(" +
@@ -32,13 +31,6 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 			"name text not null, " +
 			"url text not null ) ";
 	
-	private static String CREATE_HISTORY_TABLE_syntax = 
-			"CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE_NAME + "(" +
-			"_id integer primary key autoincrement, " +
-			"path text not null, " +
-			"filename text not null, " +
-			"timestamp datetime default current_timestamp) ";
-	
 	private static String CREATE_UTILITIES_TABLE_syntax = 
 	        "CREATE TABLE IF NOT EXISTS " + UTILITIES_TABLE_NAME + "(" +
 	        "label text not null, " +
@@ -52,7 +44,6 @@ public class MusicPlayerDBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_MUSIC_TABLE_syntax);
-		db.execSQL(CREATE_HISTORY_TABLE_syntax);
 		db.execSQL(CREATE_UTILITIES_TABLE_syntax);
 		db.execSQL(CREATE_STREAMS_TABLE_syntax);
 	}
