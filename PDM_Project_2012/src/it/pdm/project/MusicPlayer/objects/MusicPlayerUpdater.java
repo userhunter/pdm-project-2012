@@ -24,8 +24,11 @@ public class MusicPlayerUpdater implements Runnable {
 		//Data di modifica della directory sotto forma di long
 		long lLastModified = fMusicDirectory.lastModified();
 		
+		//Numero di brani presenti nel db
+		int nTracksCount = this.m_daoDatabase.getAllTracks().getCount();
+		
 		//Se non  DbUpdatedAt ha come valore null (non  stato mai popolato) oppure, se la directory che contiene la musica  stata modificata recentemente, allora aggiorno. 
-		if (this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt") == null || lLastModified > Long.parseLong(this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt")))
+		if (this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt") == null || nTracksCount == 0 || lLastModified > Long.parseLong(this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt")))
 		{
 			this.m_daoDatabase.insertUtilityValue("DbIsUpdating", "true");
 			this.m_daoDatabase.deleteAllTracks();
