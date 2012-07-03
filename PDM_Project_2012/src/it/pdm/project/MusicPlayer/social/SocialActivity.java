@@ -182,7 +182,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			else if (arg0.getId() == this.m_btnLogout.getId())
 				this.m_fbManager.logout(this);
 			else if (arg0.getId() == this.m_btnShare.getId()) {
-				if (this.m_mpService != null && this.m_mpService.getCurrentPlayingItem() != null) {
+				if (this.m_mpService != null && this.m_mpService.getCurrentPlayingItem() != null && !this.m_mpService.isStreaming()) {
 					MP3Item mp3Item = this.m_mpService.getCurrentPlayingItem();
 					this.m_fbManager.postOnWall(this, mp3Item.getLocalID3Field(mp3Item.TITLE), mp3Item.getLocalID3Field(mp3Item.ALBUM), mp3Item.getLocalID3Field(mp3Item.ARTIST));
 				} else
