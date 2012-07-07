@@ -1,5 +1,5 @@
 package it.pdm.project.MusicPlayer.objects;
-
+/**Classe oer l'oggetto MP3**/
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;

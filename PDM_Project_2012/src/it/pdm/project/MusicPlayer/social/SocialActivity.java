@@ -45,16 +45,22 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	private User m_userMe;
 	@SuppressWarnings("unused")
 	private ListView m_listView;
+	//Adapter per la lista
 	private SocialItemAdapter m_lstAdapter;
+	//Array dei post
 	private ArrayList<Post> m_strSource;
+	//Variabile per l'iterazione con Facebook
 	private FacebookManager m_fbManager;
+	//Services
 	private MusicPlayerService m_mpService;
 	
+	/**Variabili per gli oggetti grafici**/
 	private ImageButton m_btnLogout, m_btnRefresh, m_btnShare, m_btnLoginButton;
 	private TextView m_txtUsername;
 	private RelativeLayout m_lytLoginLayout;
 	private ImageView m_imgAvatar;
 	
+	//Variabile che bufferizza le immagini già caricate
 	private ImageThreadLoader m_thImageLoader;
 	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -75,7 +81,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				saveTokens();
 			}
 			else if (intent.getStringExtra("ACTION").equals("SONG_SUCCESSFULLY_POSTED")) 
-				Toast.makeText(SocialActivity.this, "Il messaggio apparirˆ sulla tua bacheca.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(SocialActivity.this, "Il messaggio sarà pubblicato sulla tua bacheca.", Toast.LENGTH_SHORT).show();
 			else if (intent.getStringExtra("ACTION").equals("TABLE_SUCCESSFULLY_UPDATED")){
 				refreshSocialItems();
 			}
@@ -113,6 +119,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         
         restoreTokens(); // Ripristino i token dell'ultima sessione
         
+        //Controllo se sono connesso ad internet per poter effettuare le operazioni relative al social networking
         if (!isOnline(this)) {
 			Toast.makeText(getApplicationContext(), "Connessione Assente!", Toast.LENGTH_SHORT).show();
 		}
@@ -153,6 +160,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	    public void onServiceDisconnected(ComponentName arg0) { }
 	};
 	
+	//Funzione che aggiorna le informazioni dell'utente corrente quali immagine e nome nell'action bar
 	public void updateAccountInfo(String strAvatarURL, String strName){
 		try {
 	    	m_thImageLoader.loadImage(strAvatarURL, new ImageLoadedListener() {
@@ -188,13 +196,13 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 				} else
 					Toast.makeText(this, "Nessun brano attualmente in riproduzione", Toast.LENGTH_SHORT).show();
 			} else if (arg0.getId() == this.m_btnRefresh.getId()) {
-				//this.m_btnRefresh.setImageResource(R.drawable.loading);
 				showRefreshAnimation();
 		    	this.m_fbManager.populateHashTable();
 			}
 		}
 	}
 	
+	//Inizializzazione delle variabili
 	private void initMemberVars() {
         this.m_strSource = new ArrayList<Post>();
         this.m_lstAdapter = new SocialItemAdapter(this, R.layout.music_player_social_row, this.m_strSource, this.getResources());
@@ -261,6 +269,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.m_fbManager.getFacebook().setAccessExpires(lEXPIRES_TOKEN);
 	}
 	
+	//Aggiorna la lista dei post
 	private void refreshSocialItems() {
 		Hashtable<Long, Post> htCurrentPost = m_fbManager.getHashTablePostApp();
     	
@@ -276,6 +285,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		stopRefreshAnimation();
 	}
 	
+	//Visualizza l'animazione di refresh
 	public void showRefreshAnimation(){
 		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
 		rotation.setRepeatCount(Animation.INFINITE);
@@ -283,6 +293,7 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		this.m_btnRefresh.startAnimation(rotation);
 	}
 	
+	//Interrompe l'animazione di refresh
 	public void stopRefreshAnimation(){
 		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
 		rotation.setRepeatCount(Animation.INFINITE);

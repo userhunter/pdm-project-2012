@@ -1,6 +1,7 @@
 package it.pdm.project.MusicPlayer;
 
 import it.pdm.project.MusicPlayer.R.drawable;
+
 import it.pdm.project.MusicPlayer.objects.MusicPlayerDAO;
 import it.pdm.project.MusicPlayer.utils.CustomEditText;
 
@@ -33,16 +34,43 @@ import android.widget.LinearLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
+/**Activity Libreria per la ricerca di brani in locale senza filtro, per artista o per album. Inoltre gestisce l'inserimento e la cancellazione di webradio**/
+
 public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener, OnKeyListener {
+	/**
+	 * Button
+	 * **/
 	private Button m_btnFilterAll, m_btnFilterAlbum, m_btnFilterArtists, m_btnFilterRadio;
+	/**
+	 *EditText per le ricerca
+	 * **/
 	private CustomEditText m_txtSearchBar;
+	/**
+	 *ExpandableListView per i risulati della ricerca
+	 * **/
 	private ExpandableListView m_expListView;
+	/**
+	 *Adapter per la lista
+	 * **/
 	private SimpleExpandableListAdapter m_expListAdapter;
+	/**
+	 *DAO per la gestione del database
+	 * **/
 	private MusicPlayerDAO m_daoDatabase;
+	/**
+	 *ArrayList per gli elementi espandibili
+	 * **/
 	private ArrayList<HashMap<String, String>> m_alRootElements;
+	/**
+	 *ArrayList per i sottoelementi di una root
+	 * **/
 	private ArrayList<ArrayList<HashMap<String, String>>> m_alChildElements;
+	/**
+	 *Indica la sezione in cui si sta ricercando
+	 * **/
 	private String m_strSection;
 	
+	/**Thread per il controllo dell'aggiornamento del database delle canzoni lette nell'sdcard**/
 	private Thread m_thUpdateChecker = new Thread(new Runnable() {
     	@Override
     	public void run() {
@@ -65,6 +93,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	}
     });
 	
+	/**Handler associato al thread sopra, il quale nel momento in cui è terminata la fase di aggiornamento elimina la popup di aggiornamento**/
 	private Handler m_hndUpdateChecker = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -102,6 +131,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		this.setListAdapter(this.m_expListAdapter);
     }
     
+    /**
+	 *Inizializzazione delle variabili
+	 * **/
     private void initMemberVars() {
     	this.m_expListView = this.getExpandableListView();
     	
@@ -152,6 +184,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		return false;
 	}
     
+	/**
+	 *Funzione che raggruppa gli elementi in base alla visualizzazione
+	 * **/
     private void applyFilter(String strFilter) {
     	this.m_daoDatabase.open();
     	
@@ -174,6 +209,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.m_daoDatabase.close();
     }
     
+    /**
+	 *Funzione che ottiene una lista di elementi in base al filtro
+	 * **/
     private void createListFromFilter(String strFilter) {
     	if (strFilter.equals("all_tracks"))
     		this.allTracksCase();
@@ -185,6 +223,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     		this.radiosCase();
     }
     
+    /**
+	 *Funzione che visualizza tutte le webradio e permette di inserirne delle nuove
+	 * **/
     private void radiosCase() {
     	this.registerForContextMenu(m_expListView);
     	
@@ -218,20 +259,25 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	this.m_alChildElements.add(alChildsElements);
     }
 	
+    /**
+	 *Funzione che ritorna le canzoni per artista o per album
+	 * **/
 	private void artistsOrAlbumCase(String strKey) {
 		this.unregisterForContextMenu(m_expListView);
 		
 		Cursor cursor;
 		
+		//Se è stata selezionata la scelta per gli album fa una query per questi
 		if (this.m_txtSearchBar.getText().length() > 0 && strKey.equals("album"))
 			cursor = this.m_daoDatabase.getAllTracks("album", "%" + this.m_txtSearchBar.getText() + "%");
-		
+		//Se è stata selezionata la scelta per l'artista fa una query per questo
 		else if(this.m_txtSearchBar.getText().length() > 0 && strKey.equals("artist"))
 			cursor = this.m_daoDatabase.getAllTracks("artist", "%" + this.m_txtSearchBar.getText() + "%");
 		
 		else
+			//Se non è stata fatta nessuna scelta in particolare richiede tutte le tracce
 			cursor = this.m_daoDatabase.getAllTracks();
-		
+		//Ottenuta la risposta "riempie" gli array di cartelle e sottocartelle
 		while (cursor.moveToNext()) {
 			HashMap<String, String> hmNewArtist = new HashMap<String, String>();
 			hmNewArtist.put("key", cursor.getString(cursor.getColumnIndex(strKey)));
@@ -267,6 +313,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		}
 	}
 	
+	/**
+	 *Funzione che ritorna tutte le tracce
+	 * **/
 	private void allTracksCase() {
 		this.unregisterForContextMenu(m_expListView);
 		
@@ -307,7 +356,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		
 		if (this.m_strSection.equalsIgnoreCase("radios")) {
 			HashMap<String, String> hmSelectedRadio = this.m_alChildElements.get(groupPosition).get(childPosition); 
-			
+			//Se è stato richiesto l'inserimento di una web radio visualizzo la dialog che lo permette
 			if (hmSelectedRadio.get("item_title").equalsIgnoreCase("Aggiungi una Web Radio..")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(MusicBrowserActivity.this);
 				LinearLayout linearLayout = new LinearLayout(this);
@@ -348,6 +397,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 				alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 				alertDialog.show();
 			} else {
+				//Altrimenti permette l'ascolto della web radio sulla tab Player
 				Intent newIntent = new Intent("it.pdm.project.MusicPlayer.playerevents");
 				newIntent.putExtra("ACTION", "PLAY_STREAM");
 				newIntent.putExtra("STREAM_NAME", hmSelectedRadio.get("item_title"));
@@ -356,6 +406,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 				this.switchTabInActivity(0);
 			}
 		}
+		//Altrimenti esegue la playlist sulla tab Player
 		else if (playlistContent.length > 0) {
 			Intent newIntent = new Intent("it.pdm.project.MusicPlayer.playerevents");
 			newIntent.putExtra("ACTION", "PLAY_PLAYLIST");
@@ -367,7 +418,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
         return true;
     }
     
-    
+    /**
+	 *Funzione che in base alla canzone cliccata ne crea la playlist costituita dai brani successivi alla canzone cliccata
+	 * **/
     private String[] getPlaylistFromClick(int group, int clickedChild) {
     	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
     	ArrayList<String> alResultList = new ArrayList<String>();
@@ -379,12 +432,18 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     	return strResult;
     }
     
-	public void switchTabInActivity(int indexTabToSwitch) {
+    /**
+   	 *Funzione che permette lo switch del tab
+   	 * **/
+    public void switchTabInActivity(int indexTabToSwitch) {
 		TabController thController = (TabController) this.getParent();
 		
 		thController.switchTab(indexTabToSwitch);
 	}
 	
+    /**
+   	 *Richiede il record sul db restituiendone il valore
+   	 * **/
 	private boolean checkIfIsUpdating() {
 		this.m_daoDatabase.open();
 		String strStatus = this.m_daoDatabase.getUtilitiesValues("DbIsUpdating");
@@ -393,7 +452,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		return strStatus.equals("true") ? true : false;
 	}
 	
-	/** OnLongClick METHODS **/
+	/** OnLongClick METHODS, utilizzato per cancellare una web radio se avviene su di essa **/
 	
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
@@ -402,7 +461,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		if (info.id > 0) {
 			menu.setHeaderIcon(drawable.ic_delete);
 			menu.setHeaderTitle(this.m_alChildElements.get(0).get((int)(info.id)).get("item_title"));
-			
+			//Visualizza la dialog per la cancellazione della web radio
 			menu.add("Cancella").setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem arg0) {
@@ -412,6 +471,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 					       .setCancelable(false)
 					       .setPositiveButton("Conferma", new DialogInterface.OnClickListener() {
 			    	   			public void onClick(DialogInterface dialog, int id) {
+			    	   				//Aggiorna il database dopo aver eliminatola webradio
 									m_daoDatabase.open();
 									m_daoDatabase.deleteStreamById(Integer.parseInt(m_alChildElements.get(0).get((int)(info.id)).get("id")));
 									m_daoDatabase.close();
@@ -422,6 +482,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 									Toast.makeText(getApplicationContext(), "Elemento eliminato con successo", Toast.LENGTH_SHORT).show();
 			    	   			}
 					       	})
+					       	//Annulla l'operazione
 					       	.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
 					       		public void onClick(DialogInterface dialog, int id) {
 					       			System.out.println("NO");

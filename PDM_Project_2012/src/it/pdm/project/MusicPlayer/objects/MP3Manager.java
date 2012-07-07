@@ -1,7 +1,6 @@
 package it.pdm.project.MusicPlayer.objects;
-
+/**Classe che si occupa dell'aggiornamento degli mp3**/
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;

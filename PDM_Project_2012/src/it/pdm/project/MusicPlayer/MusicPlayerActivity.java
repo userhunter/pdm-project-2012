@@ -29,16 +29,21 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class MusicPlayerActivity extends Activity implements OnClickListener {
-	//Servizio per la gestione del mediaplayer
+	//Variabile per usufruire delle utility
 	private Utilities m_utUtils;
+	//Servizio per la gestione del mediaplayer
 	private MusicPlayerService m_mpService;
+	//ImageButton per gestione media player
 	private ImageButton m_btnPlayButton, m_btnPauseButton, m_btnBackwardButton, m_btnForwardButton;
+	//TextView per le informazioni del brano in riproduzione
 	private TextView m_tvSongTitle, m_tvSongAlbum, m_tvSongYear, m_tvSongArtist, m_tvSongTotalDuration, m_tvSongActualPosition;
+	//Barra del tempo della canzone
 	private SeekBar m_pbPositionBar;
+	//Cover della canzone
 	private ImageView m_ivCover;
-	
+	//DAO per la gestione del db
 	public MusicPlayerDAO m_daoDatabase;
-	
+	//Booleana che indica se la barra del tempo √® stata toccata o meno
 	public static boolean m_bProgressBarTouching = false;
 	  
 	@Override
@@ -52,7 +57,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    m_daoDatabase.insertUtilityValue("DbIsUpdating", "false");
 	    m_daoDatabase.close();
 	    
-	    //BindService sarà responsabile del linking tra questa activity e il servizio. True se il bind è avvenuto con successo.
+	    //BindService sar√† responsabile del linking tra questa activity e il servizio. True se il bind ÔøΩ avvenuto con successo.
 	    if (this.getApplicationContext().bindService(new Intent(this, MusicPlayerService.class), mConnection, Context.BIND_AUTO_CREATE)){
 	    	//Abilito questa activity per ricevere notifiche dal servizio MusicPlayerService
 	    	registerReceiver(broadcastReceiver, new IntentFilter(MusicPlayerService.BROADCAST_ACTION));
@@ -65,16 +70,16 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	public void onDestroy() {
 		super.onDestroy();
 		
-		//con UnregisterReceiver, richiedo di non voler più ricevere notifiche da parte del Service
+		//con UnregisterReceiver, richiedo di non voler pi√π ricevere notifiche da parte del Service
 		unregisterReceiver(broadcastReceiver);
 	}
 	  
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		//Callback richiamata nel momento in cui il bind tra questa activity e il service è avvenuto con successo.
+		//Callback richiamata nel momento in cui il bind tra questa activity e il service ÔøΩ avvenuto con successo.
 	    public void onServiceConnected(ComponentName className, IBinder service) {
 	        LocalBinder binder = (LocalBinder) service;
-	        //Valorizzo m_mpService con il servizio a cui l'activity di è appena linkata in modo da poter richiamare metodi pubblici
+	        //Valorizzo m_mpService con il servizio a cui l'activity di ÔøΩ appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
 	        
 	        //Faccio partire il thread responsabile dell'aggiornamento.
@@ -147,7 +152,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	private OnSeekBarChangeListener positionListener = new OnSeekBarChangeListener() {
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			/* non fare niente, può causare loop e traumi vari */
+			/* non fare niente, pu√≤ causare loop e traumi vari */
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
@@ -215,7 +220,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 				m_btnPauseButton.setVisibility(View.VISIBLE);
 				m_btnPlayButton.setVisibility(View.GONE);
 				
-				//Thread che tramite l'handler imposta - se c'è - la cover dell'album
+				//Thread che tramite l'handler imposta - se c'√® - la cover dell'album
 				Thread updateCoverImage = new Thread (new Runnable() {
 					@Override
 					public void run() {
@@ -232,7 +237,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 						
 						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
 				        
-				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterà come cover */
+				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterÀÜ come cover */
 				        Bundle data = new Bundle();
 						Message msg = new Message();
 						data.putParcelable("SKEWED COVER", reflectedCover);
@@ -299,7 +304,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 						
 						Bitmap reflectedCover = createReflectedImage(getBaseContext(), originalCover);
 				        
-				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterà come cover */
+				        /* ora serializziamo il Bitmap creato come oggetto Parcelable e lo inviamo all'handler che lo imposterÀÜ come cover */
 				        Bundle data = new Bundle();
 						Message msg = new Message();
 						data.putParcelable("SKEWED COVER", reflectedCover);
@@ -332,6 +337,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    }
 	};
 	
+	//Funzione che inizializza le variabili
 	private void initViewMemberVars() {
 		this.m_utUtils = new Utilities();
 		
