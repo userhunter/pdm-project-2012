@@ -146,7 +146,8 @@ public class FacebookManager {
     	response = "{\"data\":" + response + "}";
     	JSONObject json = Util.parseJson(response);
     	JSONArray jArrayD = json.getJSONArray("data");
-	
+    	
+    	//Ottiene le informazioni dalla risposta
 		for(int k=0; k<jArrayD.length(); k++){
 	    	JSONArray jArray = jArrayD.getJSONObject(k).getJSONArray("fql_result_set");
     	
@@ -187,6 +188,7 @@ public class FacebookManager {
     		}
 		}
 		
+		//Associa ad ogni post le informazioni dell'utente che l'ha pubblicato
     	if (this.mPostFriendApp.size()>0){
     		if(mUserFriendsApp.size()!=0){
     			Long str;
@@ -245,23 +247,6 @@ public class FacebookManager {
     	this.FQLQuery(query, new CurrentUserRequestListener());
     }
     
-    //Interrogazione FQL che richiede la social history
-    public void getSocialHistory() {
-    	String query = "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id IN (SELECT uid, name FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user) AND app_id = 237120273069387 LIMIT 50";
-    	this.FQLQuery(query, new GetGenericInfoPostRequestListener());
-    }
-    
-    //Interrogazione FQL che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazioni con un'immagine passata
-    public void postOnWall(Activity activity, String imageAlbumUrl, String song, String album, String singer){
-    	Bundle params = new Bundle();
-    	params.putString("caption", singer);
-        params.putString("description", album);
-        params.putString("picture", imageAlbumUrl);
-        params.putString("name", song);
-        params.putString("link", "http://www.youtube.com/results?search_query=" + album + "+-+" + singer);
-        mFacebook.dialog(activity, "feed", params, new PostDialogListener());
-    }
-    
     //Funzione che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazione e l'immagine di default
     public void postOnWall(Activity activity, String song, String album, String singer) {
     	PostCreator postCreator = new PostCreator(this.mActivityChiamante, this, song, album, singer);
@@ -277,11 +262,13 @@ public class FacebookManager {
     		this.getFriendsPostsSorted();
     }
     
+    //Funzione che richiede i post per ogni amico che usa l'app e per l'utente stesso
     public void getFriendsPostsSorted() {
     	try {
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
 	    	
+	    	//Per ogni id fai la richiesta delle info sui post
 	    	for (User user : this.mUserFriendsApp)
 	    		jsonFQL.put(user.getId(), "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id = " + user.getId() + " AND app_id = 237120273069387");
 	    	
@@ -308,6 +295,7 @@ public class FacebookManager {
     	return this.mPostFriendApp;
     }
     
+    //Funzione che ordina cronologicamente i post
     public Hashtable<Long, Post> sortValue(){
     	ArrayList<Long> keys = new ArrayList<Long>(this.mPostFriendApp.keySet());
         Collections.sort(keys);
@@ -333,7 +321,7 @@ public class FacebookManager {
     /**
      * Listener per le richieste
      **/
-    
+    //Listener richiamato alla conclusione della richiesta delle informazioni sull'utente corrente
     private class CurrentUserRequestListener extends BaseRequestListener {
 		@Override
 		public void onComplete(String response, Object state) {
@@ -407,7 +395,9 @@ public class FacebookManager {
     	public void onComplete(final String response, final Object state) {
     		try {
     			Log.d("amici", response);
+    			//ottieni l'array degli amici
 				mUserFriendsApp = getFriendAppArray(response);
+				//richiedi i post per ognuno
 				getFriendsPostsSorted();
 			} 
     		catch (JSONException e) {
@@ -442,6 +432,7 @@ public class FacebookManager {
     	public void onComplete(final String response, final Object state) {
     		try {
     			Log.d("response", response);
+    			//parsa la risposta
 				getInfoPost(response);
 				
 				Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
@@ -472,44 +463,6 @@ public class FacebookManager {
 	           
 	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
 	    }
-    }
-    
-    //Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
-    private class PostDialogListener implements DialogListener {
-		@Override
-		public void onComplete(Bundle values) {
-			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-			intent.putExtra("ACTION", "SONG_SUCCESSFULLY_POSTED");
-			
-			FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-		}
-
-		@Override
-		public void onFacebookError(FacebookError e) {
-			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-	        intent.putExtra("ACTION", "ERROR");
-	           
-	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			
-		}
-
-		@Override
-		public void onError(DialogError e) {
-			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-	        intent.putExtra("ACTION", "ERROR");
-	           
-	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			
-		}
-
-		@Override
-		public void onCancel() {
-			Intent intent = new Intent("it.pdm.project.MusicPlayer.social.facebook.FacebookManager.displayevent");
-	        intent.putExtra("ACTION", "CANCEL");
-	           
-	        FacebookManager.this.mActivityChiamante.sendBroadcast(intent);
-			
-		}
     }
     
     //Listener invocato alla fine dell'invio della richiesta di login

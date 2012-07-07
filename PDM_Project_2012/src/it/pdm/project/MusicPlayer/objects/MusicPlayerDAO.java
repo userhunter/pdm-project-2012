@@ -1,5 +1,5 @@
 package it.pdm.project.MusicPlayer.objects;
-
+/**DAO per i db**/
 import java.util.Hashtable;
 
 import android.content.ContentValues;

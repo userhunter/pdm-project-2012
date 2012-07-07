@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//src/it/pdm/project/MusicPlayer/MusicPlayerActivity.java=UTF-8
 encoding//src/it/pdm/project/MusicPlayer/objects/MP3Player.java=UTF-8
+encoding//src/it/pdm/project/MusicPlayer/objects/MusicPlayerUpdater.java=UTF-8
 encoding//src/it/pdm/project/MusicPlayer/services/MusicPlayerService.java=UTF-8
 encoding//src/it/pdm/project/MusicPlayer/social/SocialActivity.java=UTF-8

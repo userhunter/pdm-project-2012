@@ -1,5 +1,5 @@
 package it.pdm.project.MusicPlayer.social;
-
+/**Adapter per la popolazione delle righe dei post nella tab Social**/
 import it.pdm.project.MusicPlayer.R;
 import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
 import it.pdm.project.MusicPlayer.social.facebook.Post;
@@ -46,7 +46,7 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	    final ImageView image;
 	
 	    view = inflater.inflate(resourceId, parent, false);
-
+	    //Associa gli elementi dell'xml a quelli della classe stessa
 	    try {
 	    	textTitle = (TextView)view.findViewById(R.id.record_title);
 	    	textAlbum = (TextView)view.findViewById(R.id.record_album);
@@ -63,7 +63,8 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 
 	    Post item = getItem(position);
 	    Bitmap cachedImage = null;
-    
+	    
+	    //Controlla se ha già le immagini bufferizzate e se ci sono le carica
 	    try {
 	    	cachedImage = imageLoader.loadImage(item.getUserPosted().getPicture().replace("https://", "http://"), new ImageLoadedListener() {
 	    		public void imageLoaded(Bitmap imageBitmap) {
@@ -74,15 +75,16 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	    } catch (MalformedURLException e) {
 	    	Log.e(TAG, "Bad remote image URL: " + item.getUserPosted().getPicture(), e);
 	    }
-
+	    
+	    //Imposta i campi della lista
 	    textTitle.setText(item.getTitle());
 	    textAlbum.setText(item.getAlbum());
 	    textArtist.setText(item.getArtist());
 	    textName.setText(item.getUserPosted().getName());
 	    textLikesCount.setText("" + item.getLikeUser());
 	    textDateTime.setText("" + item.getCreatedPost());
-	    //textDateTime.setText("" + item.getCreatedPost().getDay() + "/" + item.getCreatedPost().getMonth() + " @ " + item.getCreatedPost().getHours() + ":" + item.getCreatedPost().getMinutes());
-
+	    
+	    //Visualizza l'immagine
 	    if( cachedImage != null )
 	    	image.setImageDrawable(addTransparentGradient(cachedImage));
 
@@ -90,14 +92,6 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	}
 	
 	public Drawable addTransparentGradient(Bitmap bitmap){
-		/*
-		Drawable dBitmap = new BitmapDrawable(m_res, bitmap);
-		Drawable[] layers = new Drawable[2];
-        layers[0] = dBitmap;
-        layers[1] = m_res.getDrawable(R.drawable.gradient_overlay);
-        LayerDrawable layerDrawable = new LayerDrawable(layers);
-        return layerDrawable;
-        */
         return new BitmapDrawable(bitmap);
 	}
 }
