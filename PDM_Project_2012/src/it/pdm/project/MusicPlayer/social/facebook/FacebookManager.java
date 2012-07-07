@@ -270,7 +270,7 @@ public class FacebookManager {
 	    	
 	    	//Per ogni id fai la richiesta delle info sui post
 	    	for (User user : this.mUserFriendsApp)
-	    		jsonFQL.put(user.getId(), "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id = " + user.getId() + " AND app_id = 237120273069387");
+	    		jsonFQL.put(user.getId(), "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id = " + user.getId() + " AND app_id = 237120273069387 LIMIT 200");
 	    	
 	    	params.putString("method", "fql.multiquery");
 	    	params.putString("queries", jsonFQL.toString());
