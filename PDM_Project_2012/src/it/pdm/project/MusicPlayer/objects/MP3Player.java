@@ -31,7 +31,7 @@ public class MP3Player extends MediaPlayer {
 	//Hashtable che conterrˆ le canzoni
 	private Hashtable<String, MP3Item> m_htMp3sSongs;
 	
-	public MP3Player() {
+	public MP3Player() {		
 		this.m_bIsReady = false;
 		this.m_bIsStreaming = false;
 		this.m_strStreamingName = null;
