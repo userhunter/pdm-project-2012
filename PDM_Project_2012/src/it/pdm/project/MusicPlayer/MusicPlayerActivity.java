@@ -193,11 +193,11 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			this.m_btnPauseButton.setVisibility(View.GONE);
 			this.m_btnPlayButton.setVisibility(View.VISIBLE);
 			this.m_mpService.pausePlaying();
-		} else if (sourceClick.getId() == this.m_btnForwardButton.getId() && !this.m_mpService.isStreaming()) {
+		} else if (sourceClick.getId() == this.m_btnForwardButton.getId() && !this.m_mpService.isStreaming() && this.m_mpService.getCurrentPlayingItem() != null) {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playNextSong();
-		} else if (sourceClick.getId() == this.m_btnBackwardButton.getId() && !this.m_mpService.isStreaming()) {
+		} else if (sourceClick.getId() == this.m_btnBackwardButton.getId() && !this.m_mpService.isStreaming() && this.m_mpService.getCurrentPlayingItem() != null) {
 			this.m_btnPauseButton.setVisibility(View.VISIBLE);
 			this.m_btnPlayButton.setVisibility(View.GONE);
 			this.m_mpService.playPreviousSong();
@@ -289,6 +289,7 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 			}
 			
 			else if (intent.getStringExtra("ACTION")!=null && intent.getStringExtra("ACTION").equals("PLAY_STREAM")) {
+				
 				//Aggiorno le label di info sullo streaming
 				m_tvSongArtist.setText(intent.getStringExtra("STREAM_URL"));
 				m_tvSongTitle.setText(intent.getStringExtra("STREAM_NAME"));
@@ -358,10 +359,10 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	    this.m_btnPlayButton = (ImageButton)findViewById(R.id.btnPlay);
 	    this.m_btnPauseButton = (ImageButton)findViewById(R.id.btnPause);
 	    this.m_btnBackwardButton = (ImageButton)findViewById(R.id.btnPrevious);
-	    this.m_btnForwardButton = (ImageButton)findViewById(R.id.btnNext);
+	    this.m_btnForwardButton = (ImageButton)findViewById(R.id.btnNext);   
 	    
 	    this.m_ivCover = (ImageView)findViewById(R.id.cover);
-	    
+	   
 	    this.m_btnPlayButton.setOnClickListener(this);
 	    this.m_btnPauseButton.setOnClickListener(this);
 	    this.m_btnForwardButton.setOnClickListener(this);
