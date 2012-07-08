@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import android.util.Log;
+
 public class MP3Manager {
 	private String m_strMp3sPath;
 	
@@ -35,17 +37,25 @@ public class MP3Manager {
 	 * @param listDirectory
 	 */
 	private void getMp3Files(List<File> listFiles, String listDirectory) {
-		File mp3sDirectory = new File(listDirectory);
-		File[] mp3sFiles   = mp3sDirectory.listFiles();
-		
-		for (File fileItem : mp3sFiles) {
-			if (fileItem.isDirectory())
-				this.getMp3Files(listFiles, listDirectory + fileItem.getName());
-			else
-				if (fileItem.getName().endsWith(".mp3"))
-					listFiles.add(fileItem);
-		}
-	}
+	 	File mp3sDirectory = new File(listDirectory);
+	 	File[] mp3sFiles = mp3sDirectory.listFiles();
+	 	 
+	 	for (File fileItem : mp3sFiles) {
+	 	 if (fileItem.isDirectory()) {
+	 	 Log.d("MP3_MANAGER", "RECURSION ON " + listDirectory + fileItem.getName());
+	 	 this.getMp3Files(listFiles, listDirectory + fileItem.getName());
+	 	 }
+	 	 else
+	 	 {
+	 		 if (fileItem.getName().endsWith(".mp3")) {
+	 			 Log.d("MP3_MANAGER", "ADDING " + fileItem.getName());
+	 			 listFiles.add(fileItem);
+	 		 }
+	 		 else 
+	 			 Log.d("MP3_MANAGER", "SKIPPED " + fileItem.getName());
+	 	 }
+	 }
+	 }
 	
 	public String getMp3sPath() {
 		return this.m_strMp3sPath;

@@ -394,7 +394,6 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		try {
-    			Log.d("amici", response);
     			//ottieni l'array degli amici
 				mUserFriendsApp = getFriendAppArray(response);
 				//richiedi i post per ognuno
@@ -431,7 +430,6 @@ public class FacebookManager {
     	@Override
     	public void onComplete(final String response, final Object state) {
     		try {
-    			Log.d("response", response);
     			//parsa la risposta
 				getInfoPost(response);
 				

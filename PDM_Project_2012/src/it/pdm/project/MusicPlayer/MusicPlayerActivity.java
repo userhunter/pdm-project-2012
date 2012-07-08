@@ -84,7 +84,8 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 		@Override
 		//Callback richiamata nel momento in cui il bind tra questa activity e il service � avvenuto con successo.
 	    public void onServiceConnected(ComponentName className, IBinder service) {
-	        LocalBinder binder = (LocalBinder) service;
+			
+			LocalBinder binder = (LocalBinder) service;
 	        //Valorizzo m_mpService con il servizio a cui l'activity di � appena linkata in modo da poter richiamare metodi pubblici
 	        m_mpService = binder.getService();
 	        

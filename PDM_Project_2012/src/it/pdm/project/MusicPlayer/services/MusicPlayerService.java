@@ -24,7 +24,7 @@ public class MusicPlayerService extends Service {
 
 	//Oggetto di tipo IBinder che verr� restituito nel momento in cui il binding tra activity e servizio sar� completato
 	private final IBinder m_binderCurrent = new LocalBinder();
-	private final MP3Player m_mpMP3Player = new MP3Player();
+	private  MP3Player m_mpMP3Player;
 	
 	@Override
 	//Funzione richiamata nel momento in cui il bind � avvenuto con successo e sar� responsabile della callback onServiceConnected() dell'activity
@@ -35,11 +35,21 @@ public class MusicPlayerService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		m_mpMP3Player = new MP3Player();
 		
 		//Registro il servizio abilitandolo alla ricezione di Broadcast da parte di SearchActivity
 		registerReceiver(broadcastReceiver, new IntentFilter("it.pdm.project.MusicPlayer.playerevents"));
 
 	}
+	
+	@Override
+	  public int onStartCommand(Intent intent, int flags, int startId) {
+	  Log.i("LocalService", "Received start id " + startId + ": " + intent);
+	  // We want this service to continue running until it is explicitly
+	  // stopped, so return sticky.
+	  this.m_mpMP3Player = new MP3Player();
+	  return START_STICKY;
+	  }
 	
 	@Override
 	public void onDestroy() {
