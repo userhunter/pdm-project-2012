@@ -107,6 +107,12 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		}
 	};
 	
+	@Override
+	public void onBackPressed() {
+	    //do nothing
+		//Disabilitiamo il pulsante back (lasciamo attivo solo l'home button)
+	}
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);

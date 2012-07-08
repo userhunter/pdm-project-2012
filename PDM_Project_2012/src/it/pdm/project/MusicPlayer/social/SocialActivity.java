@@ -103,6 +103,12 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		super.onActivityResult(requestCode, resultCode, data);
 		this.m_fbManager.getFacebook().authorizeCallback(requestCode, resultCode, data);
 	}
+	
+	@Override
+	public void onBackPressed() {
+	    //do nothing
+		//Disabilitiamo il pulsante back (lasciamo attivo solo l'home button)
+	}
 			
     @Override
     public void onCreate(Bundle savedInstanceState) {
