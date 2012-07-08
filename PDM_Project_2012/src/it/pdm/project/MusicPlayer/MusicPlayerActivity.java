@@ -45,7 +45,13 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	public MusicPlayerDAO m_daoDatabase;
 	//Booleana che indica se la barra del tempo è stata toccata o meno
 	public static boolean m_bProgressBarTouching = false;
-	  
+	
+	@Override
+	public void onBackPressed() {
+	    //do nothing
+		//Disabilitiamo il pulsante back (lasciamo attivo solo l'home button)
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -230,8 +236,9 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 						if(artCover != null) {
 							originalCover = BitmapFactory.decodeByteArray(artCover.getBinaryData(), 0, artCover.getBinaryData().length);
 						}
-						else {
-							/* imposto la cover di default se non presente */
+						
+						if(originalCover == null){
+							/* imposto la cover di default se non presente o se qualcosa è andato storto */
 							originalCover = BitmapFactory.decodeResource(getResources(), R.drawable.sample_cover);
 						}
 						

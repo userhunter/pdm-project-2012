@@ -26,6 +26,11 @@ public class TabController extends TabActivity {
 	private ActionBar m_abActionBar;
 	private Dialog m_dlgCredits;
 	
+	@Override
+	public void onBackPressed() {
+	    //do nothing
+		//Disabilitiamo il pulsante back (lasciamo attivo solo l'home button)
+	}
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {

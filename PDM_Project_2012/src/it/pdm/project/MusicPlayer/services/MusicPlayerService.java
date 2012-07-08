@@ -107,8 +107,10 @@ public class MusicPlayerService extends Service {
 	}
 	
 	public void playNextSong(){
-		this.m_mpMP3Player.playNextSong();
-		this.playSong();
+		if(this.m_mpMP3Player.getPlaylistCursor() != this.m_mpMP3Player.getCurrentPlaylist().size()-1){
+			this.m_mpMP3Player.playNextSong();
+			this.playSong();
+		}
 	}
 	
 	public void playPreviousSong(){
