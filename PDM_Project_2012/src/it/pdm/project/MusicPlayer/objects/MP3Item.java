@@ -26,9 +26,11 @@ public class MP3Item {
 	public static String BITRATE = "BITRATE";
 	public static String LENGTH = "LENGTH";
 	
-	/*
-	 * Costruttore dell'oggetto MP3Item
-	 * tramite libreria jaudiotagger, parsa i campi ID3 del relativo mp3
+
+	/**
+	 * Costruttore di MP3Item, tramite libreria jaudiotagger, parsa i campi ID3 del relativo mp3
+	 * @param strPath Path del file mp3
+	 * @param strFileName Nome del file (con estensione)
 	 */
 	public MP3Item(String strPath, String strFileName) {
 		this.setPath(strPath);
@@ -57,6 +59,9 @@ public class MP3Item {
 
 	}
 	
+	/**
+	 * @return Path e filename in un'unica stringa
+	 */
 	public String getId(){
 		return m_strPath + m_strFileName;
 	}
@@ -77,14 +82,28 @@ public class MP3Item {
 		this.m_strFileName = m_strFileName;
 	}
 	
+	/**
+	 * Imposta un campo informazioni dell'oggetto MP3Item
+	 * @param strFieldName Nome del campo
+	 * @param strValue Valore del campo
+	 */
 	public void setLocalID3Field(String strFieldName, String strValue){
 		m_htID3Fields.put(strFieldName, strValue);
 	}
 	
+	/**
+	 * Preleva un campo informazioni dall'oggetto MP3Item
+	 * @param strFieldName Nome del campo
+	 * @return Valore del campo selezionato
+	 */
 	public String getLocalID3Field(String strFieldName){
 		return m_htID3Fields.get(strFieldName);
 	}
 	
+	/**
+	 * Preleva la copertina dal file mp3
+	 * @return null se nessuna cover è presente, altrimenti un oggetto di tipo Artwork
+	 */
 	public Artwork getCover(){
 		/* restituisce null se nessuna cover è presente */
 		File tempFile = new File(getPath()+getFileName());
