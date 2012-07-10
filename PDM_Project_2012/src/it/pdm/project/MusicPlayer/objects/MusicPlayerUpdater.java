@@ -10,6 +10,12 @@ public class MusicPlayerUpdater implements Runnable {
 	private String m_strMusicPath;
 	private Hashtable<String, MP3Item> m_htMp3Items;
 	
+	/**
+	 * Si occupa di aggiornare il database dei brani nel caso in cui siano stati aggiunti o rimossi dei brani 
+	 * @param context Contesto d'esecuzione
+	 * @param strMusicPath Path dove risiedono gli mp3
+	 * @param htMp3Items Hashtable contenente tutti gli MP3Item
+	 */
 	public MusicPlayerUpdater(Context context, String strMusicPath, Hashtable<String, MP3Item> htMp3Items) {
 		this.m_daoDatabase = new MusicPlayerDAO(context);	//Database utilizzato per le operazione di aggiornamento
 		this.m_strMusicPath = strMusicPath;					//Path dove risiedono tutti gli mp3
@@ -27,7 +33,7 @@ public class MusicPlayerUpdater implements Runnable {
 		//Numero di brani presenti nel db
 		int nTracksCount = this.m_daoDatabase.getAllTracks().getCount();
 			
-		//Se non � DbUpdatedAt ha come valore null (non � stato mai popolato) oppure, se la directory che contiene la musica � stata modificata recentemente, allora aggiorno. 
+		//Se DbUpdatedAt ha come valore null (non è stato mai popolato) oppure, se la directory che contiene la musica è stata modificata recentemente, allora aggiorno. 
 		if (this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt") == null || nTracksCount == 0 || lLastModified > Long.parseLong(this.m_daoDatabase.getUtilitiesValues("DbUpdatedAt")))
 		{
 			this.m_daoDatabase.insertUtilityValue("DbIsUpdating", "true");

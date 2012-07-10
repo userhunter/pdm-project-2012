@@ -14,7 +14,10 @@ public class MP3Manager {
 		this.m_strMp3sPath = strPath;
 	}
 	
-	//Mappo dentro la hashtable, ogni singolo mp3.
+	/**
+	 * Mappa dentro un hashtable di String e MP3Item, ogni singolo mp3 nella cartella
+	 * @return L'Hashtable di String e MP3Item appena creato
+	 */
 	public Hashtable<String, MP3Item> getMp3sTable() {
 		Hashtable<String, MP3Item> htMp3Table = new Hashtable<String, MP3Item>();
 		List<File> listFiles = new ArrayList<File>();
@@ -32,9 +35,9 @@ public class MP3Manager {
 	}
 	
 	/**
-	 * Prelievo ricorsivo di tutti gli mp3 presenti nella sdcard.
-	 * @param listFiles
-	 * @param listDirectory
+	 * Prelievo ricorsivo di tutti gli mp3 presenti nella sdcard
+	 * @param listFiles List di File in cui salvare i file trovati
+	 * @param listDirectory Directory in cui cercare i file
 	 */
 	private void getMp3Files(List<File> listFiles, String listDirectory) {
 	 	File mp3sDirectory = new File(listDirectory);
@@ -57,6 +60,9 @@ public class MP3Manager {
 	 }
 	 }
 	
+	/**
+	 * @return Directory dove vengono letti i file
+	 */
 	public String getMp3sPath() {
 		return this.m_strMp3sPath;
 	}
