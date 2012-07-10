@@ -58,6 +58,10 @@ public class MusicPlayerService extends Service {
 	}
 	
 	public class LocalBinder extends Binder {
+		/**
+		 * Utilizzato dalle activity per ottenere il controllo sul servizio stesso.
+		 * @return L'oggetto MusicPlayerService all'oggetto che ha richiesto il bind.
+		 */
 		public MusicPlayerService getService() {
 			//Ritorna il service in modo da poterne utilizzare i metodi pubblici
 			return MusicPlayerService.this;
@@ -91,8 +95,10 @@ public class MusicPlayerService extends Service {
 			}
 		}
 	};
-
-	/** PLAYER METHODS **/
+	
+	/**
+	 * Avvia la riproduzione della canzone ed invia una notifica, ad azione avvenuta, tramite messaggio in broadcast.
+	 */
 	public void playSong() {
 		//Disabilito lo streaming, se attivo
 		disableStreaming();
@@ -116,6 +122,9 @@ public class MusicPlayerService extends Service {
 		}
 	}
 	
+	/**
+	 * Riproduce la canzone successiva.
+	 */
 	public void playNextSong(){
 		if(this.m_mpMP3Player.getPlaylistCursor() != this.m_mpMP3Player.getCurrentPlaylist().size()-1){
 			this.m_mpMP3Player.playNextSong();
@@ -123,32 +132,57 @@ public class MusicPlayerService extends Service {
 		}
 	}
 	
+	/**
+	 * Riproduce la canzone precedente.
+	 */
 	public void playPreviousSong(){
 		this.m_mpMP3Player.playPreviousSong();
 		this.playSong();
 	}
 	
+	/**
+	 * Restituisce l'avanzamento del brano.
+	 * @return Intero rappresentante l'avanzamento del brano.
+	 */
 	public int getCurrentPlayingPosition() {
 		return this.m_mpMP3Player.getCurrentPosition();
 	}
 	
+	/**
+	 * Restituisce la durata totale del brano in riproduzione.
+	 * @return durata totale del brano in riproduzione.
+	 */
 	public int getCurrentPlayingTotalDuration() {
 		return Integer.parseInt(this.m_mpMP3Player.getCurrentPlaying().getLocalID3Field(MP3Item.LENGTH))*1000;
 	}
 	
+	/**
+	 * Imposta l'attuale posizione di riproduzione. Richiamata nel momento in cui l'utente interagisce con la progress bar di riproduzione.
+	 * @param pos Posizione desiderata sotto forma di intero.
+	 */
 	public void setCurrentPlayingPosition(int pos){
-		//Sposta la riproduzione a pos msec
 		this.m_mpMP3Player.seekTo(pos);
 	}
 	
+	/**
+	 * Restituisce l'oggetto attualmente in riproduzione.
+	 * @return MP3Item attualmente in riproduzione. 
+	 */
 	public MP3Item getCurrentPlayingItem() {
 		return this.m_mpMP3Player.getCurrentPlaying();
 	}
 	
+	/**
+	 * Restituisce il path dell'MP3 in riproduzione.
+	 * @return Path dell'MP3 come oggetto String.
+	 */
 	public String getMp3sPath() {
 		return this.m_mpMP3Player.getMp3sPath();
 	}
 	
+	/**
+	 * Mette in pausa la riproduzione.
+	 */
 	public void pausePlaying() {
 		//Se il riproduttore sta riproducendo, metto in pausa
 		if (this.m_mpMP3Player.isPlaying()) {
@@ -156,11 +190,19 @@ public class MusicPlayerService extends Service {
 		}
 	}
 	
-	//Metodo per ottenere l'oggetto di tipo MP3Item a partire dall'id (path+filename)
+	/**
+	 * Restituisce l'oggetto MP3Item in base ai valori passati.
+	 * @param strKey Path dell'mp3 + Filename dell'mp3.
+	 * @return MP3Item corrispondende alla chiave strKey
+	 */
 	public MP3Item getItemFromFileName(String strKey) {
 		return this.m_mpMP3Player.getMp3ElementById(strKey);
 	}
 	
+	/**
+	 * Restituisce tutti gli MP3Items
+	 * @return Restituisce tutti gli MP3Items
+	 */
 	public Hashtable<String, MP3Item> getAllMp3s() {
 		return this.m_mpMP3Player.getAllMp3s();
 	}
@@ -185,6 +227,11 @@ public class MusicPlayerService extends Service {
 		return this.m_mpMP3Player.getStreamingStatus();
 	}
 	
+	/**
+	 * Avvia la riproduzione dello stream e ne notifica il suo avvio tramite messaggio in broadcast.
+	 * @param strName Nome dello streaming.
+	 * @param strUrl URL relativo allo streaming.
+	 */
 	public void playStream(String strName, String strUrl){
 		try
 		{
