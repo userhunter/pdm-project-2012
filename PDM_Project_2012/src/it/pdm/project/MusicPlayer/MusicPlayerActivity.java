@@ -376,7 +376,12 @@ public class MusicPlayerActivity extends Activity implements OnClickListener {
 	}
 	
 	
-	//Crea un Bitmap con il riflesso
+	/**
+	 * Crea un bitmap con riflesso nella parte sottostante, da utilizzare nella visualizzazione della copertina
+	 * @param context Contesto d'esecuzione
+	 * @param originalImage Bitmap dell'immagine originale
+	 * @return Bitmap creato con il riflesso
+	 */
 	public static Bitmap createReflectedImage(Context context, Bitmap originalImage) {
 		//The gap we want between the reflection and the original image
 		final int reflectionGap = 5;

@@ -87,12 +87,17 @@ public class TabController extends TabActivity {
         return true;
     }
     
-    /**Funzione che permette di cambiare tad**/
+    /**
+     * Permette di cambiare la tab visualizzata
+     * @param tab Indice della tab da visualizzare
+     */
 	public void switchTab(int tab) {
     	this.m_thController.setCurrentTab(tab);
     }
     
-	/**Funzione che visualizza i credits dell'app**/
+	/**
+	 * Visualizza il dialog con i credits
+	 */
     private void showDialogInfo() {
     	m_dlgCredits = new Dialog(this);
     	m_dlgCredits.requestWindowFeature(Window.FEATURE_NO_TITLE);
