@@ -34,7 +34,9 @@ import android.widget.LinearLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
-/**Activity Libreria per la ricerca di brani in locale senza filtro, per artista o per album. Inoltre gestisce l'inserimento e la cancellazione di webradio**/
+/**
+ * Activity che gestisce la libreria musicale dell'utente.
+ */
 
 public class MusicBrowserActivity extends ExpandableListActivity implements OnClickListener, OnKeyListener {
 	/**
@@ -138,7 +140,7 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
     
     /**
-	 *Inizializzazione delle variabili
+	 * Inizializza le variabili membro.
 	 * **/
     private void initMemberVars() {
     	this.m_expListView = this.getExpandableListView();
@@ -191,8 +193,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	}
     
 	/**
-	 *Funzione che raggruppa gli elementi in base alla visualizzazione
-	 * **/
+	 * Richiede i dati dal database e ricostruisce la lista visualizzata all'utente in base al filtro passato. 
+	 * @param strFilter Filtro identificante la "sezione" visualizzata.
+	 */
     private void applyFilter(String strFilter) {
     	this.m_daoDatabase.open();
     	
@@ -216,8 +219,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
     
     /**
-	 *Funzione che ottiene una lista di elementi in base al filtro
-	 * **/
+     * Richiama le procedure per popolare la lista in base al filtro.
+     * @param strFilter Filtro identificante la sezione visualizzata.
+     */
     private void createListFromFilter(String strFilter) {
     	if (strFilter.equals("all_tracks"))
     		this.allTracksCase();
@@ -230,8 +234,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
     
     /**
-	 *Funzione che visualizza tutte le webradio e permette di inserirne delle nuove
-	 * **/
+     * Costruisce la lista popolandola con le webradio presenti sul database.
+     */
     private void radiosCase() {
     	this.registerForContextMenu(m_expListView);
     	
@@ -266,8 +270,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
 	
     /**
-	 *Funzione che ritorna le canzoni per artista o per album
-	 * **/
+     * Costruisce la lista popolandola con gli mp3 memorizzati nel database. La visualizzazione varia in base al filtro applicato (album o artisti).
+     * @param strKey Filtro identificante la sezione visualizzata.
+     */
 	private void artistsOrAlbumCase(String strKey) {
 		this.unregisterForContextMenu(m_expListView);
 		
@@ -320,8 +325,8 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	}
 	
 	/**
-	 *Funzione che ritorna tutte le tracce
-	 * **/
+	 * Popola la lista senza applicare alcun filtro.
+	 */
 	private void allTracksCase() {
 		this.unregisterForContextMenu(m_expListView);
 		
@@ -356,7 +361,13 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 		this.m_alChildElements.add(alAllTracksChilds);
 	}
 	
-    /* This function is called on each child click */
+	/**
+	 * Richiamata nel momento in cui viene intercettato un evento touch su di un sottoelemento della lista.
+	 * @param parent Lista espandibile sulla quale è stato intercettato l'evento.
+	 * @param groupPosition Posizione dell'elemento "padre" che contiene l'elemento cliccato.
+	 * @param childPosition Posizione dell'elemento cliccato.
+	 * @param id Id dell'elemento cliccato.
+	 */
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 		String[] playlistContent = this.getPlaylistFromClick(groupPosition, childPosition);
 		
@@ -425,8 +436,11 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
     
     /**
-	 *Funzione che in base alla canzone cliccata ne crea la playlist costituita dai brani successivi alla canzone cliccata
-	 * **/
+     * Restituisce la playlist in base all'elemento cliccato.
+     * @param group Posizione del "padre" contenente l'elemento cliccato.
+     * @param clickedChild Posizione dell'elemento cliccato.
+     * @return Array di stringhe contenenti gli id degli MP3 costituenti la nuova playlist.
+     */
     private String[] getPlaylistFromClick(int group, int clickedChild) {
     	ArrayList<HashMap<String, String>> clickedGroupChilds = this.m_alChildElements.get(group);
     	ArrayList<String> alResultList = new ArrayList<String>();
@@ -439,8 +453,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
     }
     
     /**
-   	 *Funzione che permette lo switch del tab
-   	 * **/
+     * Cambio di tab posta in primo piano.
+     * @param indexTabToSwitch Numero identificativo della tab da porre in primo piano.
+     */
     public void switchTabInActivity(int indexTabToSwitch) {
 		TabController thController = (TabController) this.getParent();
 		
@@ -448,8 +463,9 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	}
 	
     /**
-   	 *Richiede il record sul db restituiendone il valore
-   	 * **/
+     * Utilizzato per verificare se il database è in aggiornamento o meno.
+     * @return true se il database è in aggiornamento, false al contrario.
+     */
 	private boolean checkIfIsUpdating() {
 		this.m_daoDatabase.open();
 		String strStatus = this.m_daoDatabase.getUtilitiesValues("DbIsUpdating");
@@ -459,7 +475,6 @@ public class MusicBrowserActivity extends ExpandableListActivity implements OnCl
 	}
 	
 	/** OnLongClick METHODS, utilizzato per cancellare una web radio se avviene su di essa **/
-	
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		final ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
