@@ -1,5 +1,7 @@
 package it.pdm.project.MusicPlayer.social;
-/**Adapter per la popolazione delle righe dei post nella tab Social**/
+/**
+ * Adapter per la popolazione delle righe dei post nella tab Social
+ */
 import it.pdm.project.MusicPlayer.R;
 import it.pdm.project.MusicPlayer.social.ImageThreadLoader.ImageLoadedListener;
 import it.pdm.project.MusicPlayer.social.facebook.Post;
@@ -64,7 +66,9 @@ public class SocialItemAdapter extends ArrayAdapter<Post> {
 	    Post item = getItem(position);
 	    Bitmap cachedImage = null;
 	    
-	    //Controlla se ha già le immagini bufferizzate e se ci sono le carica
+	    /**
+	     * Controlla se ha giï¿½ le immagini bufferizzate e se ci sono le carica
+	     */
 	    try {
 	    	cachedImage = imageLoader.loadImage(item.getUserPosted().getPicture().replace("https://", "http://"), new ImageLoadedListener() {
 	    		public void imageLoaded(Bitmap imageBitmap) {
