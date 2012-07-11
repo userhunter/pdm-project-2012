@@ -1,3 +1,7 @@
+/**
+ * Classe che offre tutte le funzionalità per lo sviluppo della parte social
+ */
+
 package it.pdm.project.MusicPlayer.social.facebook;
 
 import java.io.IOException;
@@ -27,31 +31,51 @@ import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.Util;
 
 public class FacebookManager {
-	//Utente che ha effettuato il login
+	/**
+	 * Utente che ha effettuato il login
+	 */
 	private User m_userMe;
 	
-	//Variabile che identifica l'app
+	/**
+	 * Variabile che identifica l'app
+	 */
 	public static String APP_ID = "237120273069387";
 	
-	//Autorizzazioni necessarie per accedere alle informazioni dell'utente loggato
+	/**
+	 * Autorizzazioni necessarie per accedere alle informazioni dell'utente loggato
+	 */
 	public static String[] PERMISSION= { "offline_access", "publish_stream", "user_photos", "publish_checkins", "photo_upload", "read_stream", "read_insights" };
 	
-	//Variabile che fornisce i metodi per interagire con fb
+	/**
+	 * Variabile che fornisce i metodi per interagire con fb
+	 */
 	private Facebook mFacebook;
     
-    //Necessaria per effettuare interrogazioni asincrone senza interropere il thread chiamante 
+    /**
+     * Necessaria per effettuare interrogazioni asincrone senza interropere il thread chiamante 
+     */
     private AsyncFacebookRunner mAsyncRunner;
     
-    //Necessaria per avere l'activity del social networking
+    /**
+     * Necessaria per avere l'activity del social networking
+     */
 	private Activity mActivityChiamante;
 	
-	//Necessario renderla globale a causa delle risposte che vengono gestite nei listener
+	/**
+	 * Necessario renderla globale a causa delle risposte che vengono gestite nei listener
+	 */
 	private Hashtable<Long, Post> mPostFriendApp;
 	
-	//ArrayList contenenti gli id degli utenti che usano l'applicazione
+	/**
+	 * ArrayList contenenti gli id degli utenti che usano l'applicazione
+	 */
 	private ArrayList<User> mUserFriendsApp;
 
-    //Costruttore senza parametri
+    /**
+     * Costruttore che richiede solo una activity come paramentro
+     * 
+     * @param mActivityChimante Activity che richiede le funzionalità social
+     */
     public FacebookManager(Activity mActivityChimante){
     	this.m_userMe = null;
     	this.mFacebook = new Facebook(APP_ID);
@@ -61,7 +85,10 @@ public class FacebookManager {
     	this.mPostFriendApp = new Hashtable<Long, Post>();
     }
     
-    //Costruttore con parametri
+    /**
+     * Costruttore che richiede una variabile di tipo facebook
+     * @param facebook Variabile di tipo facebook che esegue per l'esecuzione delle richieste
+     */
     public FacebookManager(Facebook facebook){
     	this.m_userMe = new User();
     	this.mFacebook = facebook;
@@ -72,7 +99,12 @@ public class FacebookManager {
     
     /**Utility**/
  
-    //Funzione che permette l'interrogazione delle info dell'utente data la query e il listener
+    /**
+     * Funzione che permette l'interrogazione delle info dell'utente data la query e il listener
+     * @param query Query che si vuole eseguire
+     * @param listener Listener per l'interfaccia di callback richiamata alla fine dell'esecuzione 
+     * 				   della query	
+     */
     public void FQLQuery(String query, BaseRequestListener listener){
     	Bundle params = new Bundle();
 		params.putString("method", "fql.query");
@@ -80,12 +112,21 @@ public class FacebookManager {
 		mAsyncRunner.request(params, listener);
     }
     
-    //Funzione che esegue una multiquery
+    /**
+     * Funzione che esegue una multiquery
+     * @param params Bundle che contiene le query da eseguire
+     * @param listener Listener richiamato alla fine dell'esecuzione della multiquery
+     */
     public void FQLMultiQuery(Bundle params, BaseRequestListener listener) {
     	mAsyncRunner.request(params, listener);
     }
    
-    //Funzione che restituisce la lista di amici che usano l'app (Da usare per parsare le risposte ottenute nel listener)
+    /**
+     * Funzione che restituisce la lista di amici che usano l'app (Da usare per parsare le risposte ottenute nel listener)
+     * @param response Risposta alla query ottenuta nel listener
+     * @return ArrayList di utenti che usano l'app e sono amici dell'utente loggato
+     * @throws JSONException Si verifica nel caso in cui non si riesca a convertire la risposta in JSON
+     */
     public ArrayList<User> getFriendAppArray(String response) throws JSONException{
     	ArrayList<User> friendList = new ArrayList<User>();
     	String id = "";
@@ -108,7 +149,10 @@ public class FacebookManager {
     	return friendList;
     }
     
-    //Funzione che restituisce l'utente corrente
+    /**
+     * Funzione che restituisce l'utente corrente
+     * @return Utente
+     */
     public User getCurrentUser() {
     	if (this.m_userMe == null)
     		this.getUserInfo();
@@ -116,7 +160,12 @@ public class FacebookManager {
     	return this.m_userMe;
     }
     
-    //Funzione che restituisce le info del'utente loggato (Da usare per parsare le risposte ottenute nel listener)
+    /**
+     * Funzione che restituisce le info del'utente loggato (Da usare per parsare le risposte ottenute nel listener)
+     * @param response Risposta alla query ottenuta nel listener
+     * @return Variabile di tipo user che contiene l'utente loggato
+     * @throws JSONException Si verifica nel caso in cui non si riesca a convertire la risposta in JSON
+     */
     public User getMyInfo(final String response) throws JSONException{
     	String id = "";
     	String name = "";
@@ -130,6 +179,13 @@ public class FacebookManager {
     	return new User(id, name, picture);
     }
 
+    /**
+     * Funzione che parsa la risposta ottenuta ad una richiesta di post degli utenti amici dell'utente 
+     * loggato
+     * Usata per popolare l'hashtable
+     * @param response Risposta alla query ottenuta nel listener
+     * @throws JSONException Si verifica nel caso in cui non si riesca a convertire la risposta in JSON
+     */
     @SuppressWarnings("rawtypes")
 	public void getInfoPost(String response) throws JSONException{
     	Format formatter = new SimpleDateFormat("dd/MM HH:mm");
@@ -147,7 +203,9 @@ public class FacebookManager {
     	JSONObject json = Util.parseJson(response);
     	JSONArray jArrayD = json.getJSONArray("data");
     	
-    	//Ottiene le informazioni dalla risposta
+    	/**
+    	 * Ottiene le informazioni dalla risposta
+    	 */
 		for(int k=0; k<jArrayD.length(); k++){
 	    	JSONArray jArray = jArrayD.getJSONObject(k).getJSONArray("fql_result_set");
     	
@@ -188,7 +246,9 @@ public class FacebookManager {
     		}
 		}
 		
-		//Associa ad ogni post le informazioni dell'utente che l'ha pubblicato
+		/**
+		 * Associa ad ogni post le informazioni dell'utente che l'ha pubblicato
+		 */
     	if (this.mPostFriendApp.size()>0){
     		if(mUserFriendsApp.size()!=0){
     			Long str;
@@ -211,50 +271,82 @@ public class FacebookManager {
     
     /**Function**/
     
-    //Funzione che effettua il login con le autorizzazioni per la nostra app
+    /**
+     * Funzione che effettua il login con le autorizzazioni per la nostra app, al suo completamento
+     * richiama LoginRequestListener
+     */
     public void login(){
     	mFacebook.authorize(mActivityChiamante, PERMISSION, new LoginRequestListener());
     }
     
-    //Funzione che effettua il login con le autorizzazioni di default dell'utente
+    /**
+     * Funzione che effettua il login con le autorizzazioni di default dell'utente
+     * Al suo completamento viene richiamato il LoginRequestListener
+     * @param activity Activity che richiede il login
+     */
     public void login(Activity activity){
     	 mFacebook.authorize(activity, new LoginRequestListener());
     }
     
-    //Funzione che effettua il login con le autorizzazioni specifiche
+    /**
+     * Funzione che effettua il login con le autorizzazioni specifiche
+     * @param activity Activity che richiede il login
+     * @param permission Elenco dei permessi necessari
+     */
     public void login(Activity activity, String[] permission){
     	 mFacebook.authorize(activity, permission, new LoginRequestListener());
     }
     
-    //Funzione che effettua il logout dell'utente con listener generico
+    /**
+     * Funzione che effettua il logout dell'utente con listener generico
+     * @param context Context nel quale è stato richiesto il login della sessione
+     * @param listener Interfaccia di callback richiamata a fine richiesta
+     */
     public void logout(Context context, BaseRequestListener listener){
     	mAsyncRunner.logout(context ,listener);
     }
     
-    //Funzione che effettua il logout dell'utente con listener della classe
+    /**
+     * Funzione che effettua il logout dell'utente con listener della classe
+     * @param context Context nel quale è stato richiesto il login della sessione
+     */
     public void logout(Context context){
     	mAsyncRunner.logout(context ,new LogoutRequestListener());
     }
     
-    //Funzione che restituisce tutti gli amici che utilizzano l'app compreso l'utente loggato
+    /**
+     * Funzione che restituisce tutti gli amici che utilizzano l'app compreso l'utente loggato
+     * @return Stringa contenente la query
+     */
     public String getAllFriendsIds() {
     	return "SELECT uid, name, pic_square FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user";
     }
     
-    //Interrogazione FQL che richiede le info dell'utente loggato
+    /**
+     * Interrogazione FQL che richiede le info dell'utente loggato
+     * Al suo completamento viene richiamato CurrentUserRequestListener
+     */
     public void getUserInfo(){
     	String query = "SELECT uid, name, pic_square FROM user WHERE uid = me()";
     	this.FQLQuery(query, new CurrentUserRequestListener());
     }
     
-    //Funzione che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazione e l'immagine di default
+    /**
+     * Funzione che posta sul profilo dell'utente loggato la canzone che sta ascoltando con le sue informazione e l'immagine di default
+     * @param activity Activity a cui è stato affidato il compito di postare il messaggio sulla bacheca
+     * @param song Titolo della canzone
+     * @param album Nome dell'album 
+     * @param singer Nome del cantante
+     */
     public void postOnWall(Activity activity, String song, String album, String singer) {
     	PostCreator postCreator = new PostCreator(this.mActivityChiamante, this, song, album, singer);
     	Thread child = new Thread(postCreator);
     	child.start();
     }
     
-    //Funzione che popola l'hashtable degli amici
+    /**
+     * Funzione che popola l'hashtable degli amici
+     */
     public void populateHashTable() {
     	if (this.mUserFriendsApp.size() == 0)
     		this.FQLQuery(getAllFriendsIds(), new GetUsersListener());
@@ -262,13 +354,17 @@ public class FacebookManager {
     		this.getFriendsPostsSorted();
     }
     
-    //Funzione che richiede i post per ogni amico che usa l'app e per l'utente stesso
+    /**
+     * Funzione che richiede i post per ogni amico che usa l'app e per l'utente stesso
+     */
     public void getFriendsPostsSorted() {
     	try {
 	    	Bundle params = new Bundle();
 	    	JSONObject jsonFQL = new JSONObject();
 	    	
-	    	//Per ogni id fai la richiesta delle info sui post
+	    	/**
+	    	 * Per ogni id fai la richiesta delle info sui post
+	    	 */
 	    	for (User user : this.mUserFriendsApp)
 	    		jsonFQL.put(user.getId(), "SELECT actor_id, post_id, attachment.name, attachment.description, attachment.caption, created_time, message, likes.count FROM stream WHERE source_id = " + user.getId() + " AND app_id = 237120273069387 LIMIT 200");
 	    	
@@ -285,17 +381,26 @@ public class FacebookManager {
     	}
     }
     
-    //Funzione che restituisce vero se l'utente corrente � loggato altrimenti falso
+    /**
+     * Funzione che restituisce vero se l'utente corrente è loggato altrimenti falso
+     * @return Booleano che indica se esiste una sessione valida(esiste un utente loggato)
+     */
     public boolean isLogged(){
     	return mFacebook.isSessionValid();
     }
     
-    //Funzione che restituisce l'hashtable dei post 
+    /**
+     * Funzione che restituisce l'hashtable dei post 
+     * @return Hashtable con i post
+     */
     public Hashtable<Long, Post> getHashTablePostApp(){ 
     	return this.mPostFriendApp;
     }
     
-    //Funzione che ordina cronologicamente i post
+    /**
+     * Funzione che ordina cronologicamente i post in base alla data di creazione
+     * @return Hashtable dei post ordinata
+     */
     public Hashtable<Long, Post> sortValue(){
     	ArrayList<Long> keys = new ArrayList<Long>(this.mPostFriendApp.keySet());
         Collections.sort(keys);
@@ -308,7 +413,7 @@ public class FacebookManager {
         return newHtable;
      }
     
-    //Funzione che restituisce l'hashtable dei post 
+    
     public Facebook getFacebook(){
     	return this.mFacebook;
     }
@@ -321,7 +426,11 @@ public class FacebookManager {
     /**
      * Listener per le richieste
      **/
-    //Listener richiamato alla conclusione della richiesta delle informazioni sull'utente corrente
+    /**
+     * Listener richiamato alla conclusione della richiesta delle informazioni sull'utente corrente
+     * @author ChronicDev
+     *
+     */
     private class CurrentUserRequestListener extends BaseRequestListener {
 		@Override
 		public void onComplete(String response, Object state) {
@@ -361,7 +470,11 @@ public class FacebookManager {
 	    }
     }
     
-    //Listener invocato alla conclusione della richiesta di logout
+    /**
+     * Listener invocato alla conclusione della richiesta di logout
+     * @author ChronicDev
+     *
+     */
     private class LogoutRequestListener extends BaseRequestListener {
         @Override
         public void onComplete(String response, final Object state) {
@@ -389,7 +502,11 @@ public class FacebookManager {
 	    }
     }
     
-    //Listener invocato alla conclusione della richiesta per le info di un utente dato l'id
+    /**
+     * Listener invocato alla conclusione della richiesta per le info di un utente dato l'id
+     * @author ChronicDev
+     *
+     */
     private class GetUsersListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {
@@ -425,7 +542,11 @@ public class FacebookManager {
     		
     }
     
-    //Listener invocato alla conclusione della richiesta per le generiche info di un post(Messaggio e id dell'utente, id del post, data di creazione del post)
+    /**
+     * Listener invocato alla conclusione della richiesta per le generiche info di un post(Messaggio e id dell'utente, id del post, data di creazione del post)
+     * @author ChronicDev
+     *
+     */
     private class GetGenericInfoPostRequestListener extends BaseRequestListener {
     	@Override
     	public void onComplete(final String response, final Object state) {
@@ -463,7 +584,11 @@ public class FacebookManager {
 	    }
     }
     
-    //Listener invocato alla fine dell'invio della richiesta di login
+    /**
+     * Listener invocato alla fine dell'invio della richiesta di login
+     * @author ChronicDev
+     *
+     */
     private class LoginRequestListener implements DialogListener {
 		@Override
 		public void onComplete(Bundle values) {

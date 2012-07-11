@@ -1,6 +1,8 @@
 package it.pdm.project.MusicPlayer.social.facebook;
 
-/**Classe che crea il post da pubblicare con i link a iTunes o YouTube**/
+/**
+ * Classe che crea il post da pubblicare con i link a iTunes o YouTube
+ **/
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +26,27 @@ import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
 
 public class PostCreator implements Runnable {
+	/**
+	 * Activity chiamante
+	 */
 	private Activity m_aCaller;
+	/**
+	 * Informazioni canzone
+	 */
 	private String m_strAlbum, m_strArtist, m_strTitle;
+	/**
+	 * FacebookManager per la richiesta di post 
+	 */
 	private FacebookManager m_fbManager;
 	
+	/**
+	 * Costruttore
+	 * @param callerActivity Activity chiamante
+	 * @param fbManager FacebookManager per la richiesta di post 
+	 * @param strTitle Titolo canzone
+	 * @param strAlbum Album
+	 * @param strArtist Cantante
+	 */
 	public PostCreator(Activity callerActivity, FacebookManager fbManager, String strTitle, String strAlbum, String strArtist) {
 		this.m_aCaller = callerActivity;
 		this.m_fbManager = fbManager;
@@ -36,11 +55,19 @@ public class PostCreator implements Runnable {
 		this.m_strTitle = strTitle;
 	}
 	
+	/**
+	 * Ottiene il link iTunes o YouTube della canzone oggetto del post
+	 * Pubblica il post con tali informazioni
+	 */
 	@Override
 	public void run() {
-		//Richiede i link alle informazioni sul brano
+		/**
+		 * Richiede i link alle informazioni sul brano
+		 */
 		String[] result = this.getLinkDetails();
-		//Prepara il post
+		/**
+		 * Prepara il post
+		 */
     	Bundle params = new Bundle();
         params.putString("caption", this.m_strArtist);
         params.putString("description", this.m_strAlbum);
@@ -49,18 +76,25 @@ public class PostCreator implements Runnable {
         params.putString("link", result[0]);
         
         Looper.prepare();
-        //Richiede la pubblicazione del post
+        /**
+         * Richiede la pubblicazione del post
+         */
         this.m_fbManager.getFacebook().dialog(this.m_aCaller, "feed", params, new PostDialogListener());
         Looper.loop();
 	}
 	
-	//Ottiene i link alle informazioni
+	/**
+	 * Ottiene i link alle informazioni
+	 * @return il link di iTunes o YouTube della canzone
+	 */
 	private String[] getLinkDetails() {
 		String[] resultInfo;
 		String searchQuery = "http://itunes.apple.com/search?term=" + this.m_strAlbum.replaceAll(" ", "+") + "&term=" + this.m_strArtist.replaceAll(" ", "+") + "&media=music&entity=album";
 		System.out.println("QUERY: " + searchQuery);
 		
-		//Per ottenere il link delle informazioni prima tenta di reperirle sul iTunes
+		/**
+		 * Per ottenere il link delle informazioni prima tenta di reperirle sul iTunes
+		 */
 		try {
 			InputStream is = new URL(searchQuery).openStream();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -106,13 +140,19 @@ public class PostCreator implements Runnable {
 	        m_fbManager.getActivity().sendBroadcast(intent);
 		}
 		
-		//Se non vi riesce le reindirizza su YouTube
+		/**
+		 * Se non vi riesce le reindirizza su YouTube
+		 */
 		resultInfo = new String[] { "http://www.youtube.com/results?search_query=" + this.m_strAlbum + "-" + this.m_strArtist, "http://4.bp.blogspot.com/-Z57TwcYK41U/T7-LXXc9GSI/AAAAAAAAGBc/sxV4gzPJ_cg/s1600/musica+android.jpg" };
 		
 		return resultInfo;
     }
 	
-    //Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
+    /**
+     * Listener invocato alla fine dell'invio della richiesta di post sulla bacheca
+     * @author ChronicDev
+     *
+     */
     private class PostDialogListener implements DialogListener {
 		@Override
 		public void onComplete(Bundle values) {
