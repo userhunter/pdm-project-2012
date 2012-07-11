@@ -45,24 +45,39 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	private User m_userMe;
 	@SuppressWarnings("unused")
 	private ListView m_listView;
-	//Adapter per la lista
+	/**
+	 * Adapter per la lista
+	 */
 	private SocialItemAdapter m_lstAdapter;
-	//Array dei post
+	/**
+	 * Array dei post
+	 */
 	private ArrayList<Post> m_strSource;
-	//Variabile per l'iterazione con Facebook
+	/**
+	 * Variabile per l'iterazione con Facebook
+	 */
 	private FacebookManager m_fbManager;
-	//Services
+	/**
+	 * Services
+	 */
 	private MusicPlayerService m_mpService;
 	
-	/**Variabili per gli oggetti grafici**/
+	/**
+	 * Variabili per gli oggetti grafici
+	 * */
 	private ImageButton m_btnLogout, m_btnRefresh, m_btnShare, m_btnLoginButton;
 	private TextView m_txtUsername;
 	private RelativeLayout m_lytLoginLayout;
 	private ImageView m_imgAvatar;
 	
-	//Variabile che bufferizza le immagini già caricate
+	/**
+	 * Variabile per immagazinare le immagini nella cache
+	 */
 	private ImageThreadLoader m_thImageLoader;
 	
+	/**
+	 * Intercetta i messaggi etichettati nella regestrazione del servizio (OnCreate)
+	 */
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 	    public void onReceive(Context context, Intent intent) {
@@ -97,7 +112,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 			}
 		}
 	};
-	
+	/**
+	 * Funzione che notifica se il token è stato ottenuto
+	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -140,7 +157,11 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         }
     }
     
-    //Funzione che controlla lo stato della rete
+    /**
+     * Funzione che controlla lo stato della rete
+     * @param c Context in cui devo verificare se la connessione è presente
+     * @return Boolen che indica se la connessione è presente(true) o assente (false)
+     */
     public boolean isOnline(Context c) {
     	ConnectivityManager cm = (ConnectivityManager) c
     	.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -152,6 +173,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
     	  return false;
     }
     
+    /**
+     * Variabile che informa se il bind è avvenuto con successo o meno
+     */
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
 		//Callback richiamata nel momento in cui il bind tra questa activity e il service è avvenuto con successo.
@@ -166,7 +190,11 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 	    public void onServiceDisconnected(ComponentName arg0) { }
 	};
 	
-	//Funzione che aggiorna le informazioni dell'utente corrente quali immagine e nome nell'action bar
+	/**
+	 * Funzione che aggiorna le informazioni dell'utente corrente quali immagine e nome nell'action bar
+	 * @param strAvatarURL URL dell'immagine profilo
+	 * @param strName Nome e Cognome dell'utente loggato
+	 */
 	public void updateAccountInfo(String strAvatarURL, String strName){
 		try {
 	    	m_thImageLoader.loadImage(strAvatarURL, new ImageLoadedListener() {
@@ -275,7 +303,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
         this.m_fbManager.getFacebook().setAccessExpires(lEXPIRES_TOKEN);
 	}
 	
-	//Aggiorna la lista dei post
+	/**
+	 * Richiede la lista dei post dell'utente loggato e dei suoi amici che usano l'applicazione
+	 */
 	private void refreshSocialItems() {
 		Hashtable<Long, Post> htCurrentPost = m_fbManager.getHashTablePostApp();
     	
@@ -291,7 +321,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		stopRefreshAnimation();
 	}
 	
-	//Visualizza l'animazione di refresh
+	/**
+	 * Visualizza l'animazione di refresh
+	 */
 	public void showRefreshAnimation(){
 		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
 		rotation.setRepeatCount(Animation.INFINITE);
@@ -299,7 +331,9 @@ public class SocialActivity extends ListActivity implements OnClickListener {
 		this.m_btnRefresh.startAnimation(rotation);
 	}
 	
-	//Interrompe l'animazione di refresh
+	/**
+	 * Interrompe l'animazione di refresh
+	 */
 	public void stopRefreshAnimation(){
 		Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_animation);
 		rotation.setRepeatCount(Animation.INFINITE);
