@@ -1,0 +1,1 @@
+Progetto per l'esame di Programmazione di Dispositivi Mobili basato su sistema operativo Android.
